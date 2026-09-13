@@ -778,6 +778,11 @@ namespace Toltech.App.Services
 
         #region Service Model
 
+        /// <summary>
+        /// Notification d'ouverture de model pour rafraichir l'UI par le EventManager
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
         private async Task NotifyModelOpen(string path)
         {
 
@@ -1029,6 +1034,8 @@ namespace Toltech.App.Services
                 // 4. enregistrement global
                 await _databaseService.InitializeModelAsync(modelId, nameModel, modelPath);
                 await MetaModelDatabaseService.ActiveInstance.RegisterModelAsync(modelId, modelPath, "");
+
+                await NotifyModelOpen(modelPath);
 
                 return Result<Guid>.Success(modelId);
 
@@ -1359,20 +1366,6 @@ namespace Toltech.App.Services
 
         #region Visualization 
 
-        public async Task<Result<List<ModelData>>> GetAllModelDataAsync()
-        {
-            try
-            {
-                var modelDataList = await _databaseService.GetAllModelDataAsync();
-                return Result<List<ModelData>>.Success(modelDataList);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("GetAllModelDataAsync failed", "", ex);
-                return Result<List<ModelData>>.Failure("Erreur lors du chargement des données du modèle.", ErrorCode.Unknown);
-            }
-        }
-
         public async Task<Result<List<ModelData>>> GetActivePartsModelDataAsync()
         {
             try
@@ -1382,6 +1375,7 @@ namespace Toltech.App.Services
 
             // Vérifie l'état actif de chaque pièce.
             var activePartIds = new List<int>();
+             Part? FixPart = await _databaseService.GetFixedPartAsync();
 
             foreach (var part in parts)
             {
@@ -1389,7 +1383,7 @@ namespace Toltech.App.Services
                 bool isActive = await _databaseService.GetIsActivePartAsync(part);
 
                 // Conserve uniquement les IDs des pièces actives.
-                if (isActive)
+                if (isActive & !part.IsFixed)
                 {
                     activePartIds.Add(part.Id);
                 }
@@ -1400,7 +1394,7 @@ namespace Toltech.App.Services
                 return Result<List<ModelData>>.Success(new List<ModelData>());  
 
             // Récupère les ModelData correspondant uniquement aux pièces actives.
-            var existingDatas = await _databaseService.GetModelDataByIdsAsync(activePartIds);
+            var existingDatas = await _databaseService.GetModelDataByPartIdsAsync(activePartIds);
 
             return Result<List<ModelData>>.Success(existingDatas);
             }

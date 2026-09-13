@@ -1,13 +1,10 @@
 ﻿using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using SQLite;
 using Toltech.App.Models;
 using Toltech.App.Services.Logging;
 using static Toltech.App.Models.NodesDefinition;
-using static Toltech.App.Services.EventsManager;
 
 // DatabaseService
 // Description : Ce fichier gère toutes les opérations CRUD (Créer, Lire, Mettre à jour, Supprimer) avec la base de données SQLite.
@@ -20,47 +17,47 @@ namespace Toltech.App.Services
     /// Centralise les opérations d’accès aux données et isole la logique de stockage
     /// du reste de l’application (Domain / UI).
     /// </summary>
-    public class DatabaseService 
+    public class DatabaseService
     {
         // Instance globale unique
+        private const string EmptyDatabaseFileName = "template_db.tolx";
+        private string EmptyDatabasePath => Path.Combine(ModelManager.TemporaryToltechPath, EmptyDatabaseFileName);
+
         private static string _modelPath = "template_db.tolx";
         private SQLiteAsyncConnection _asyncDb; // Connexion à la base de données SQLite
         private string _dbPath; // Chemin d'accès à la base de données
         public static DatabaseService ActiveInstance { get; private set; } = null!;
         private static ILoggerService _logger;
-        public DatabaseService(string dbPath)
+        public DatabaseService()
         {
-            if (string.IsNullOrEmpty(dbPath))
-            {
-                string tempPath = ModelManager.GetTolTechTempPath();
-                dbPath = System.IO.Path.Combine(tempPath, _modelPath);
-            }
-
-            _dbPath = dbPath;
             _logger = App.Logger;
 
-            ActiveInstance = this;
+            _dbPath = EmptyDatabasePath;
 
-            if (!string.IsNullOrEmpty(dbPath))
-                _asyncDb = new SQLiteAsyncConnection(_dbPath);
+            ActiveInstance = this;
+            _asyncDb = new SQLiteAsyncConnection(_dbPath);
+        }
+        public async Task InitializeEmptyDatabaseAsync()
+        {
+            await EnsureSchemaAsync(_asyncDb);
+        }
+        public async Task OpenEmptyDatabaseAsync()
+        {
+            await Open(EmptyDatabasePath);
         }
 
         /// <summary>
         /// Ouvre une instance Sqlite
         /// </summary>
-        public async Task Open(string modelPath="")
+        public async Task Open(string modelPath = "")
         {
-            if (string.IsNullOrEmpty(ModelManager.AppDataPath))
-                ModelManager.AppDataPath = ModelManager.AppDataPathDefault();
-
             Directory.CreateDirectory(ModelManager.AppDataPath);
 
             bool isTempPath = false;
             if (string.IsNullOrEmpty(modelPath))
             {
                 isTempPath = true;
-                string tempPath = ModelManager.GetTolTechTempPath();
-                modelPath = System.IO.Path.Combine(tempPath, _modelPath);
+                modelPath = EmptyDatabasePath;
             }
 
 
@@ -98,13 +95,15 @@ namespace Toltech.App.Services
             // Création physique via ouverture temporaire
             var db = new SQLiteAsyncConnection(modelPath);
 
-           await EnsureSchemaAsync(db);
+            await EnsureSchemaAsync(db);
             await db.CloseAsync();
         }
 
 
         public async Task InitializeModelAsync(Guid modelId, string name, string path)
         {
+            //var _tempAsyncDb = new SQLiteAsyncConnection(path);
+            await Open(path);
             var meta = await _asyncDb.FindAsync<ModelDB>(1);
 
             if (meta != null)
@@ -112,8 +111,11 @@ namespace Toltech.App.Services
                 meta.IdModel = modelId;
                 meta.ModelName = name;
                 meta.FilePathModel = path;
+                meta.DescriptionModel = "test1";
 
                 await _asyncDb.UpdateAsync(meta);
+                await _asyncDb.CloseAsync();
+
                 return;
             }
 
@@ -124,6 +126,7 @@ namespace Toltech.App.Services
                 ModelName = name,
                 FilePathModel = path
             });
+
         }
 
         public SQLiteAsyncConnection GetConnection()
@@ -146,7 +149,7 @@ namespace Toltech.App.Services
             await db.CreateTableAsync<Part>();
 
         }
-      
+
         public async Task CloseConnection()
         {
             if (_asyncDb != null)
@@ -182,7 +185,7 @@ namespace Toltech.App.Services
             await _asyncDb.DeleteAsync(entity);
         }
         #endregion
-       
+
         #region CRUD Bulk
         public async Task InsertRangeAsync<T>(IEnumerable<T> entities)
         {
@@ -336,7 +339,7 @@ namespace Toltech.App.Services
         /// <summary>
         /// Specific batch save function to insert and update parts in a single transaction, to avoid multiple calls to the database and ensure data integrity.
         /// </summary>
-        public async Task SavePartsRangeAsync(List<Part> toUpdate , List<Part> toInsert=null)
+        public async Task SavePartsRangeAsync(List<Part> toUpdate, List<Part> toInsert = null)
         {
             await _asyncDb.RunInTransactionAsync(conn =>
             {
@@ -380,7 +383,7 @@ namespace Toltech.App.Services
         {
             if (part == null) throw new ArgumentNullException(nameof(part));
 
-            return  await SetFixedPart_PartAsync(part);
+            return await SetFixedPart_PartAsync(part);
         }
 
         private async Task<List<Part>> SetFixedPart_PartAsync(Part part)
@@ -454,18 +457,39 @@ namespace Toltech.App.Services
             return await _asyncDb.Table<ModelData>().ToListAsync();
         }
 
-        public async Task<List<ModelData>> GetModelDataByPartIdAsync(int partId)
+        public async Task<List<ModelData>> GetModelDataByPartIdsAsync(List<int> partIds)
         {
-            Debug.WriteLine("[DataBaseService] - GetModelDataByPartIdAsync()");
+            Debug.WriteLine("[DataBaseService] - GetModelDataByPartIdsAsync()");
 
-            if (partId <= 0)
-                throw new ArgumentException("Identifiant de part invalide.", nameof(partId));
+            if (partIds == null)
+                throw new ArgumentNullException(nameof(partIds));
+
+            if (partIds.Any(id => id <= 0))
+                throw new ArgumentException(
+                    "La liste contient un ou plusieurs identifiants de part invalides.",
+                    nameof(partIds));
 
             await _asyncDb.CreateTableAsync<ModelData>();
 
-            return await _asyncDb.Table<ModelData>()
-                .Where(d => d.ExtremitePartId == partId)
-                .ToListAsync();
+            var result = new List<ModelData>();
+
+            // Effectue la même requête que l'ancienne méthode,
+            // mais pour chaque identifiant de part.
+            foreach (var partId in partIds.Distinct())
+            {
+                var datas = await _asyncDb.Table<ModelData>()
+                    .Where(d => d.ExtremitePartId == partId)
+                    .ToListAsync();
+
+                result.AddRange(datas);
+            }
+
+            return result;
+        }
+
+        public async Task<List<ModelData>> GetModelDataByPartIdAsync(int partId)
+        {
+            return await GetModelDataByPartIdsAsync(new List<int> { partId });
         }
 
         /// <summary>
@@ -540,13 +564,13 @@ namespace Toltech.App.Services
                 .CountAsync() > 0;
         }
 
-        
+
         // Check si une exigence du meme nom est deja dans la DB
         public async Task<bool> NameReqExisteAsync(string nomRequirement)
         {
-                return await _asyncDb.Table<Requirements>()
-                               .Where(r => r.NameReq == nomRequirement)
-                               .CountAsync() > 0;
+            return await _asyncDb.Table<Requirements>()
+                           .Where(r => r.NameReq == nomRequirement)
+                           .CountAsync() > 0;
         }
 
 
@@ -692,7 +716,7 @@ namespace Toltech.App.Services
         #endregion
 
         #region Operations
-      
+
         public async Task NormalizeDisplayOrderAsync(int? parentId)
         {
             var children = await GetChildrenAsync(parentId);
@@ -715,7 +739,7 @@ namespace Toltech.App.Services
         }
 
         #endregion
-      
+
         #endregion
 
         #region Lien MetaModel

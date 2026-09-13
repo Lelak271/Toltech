@@ -2,9 +2,9 @@
 using System.Data;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Microsoft.Win32;
 using Toltech.App.FrontEnd.Controls;
 using Toltech.App.Models;
@@ -12,6 +12,7 @@ using Toltech.App.Models.Mapping;
 using Toltech.App.Services;
 using Toltech.App.Services.Dialog;
 using Toltech.App.Services.Notification;
+using Toltech.App.Services.Logging;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.ToltechCalculation.Resux;
 using Toltech.App.ViewModels;
@@ -22,59 +23,54 @@ namespace Toltech.App.Views
     public partial class PageResultats : UserControl
     {
         #region Champs privés
+
         private readonly ComputeValidationService _computeValidationService;
         private IComputeEngine _computeEngine;
         private ResuxSerializer _resuxSerializer;
         private INotificationService _notificationService;
         private IDialogService _dialog;
+        private ILoggerService _logger;
 
         private ResultsViewModel ResultsVM; // TODO pas joli l'appel
-        private MainViewModel mainVM; // TODO pas joli l'appel
+
+        private readonly MainViewModel mainVM; // TODO pas joli l'appel
         public PageResultats()
         {
             InitializeComponent();
 
-            // On attend que DataContext soit défini
-            // Dès que le DataContext est assigné par le DataTemplate
-            this.DataContextChanged += (s, e) =>
-            {
-                if (DataContext is ResultsViewModel vm)
-                {
-                    _dialog = App.DialogService;
-                    _notificationService = App.NotificationService;
-                }
-            };
-
-            if (DataContext is ResultsViewModel vm)
-            {
-                ResultsVM = vm;
-            }
+            Loaded += PageResultats_Loaded;
 
             _computeEngine = App.MainVM.ComputeEngine; // TODO enlever couplage en passant par la VM avec injection de Icompute
-            _computeValidationService = App.MainVM.ComputeValidationService; 
+            _computeValidationService = App.MainVM.ComputeValidationService;
 
             _resuxSerializer = new ResuxSerializer();
-            this.Loaded += PageResultas_Load;
+            this.Loaded += PageResultats_Loaded;
 
             BarChartControl1.ParentPage = this;
             CrossTableControl1.ParentPage = this;
             BchartReqsControl.ParentPage = this;
 
         }
+
+
         #endregion
 
         #region Méthodes d'initialisation
-        private async void PageResultas_Load(object sender, RoutedEventArgs e)
+
+        private void PageResultats_Loaded(object sender, RoutedEventArgs e)
         {
             CbAllReqs.IsChecked = false;
+
+
+            if (DataContext is ResultsViewModel vm)
+            {
+                ResultsVM = vm;
+
+                _dialog = App.DialogService;
+                _logger = App.Logger;
+                _notificationService = App.NotificationService;
+            }
         }
-
-        #endregion
-
-        #region Zone de calculs - Méthode Cascade Matricielle
-        // Récuperation des req ID et Name
-      
-
         #endregion
 
         #region Zone de calculs -Méthode OneMatrix
@@ -137,24 +133,19 @@ namespace Toltech.App.Views
 
                 AllResults = await _computeEngine.ComputeAsync(request);
 
-                var legacyResults = new ConcurrentDictionary<int, List<PrimaryResults>>();
+                string filePathResx = await _resuxSerializer.WriteResultsToFileV3Async(AllResults, exigencesSelectionnees);
 
-                foreach (var kvp in AllResults.ResultsNew)
-                {
-                    legacyResults.TryAdd(kvp.Key, kvp.Value.Summary); // FIX
-                }
-
-                await _resuxSerializer.WriteResultsToFileV3Async(AllResults, exigencesSelectionnees);
+                ResultsVM.SetFileResx(filePathResx);
 
                 await Application.Current.Dispatcher.InvokeAsync(async () =>
-                {
-                    _notificationService.ShowNotifAsync("Fin des résultats", false);
+                        {
+                            _notificationService.ShowNotifAsync("Fin des résultats", false);
 
-                    await BarChartControl1.LoadRequirementsToComboBox(ModelManager.FilePathResx);
-                    await CrossTableControl1.GenerateAndDisplayCrossTable(ModelManager.FilePathResx);
-                    BchartReqsControl.LoadBartChartReqs();
+                            await BarChartControl1.LoadRequirementsToComboBox(ModelManager.FilePathResx);
+                            await CrossTableControl1.GenerateAndDisplayCrossTable(ModelManager.FilePathResx);
+                            BchartReqsControl.LoadBartChartReqs();
 
-                });
+                        });
                 loader.Close();
                 Debug.WriteLine("Fin de l'étude des Exigences !");
 
@@ -196,7 +187,7 @@ namespace Toltech.App.Views
         private async Task ImportResxBack()
         {
             string _selectedFilePath;
-            string resultsPath = ModelManager.GetResultsPath();
+            string resultsPath = ModelManager.FilePathResx;
 
             var dlg = new OpenFileDialog
             {
@@ -370,6 +361,15 @@ namespace Toltech.App.Views
             }
         }
 
+
+        private void CopyPath_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(PathResuxText.Text))
+                Clipboard.SetText(PathResuxText.Text);
+
+            _notificationService.ShowNotifAsync("Texte copier dans le presse papier...");
+            _logger.LogInfo($"Texte copier dans le presse papier : {PathResuxText.Text}");
+        }
 
         #endregion
     }

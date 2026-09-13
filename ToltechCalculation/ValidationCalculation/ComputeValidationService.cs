@@ -137,7 +137,7 @@ namespace Toltech.App.ToltechCalculation.Helpers
             // Directions nulles sur les exigences
             var invalidReqs = requirements
                 .Where(r => IsVectorZero(r.CoordU, r.CoordV, r.CoordW))
-                .Select(r => $"{r.PartReq1Id} → {r.PartReq2Id} (Exigence : {r.NameReq})")
+                .Select(r => $"{r.PartReq1Id} → {r.PartReq2Id} (Exigence : {r.Name})")
                 .Distinct().ToList();
 
             if (invalidReqs.Any())

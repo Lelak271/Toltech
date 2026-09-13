@@ -21,6 +21,7 @@
 	17. Sauvegarde qui incrémente le naming à chaque fois → ne pas prendre en compte son propre nom DB
 	18. Erreur lors du close `PartDBPage` ?? Laquelle
 19. Voir la regle : Utiliser le constructeur principal (IDE0290) et les regle Messages d'erreur de compilation
+	1. Refresh de l'ui apres association du modele 
 	
 
 ## Moyen terme

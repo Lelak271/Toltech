@@ -39,13 +39,16 @@ namespace Toltech.App.FrontEnd.Controls
         }
         #endregion
 
+        /// <summary>
+        /// Fonction pour associer le model en cours d'édition
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void RegisterActiveModel_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var nameModel = Path.GetFileNameWithoutExtension(ModelManager.ModelActif);
-                // Enregistre le modèle actif via la VM
-                var result = await _domainService.RegisterModelAsync(nameModel, ModelManager.ModelActif);
+                var result = await _domainService.RegisterModelAsync(ModelManager.NameModelActif, ModelManager.ModelActif);
 
                 if (result.IsFailure)
                 {
@@ -54,8 +57,7 @@ namespace Toltech.App.FrontEnd.Controls
             }
             catch (Exception ex)
             {
-                // Affiche une erreur si l'enregistrement échoue
-                _dialog.Error($"Impossible d'enregistrer le modèle actif : {ex.Message}", "Erreur");
+                _dialog.Error($"Impossible d'associer le modèle actif : {ex.Message}", "Erreur");
             }
         }
 
@@ -79,6 +81,9 @@ namespace Toltech.App.FrontEnd.Controls
                 // Enregistre le modèle sélectionné via la VM
                 var nameModel = Path.GetFileNameWithoutExtension(selectedFile);
                 var result = await _domainService.RegisterModelAsync(nameModel, selectedFile);
+
+                ModelManager.ModelActif = selectedFile;
+
             }
             catch (Exception ex)
             {

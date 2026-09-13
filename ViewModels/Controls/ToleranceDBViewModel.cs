@@ -30,7 +30,7 @@ namespace Toltech.App.ViewModels
                 MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            _databaseService = new DatabaseService("TODO");
+            _databaseService = new DatabaseService(); // TODO : enlever lappel db 
             // TODO : Lors du refactor reprendre instance unique de DB
             _databaseService.Open(ModelManager.ModelActif);
 

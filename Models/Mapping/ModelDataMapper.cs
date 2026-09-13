@@ -235,8 +235,8 @@ namespace Toltech.App.Models.Mapping
         {
             return new ComputeRequirement
             {
-                Id_req = req.Id_req,
-                NameReq = req.NameReq,
+                Id = req.Id_req,
+                Name = req.NameReq,
 
                 CoordX = req.CoordX,
                 CoordY = req.CoordY,

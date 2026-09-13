@@ -167,12 +167,12 @@ namespace Toltech.App.ToltechCalculation.Resux
 
         #region Écriture
 
-        public async Task WriteResultsToFileV3Async(
+        public async Task<string> WriteResultsToFileV3Async(
             ComputeResult AllResults,
             List<Requirements> ReqCompute)
         {
             string nameModel = Path.GetFileNameWithoutExtension(ModelManager.ModelActif);
-            string folderPath = ModelManager.GetTolTechTempPath();
+            string folderPath = ModelManager.TemporaryToltechPath;
             string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string filePath = Path.Combine(folderPath, $"ResultsUI_{nameModel}_{timestamp}.resux");
 
@@ -187,7 +187,7 @@ namespace Toltech.App.ToltechCalculation.Resux
                 TypeCalcul = "OneMatrix",
             };
 
-            foreach (var (idReq, reqResult) in AllResults.ResultsNew)
+            foreach (var (idReq, reqResult) in AllResults.RawResults)
             {
                 var requirement = ReqCompute.FirstOrDefault(r => r.Id_req == idReq);
 
@@ -283,7 +283,8 @@ namespace Toltech.App.ToltechCalculation.Resux
 
             string json = JsonSerializer.Serialize(root, WriteOptions);
             await File.WriteAllTextAsync(filePath, json);
-            ModelManager.FilePathResx = filePath;
+
+            return filePath;
         }
         // -----------------------------------------------------------------------
         // Helpers privés

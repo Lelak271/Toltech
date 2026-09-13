@@ -1,27 +1,70 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using Toltech.App.FrontEnd.Controls;
 
 namespace Toltech.App.Services
 {
+    /// <summary>
+    /// Gestionnaire statique centralisant les informations globales liées au modèle
+    /// actif de l'application Toltech ainsi que les chemins de fichiers et de dossiers
+    /// utilisés par l'application.
+    ///
+    /// <para>
+    /// Cette classe permet notamment de :
+    /// <list type="bullet">
+    /// <item>gérer le chemin du modèle actif ;</item>
+    /// <item>gérer le chemin de stockage des données de l'application ;</item>
+    /// <item>gérer le chemin des fichiers de résultats ;</item>
+    /// <item>notifier les composants de l'application lors d'un changement de ces valeurs ;</item>
+    /// <item>centraliser la création et l'accès aux différents dossiers utilisés par Toltech.</item>
+    /// </list>
+    /// </para>
+    /// </summary>
     public static class ModelManager
     {
-        private static string _modelActif;
-        private static string _appDataPath;
-        private static string _filepathResx;
+        #region Champs privés
 
-        // Événements synchrones
+        private static string _modelActif;
+
+        // Initialise le chemin des données avec le chemin par défaut.
+        private static string _appDataPath = AppDataPathDefault();
+
+        private static string _filepathResx = GetResultsPath();
+        private static string _temporaryToltechPath = GetTolTechTemporaryPath();
+
+        #endregion
+
+
+        #region Événements
+
+        /// <summary>
+        /// Se produit lorsque le modèle actif est modifié.
+        /// </summary>
         public static event Action<object> OnModelChanged;
+
+        /// <summary>
+        /// Se produit lorsqu'une pièce du modèle est modifiée.
+        /// </summary>
         public static event Action<object> OnPartChanged;
+
+        /// <summary>
+        /// Se produit lorsque le chemin des données de l'application est modifié.
+        /// </summary>
         public static event Action<string> OnAppDataPathChanged;
+
+        /// <summary>
+        /// Se produit lorsque le chemin du fichier de résultats est modifié.
+        /// </summary>
         public static event Action<string> FilePathResxChanged;
 
-        // Nouvelle propriété pour accéder à l'instance active du service DB
+        #endregion
 
-        #region Constructeur
 
-        // Permet d'avoir un MODEL ACTIF DE LA DB
+        #region Propriétés
+
+        /// <summary>
+        /// Obtient ou définit le modèle actuellement actif dans la base de données.
+        /// </summary>
         public static string ModelActif
         {
             get => _modelActif;
@@ -30,22 +73,31 @@ namespace Toltech.App.Services
                 if (_modelActif != value)
                 {
                     _modelActif = value;
-                    Debug.WriteLine($"ModelActif Changed : Path - {_modelActif}");
 
-                    // On notifie toujours, même si null
+                    Debug.WriteLine(
+                        $"ModelActif Changed : Path - {_modelActif}");
+
+                    // Notifie les abonnés du changement, y compris lorsque
+                    // la nouvelle valeur est null.
                     OnModelChanged?.Invoke(_modelActif);
                 }
             }
         }
-       
-        
-        // Permet d'avoir un chemin AppData
+
+        public static string NameModelActif => string.IsNullOrEmpty(ModelActif) ? string.Empty : Path.GetFileNameWithoutExtension(ModelActif);
+
+        /// <summary>
+        /// Obtient ou définit le chemin utilisé pour le stockage des données
+        /// de l'application.
+        /// </summary>
         public static string AppDataPath
         {
             get => _appDataPath;
             set
             {
-                Debug.WriteLine("[ModelManager] - AppDataPath Mettre en variable App");
+                Debug.WriteLine(
+                    "[ModelManager] - AppDataPath Mettre en variable App");
+
                 if (_appDataPath != value)
                 {
                     _appDataPath = value;
@@ -54,7 +106,11 @@ namespace Toltech.App.Services
             }
         }
 
-        // Chemin utiliser pour l'affichage des résultats et de l'export 
+
+        /// <summary>
+        /// Obtient ou définit le chemin utilisé pour l'affichage et l'export
+        /// des résultats.
+        /// </summary>
         public static string FilePathResx
         {
             get => _filepathResx;
@@ -67,26 +123,46 @@ namespace Toltech.App.Services
                 }
             }
         }
-
-        #endregion
         
-
-        #region UI
+        /// <summary>
+        /// Obtient ou définit le chemin utilisé pour l'affichage et l'export
+        /// des résultats.
+        /// </summary>
+        public static string TemporaryToltechPath
+        {
+            get => _temporaryToltechPath;
+            set
+            {
+                if (_temporaryToltechPath != value)
+                {
+                    _temporaryToltechPath = value;
+                }
+            }
+        }
 
         #endregion
 
-        #region Gestions des dossiers
 
-        // Création du fichier Temp ou obtention du chemin
-        public static string GetTolTechTempPath()
+        #region Gestion des dossiers
+
+        /// <summary>
+        /// Retourne le chemin du répertoire temporaire utilisé par Toltech.
+        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// </summary>
+        /// <returns>
+        /// Le chemin complet du répertoire temporaire Toltech.
+        /// </returns>
+        public static string GetTolTechTemporaryPath()
         {
-            // Récupération du répertoire temporaire de l’utilisateur
+            // Récupération du répertoire temporaire de l'utilisateur.
             string tempPath = Path.GetTempPath();
 
-            // Combinaison avec le nom du sous-dossier de l’application
-            string usertempPath = Path.Combine(tempPath, "TolTech_Temp");
+            // Combinaison avec le nom du sous-dossier de l'application.
+            string usertempPath = Path.Combine(
+                tempPath,
+                "TolTech_Temp");
 
-            // Création du répertoire s’il n’existe pas
+            // Création du répertoire s'il n'existe pas.
             if (!Directory.Exists(usertempPath))
             {
                 Directory.CreateDirectory(usertempPath);
@@ -96,11 +172,19 @@ namespace Toltech.App.Services
         }
 
 
-        // Retourne le chemin TolTech\Results dans Documents, crée le dossier si nécessaire
+        /// <summary>
+        /// Retourne le chemin du répertoire de stockage des résultats Toltech
+        /// dans le dossier Documents de l'utilisateur.
+        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// </summary>
+        /// <returns>
+        /// Le chemin complet du répertoire des résultats.
+        /// </returns>
         public static string GetResultsPath()
         {
             string path = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments),
                 "TolTech",
                 "Results");
 
@@ -112,11 +196,20 @@ namespace Toltech.App.Services
             return path;
         }
 
-        // Retourne le chemin TolTech\Results dans Documents, crée le dossier si nécessaire
+
+        /// <summary>
+        /// Retourne le chemin du répertoire contenant les métadonnées des modèles
+        /// Toltech dans le dossier Documents de l'utilisateur.
+        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// </summary>
+        /// <returns>
+        /// Le chemin complet du répertoire des métadonnées des modèles.
+        /// </returns>
         public static string GetModelMetaPath()
         {
             string path = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                Environment.GetFolderPath(
+                    Environment.SpecialFolder.MyDocuments),
                 "TolTech",
                 "ModelMeta");
 
@@ -128,23 +221,25 @@ namespace Toltech.App.Services
             return path;
         }
 
-        // Permet d'avoir un chemin AppData par defaut 
+
+        /// <summary>
+        /// Retourne le chemin par défaut utilisé pour le stockage des données
+        /// de la base de données Toltech.
+        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// </summary>
+        /// <returns>
+        /// Le chemin complet du répertoire de données par défaut.
+        /// </returns>
         public static string AppDataPathDefault()
         {
-            string path = "C:\\Toltech\\DataBase_Default\\";
+            string path = @"C:\Toltech\DataBase_Default";
 
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            // Crée le dossier s'il n'existe pas.
+            Directory.CreateDirectory(path);
 
             return path;
         }
 
-
         #endregion
-
-
-
     }
 }

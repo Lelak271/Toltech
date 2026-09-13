@@ -74,7 +74,7 @@ namespace Toltech.App.Front
                     MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                _databaseService = new DatabaseService("TODO");
+                _databaseService = new DatabaseService(); // TODO : enlever lappel db 
                 _databaseService.Open(ModelManager.ModelActif);
                 var tolerances = await _databaseService.GetTolerancesAsync();
 

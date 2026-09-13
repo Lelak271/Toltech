@@ -347,6 +347,7 @@ namespace Toltech.App.ViewModels
             }
             else
             {
+                _dialog.Error("Fichier introuvable, il a peut-etre été déplacé ou supprimer. \n Veuillez sélectionné le fichier pour associer le modèle.");
                 if (openFileDialog.ShowDialog() != true)
                     return;
 

@@ -89,9 +89,15 @@
         <GridSplitter Grid.Column="1" Width="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Background="{DynamicResource PrimaryBorderBrush}"
                   ResizeBehavior="PreviousAndNext" ResizeDirection="Columns" />
 
-        <Expander Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ExpandDirection="Left" IsExpanded="True"
-                  Expanded="Expander_Expanded" Collapsed="Expander_Collapsed" Background="{DynamicResource SecondaryBackgroundBrush}"  >
-            <Grid >
+        <Expander Grid.Column="2" 
+                  HorizontalAlignment="Stretch" 
+                  VerticalAlignment="Stretch" 
+                  ExpandDirection="Left" 
+                  IsExpanded="True"
+                  Expanded="Expander_Expanded" 
+                  Collapsed="Expander_Collapsed" 
+                  Background="{DynamicResource SecondaryBackgroundBrush}"  >
+            <Grid ShowGridLines="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
@@ -183,16 +189,39 @@
                 </StackPanel>
 
 
-                <TextBlock Grid.Row="2" 
-                           x:Name="PathResuxText" 
-                           Text="{Binding FilePathResx}"
-                           ToolTip="{Binding FilePathResx}"
-                           HorizontalAlignment="Left"
-                           Margin="0,8,0,0"
-                           FontSize="12"
-                           Foreground="Gray"
-                           TextWrapping="NoWrap"
-                           MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualWidth}" />
+                <Grid Grid.Row="2"
+                             Margin="0,8,0,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               x:Name="PathResuxText"
+                               Text="{Binding FilePathResx}"
+                               ToolTip="{Binding FilePathResx}"
+                               HorizontalAlignment="Left"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               MaxWidth="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=ActualWidth}" />
+
+                    <Button Grid.Column="1"
+                            Width="28"
+                            Height="28"
+                            Margin="8,0,0,0"
+                            Padding="4"
+                            ToolTip="Copier le chemin"
+                            Click="CopyPath_Click">
+
+                        <TextBlock Text="📋"
+                   FontSize="14"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" />
+
+                    </Button>
+
+                </Grid>
             </Grid>
 
         </Expander>

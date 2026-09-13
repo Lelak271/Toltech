@@ -60,15 +60,11 @@ namespace Toltech.App
 
         public App()
         {
-
             Logger = new LoggerService();
 
             DialogService = new DialogService();
             NotificationService = new NotificationService();
             UiSettings = new UiSettingsService();
-
-            IComputeEngine engine = ComputeEngineFactory.Create();
-            MainVM = new MainViewModel(engine);
 
 
             #region CAD INTEGRATION
@@ -103,31 +99,56 @@ namespace Toltech.App
             #endregion
         }
 
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
             Logger.LogInfo("Application démarrée");
 
-            await UiSettings.LoadAsync();
+            try
+            {
+                // Création du moteur de calcul.
+                IComputeEngine engine = ComputeEngineFactory.Create();
 
-            // Assure la chargement initial des ressources
-            AppResourceLoader.ApplySettings();
+                // Création du ViewModel principal.
+                MainVM = new MainViewModel(engine);
 
-
-            //if (!AccessControl.VerifyAccess())
-            //{
-            //    Shutdown();
-            //    return;
-            //}
-
-            ShutdownMode = ShutdownMode.OnMainWindowClose;
+                // Initialise les éléments nécessitant des opérations asynchrones,
+                // notamment la base de données.
+                await MainVM.InitializeAsync();
 
 
-            //AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-            //{
-            //    MessageBox.Show("Exception non gérée : " + e.ExceptionObject.ToString());
-            //};
+                // Chargement des paramètres d'interface utilisateur.
+                await UiSettings.LoadAsync();
 
+                // Assure le chargement initial des ressources.
+                AppResourceLoader.ApplySettings();
+
+
+                //if (!AccessControl.VerifyAccess())
+                //{
+                //    Shutdown();
+                //    return;
+                //}
+
+
+                ShutdownMode = ShutdownMode.OnMainWindowClose;
+
+
+                //AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+                //{
+                //    MessageBox.Show("Exception non gérée : " + e.ExceptionObject.ToString());
+                //};
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(
+                    $"Erreur lors du démarrage de l'application : {ex}",
+                    nameof(App));
+
+                Shutdown();
+            }
         }
 
 

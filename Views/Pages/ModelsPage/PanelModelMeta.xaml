@@ -115,7 +115,7 @@
                     </TextBox.IsReadOnly>
                 </TextBox>
 
-                    <TextBlock Grid.Column="1"
+                    <TextBlock Visibility="Collapsed" Grid.Column="1"
                            Width="60"
                            VerticalAlignment="Center"
                            Text="{Binding IdModel}" />
@@ -163,23 +163,36 @@
                                Stretch="Uniform"
                                Opacity="0.8"
                                Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageConverter}}"/>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" >
+
+                        <StackPanel Orientation="Vertical"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    MaxWidth="300">
+
                             <TextBlock Text="{lang:Loc Drag_and_drop_an_image_here}"
                                        HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
                                        FontStyle="Italic"
                                        Foreground="{DynamicResource SecondaryBorderBrush}"
                                        Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
-                            <TextBlock Text="{lang:Loc or}"       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
+
+                            <TextBlock Text="{lang:Loc or}"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
                                        FontStyle="Italic"
                                        Foreground="{DynamicResource SecondaryBorderBrush}"
                                        Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
-                            <TextBlock Text="{lang:Loc Click_to_select_one}" HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
+
+                            <TextBlock Text="{lang:Loc Click_to_select_one}"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       TextWrapping="Wrap"
                                        FontStyle="Italic"
                                        Foreground="{DynamicResource SecondaryBorderBrush}"
                                        Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
+
                         </StackPanel>
                     </Grid>
                 </Border>

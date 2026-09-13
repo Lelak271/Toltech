@@ -127,7 +127,8 @@ namespace Toltech.App.ViewModels
 
         public MainViewModel(IComputeEngine computeEngine)
         {
-            DatabaseService = new DatabaseService(""); // Instance Unique
+            DatabaseService = new DatabaseService(); // Instance Unique
+
             MetaModelDatabaseService = new MetaModelDatabaseService(); // Instance Unique
             MetaModelSyncService = new MetaModelSyncService(MetaModelDatabaseService, DatabaseService);
 
@@ -173,7 +174,10 @@ namespace Toltech.App.ViewModels
 
         }
 
-
+        public async Task InitializeAsync()
+        {
+            await DatabaseService.InitializeEmptyDatabaseAsync();
+        }
         #endregion
 
         #region Modèle actif / Pièce active

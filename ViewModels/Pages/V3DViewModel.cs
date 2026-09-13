@@ -11,6 +11,7 @@ using HelixToolkit.Wpf;
 using LiveChartsCore.VisualElements;
 using Toltech.App.Models;
 using Toltech.App.Services;
+using Toltech.App.Utilities;
 using Toltech.App.Utilities.Object3D;
 using Toltech.Solver.Contracts;
 using static Toltech.App.Services.EventsManager;
@@ -360,13 +361,16 @@ namespace Toltech.App.ViewModels
 
         #endregion
 
-        #region Linakges depuis la base
+        #region Linkages depuis la base
 
         /// <summary>
         /// Fonction principale pour l'import de la base de tolérnace
         /// </summary>
         private async Task Load3DFromDatabaseAsync()
         {
+            if (!ModelValidationHelper.CheckModelActif(true))
+                return;
+
             if (_domainService == null)
                 return;
 
@@ -418,6 +422,7 @@ namespace Toltech.App.ViewModels
             catch (Exception ex)
             {
                 ShowError?.Invoke($"Erreur lors du chargement des flèches : {ex.Message}", "Erreur");
+                StatusMessage = $"Erreur lors du chargement des liaisons.";
             }
             finally
             {

@@ -305,7 +305,7 @@
                 <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabRequirements}" Width="auto"    HorizontalContentAlignment="Center"  />
                 <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabResults}" Width="auto"    HorizontalContentAlignment="Center" />
                 <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabV3D}"  Width="auto"    HorizontalContentAlignment="Center"  />
-                <TabItem Header="TEst Req PAge"  Width="auto"    HorizontalContentAlignment="Center"  />
+                <!--<TabItem Header="TEst Req PAge"  Width="auto"    HorizontalContentAlignment="Center"  />-->
             </TabControl>
             <Border Visibility="Visible"    Height="1"  Background="Gray" HorizontalAlignment="Stretch"  Margin="10,-5,10,0"/>
         </StackPanel>
