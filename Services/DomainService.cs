@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using MathNet.Numerics.LinearAlgebra;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Toltech.App.Models;
 using Toltech.App.Services.Logging;
 using Toltech.App.Services.Notification;
@@ -96,6 +96,8 @@ namespace Toltech.App.Services
                 var data = new ModelData();
                 data.LoadFromDb(firstData);
 
+                _logger.LogInfo($"Created of linkage '{data.Model}' successfully");
+
                 return Result<ModelData>.Success(data);
             }
             catch (Exception ex)
@@ -129,14 +131,19 @@ namespace Toltech.App.Services
                 // 2. suppression atomique
                 await _databaseService.DeleteRangeAsync(existingDatas);
 
+                if (ids.Count > 1)
+                {
+                    _logger.LogInfo($"Deleted {ids.Count} linkages successfully");
+                }
+                else
+                {
+                    _logger.LogInfo($"Deleted linkage '{datas.First().Model}' successfully");
+                }
+
                 // 3. notification batch
                 _ = _notificationService.ShowNotifAsync(
                     $"{ids.Count} donnée(s) supprimée(s) avec succès.",
                     false);
-
-                // 4. events métier
-
-
 
                 return Result.Success();
             }
@@ -188,7 +195,7 @@ namespace Toltech.App.Services
                     ErrorCode.Unknown);
             }
         }
-    
+
         /// <summary>
         /// Supprime une part et ses données associées.
         /// </summary>
@@ -196,6 +203,7 @@ namespace Toltech.App.Services
         {
             var result = await DeletePartsWithDatasByIdsAsync(new List<int> { idPart });
             if (result.IsFailure) return Result<PartWithDatasResult>.Failure(result.Error);
+
 
             var single = result.Value.FirstOrDefault();
             return single is not null
@@ -224,8 +232,9 @@ namespace Toltech.App.Services
                 var results = new List<PartWithDatasResult>();
                 foreach (var id in idParts)
                 {
-                    var part = await _databaseService.GetPartByIdAsync(id);
-                    var datas = await _databaseService.GetModelDataByPartIdAsync(id);
+                    Part part = await _databaseService.GetPartByIdAsync(id);
+
+                    List<ModelData> datas = await _databaseService.GetModelDataByPartIdAsync(id);
                     results.Add(new PartWithDatasResult
                     {
                         Part = part,
@@ -235,6 +244,16 @@ namespace Toltech.App.Services
 
                 // 2. Suppression atomique
                 await _databaseService.DeletePartsWithDatasRangeAsync(idParts.ToList());
+
+                if (idParts.Count > 1)
+                {
+                    _logger.LogInfo($"Deleted {idParts.Count} parts successfully");
+                }
+                else
+                {
+                    _logger.LogInfo(
+                        $"Deleted part '{results.First().Part.NamePart}' - Id: {results.First().Part.Id} successfully");
+                }
 
                 // 3. Notification
                 var label = idParts.Count == 1
@@ -289,7 +308,20 @@ namespace Toltech.App.Services
                     d.ClearDirty();
                     d.ClearSaving();
                 }
+
+                if (toSave.Count > 1)
+                {
+                    _logger.LogInfo($"Updated of {toSave.Count} linkages");
+                }
+                else
+                {
+                    _logger.LogInfo(
+                        $"Updated of linkage '{toSave.First().Model}' successfully");
+                }
+
                 return Result.Success();
+
+
             }
             catch (Exception ex)
             {
@@ -395,8 +427,11 @@ namespace Toltech.App.Services
                 if (!selectedPartId.HasValue)
                     return Result<ValidationResult>.Failure("Aucune pièce sélectionnée.", ErrorCode.Unknown);
 
+
                 // 1. récupération part
                 Part partActif = await _databaseService.GetPartByIdAsync(selectedPartId.Value);
+
+                _logger.LogInfo($"Computing isostatic constraint for part '{partActif.NamePart}'");
 
                 if (partActif == null)
                     return Result<ValidationResult>.Failure("Pièce introuvable.", ErrorCode.Unknown);
@@ -420,6 +455,8 @@ namespace Toltech.App.Services
                     return Result<List<Part>>.Failure("Part is null", ErrorCode.Unknown);
 
                 var result = await _databaseService.SetFixedPartAsync(part);
+
+                _logger.LogInfo($"Update of fixed part in {part.NamePart} completed successfully");
 
                 return Result<List<Part>>.Success(result);
             }
@@ -568,7 +605,7 @@ namespace Toltech.App.Services
                 // 4. notification
                 _ = _notificationService.ShowNotifAsync($"Exigence \"{nomRequirement}\" ajoutée avec succès !", false);
 
-
+                _logger.LogInfo($"Creation of requirement '{nomRequirement}' completed successfully");
 
                 return Result<Requirements?>.Success(uiModel);
             }
@@ -617,7 +654,7 @@ namespace Toltech.App.Services
                 var renamed = await ResolveUniqueNamesAsync(toSave, _databaseService.NumberOfReqAsync);
 
                 foreach (var (original, resolved) in renamed)
-                    _logger.LogInfo($"Requirement renommé : \"{original}\" → \"{resolved}\"");
+                    _logger.LogWarning($"Requirement renommé : \"{original}\" → \"{resolved}\"");
 
                 await _databaseService.UpdateRangeAsync(toSave);
 
@@ -625,6 +662,15 @@ namespace Toltech.App.Services
                 {
                     req.ClearDirty();
                     req.ClearSaving();
+                }
+
+                if (toSave.Count == 1)
+                {
+                    _logger.LogInfo($"Updated of requirement '{toSave.First().NameReq}' completed successfully");
+                }
+                else
+                {
+                    _logger.LogInfo($"Updated of {toSave.Count} requirements completed successfully");
                 }
 
                 return Result.Success();
@@ -654,6 +700,7 @@ namespace Toltech.App.Services
                 if (requirement == null)
                     return Result.Failure("Requirement introuvable.", ErrorCode.NotFound);
 
+                string oldName = requirement.NameReq;
                 requirement.NameReq = newName.Trim();
 
                 var renamed = await ResolveUniqueNamesAsync(requirement, _databaseService.NumberOfReqAsync);
@@ -662,6 +709,8 @@ namespace Toltech.App.Services
                     _logger.LogInfo($"Requirement renommé : \"{original}\" → \"{resolved}\"");
 
                 await _databaseService.UpdateAsync(requirement);
+
+                _logger.LogInfo($"Update of requirement name from '{oldName}' to '{newName}' completed successfully");
 
                 return Result.Success();
             }
@@ -691,8 +740,14 @@ namespace Toltech.App.Services
 
                 await _databaseService.DeleteRangeAsync(list);
 
-
-
+                if (list.Count == 1)
+                {
+                    _logger.LogInfo($"Deletion of requirement '{list.First().NameReq}' completed successfully");
+                }
+                else
+                {
+                    _logger.LogInfo($"Deletion of {list.Count} requirements completed successfully");
+                }
 
                 return Result.Success();
             }
@@ -831,6 +886,8 @@ namespace Toltech.App.Services
                     $"Modèle '{modelName}' créé avec succès",
                     false);
 
+                _logger.LogInfo($"Model '{modelName}' created successfully");
+
                 return Result.Success();
             }
             catch (Exception ex)
@@ -857,6 +914,8 @@ namespace Toltech.App.Services
 
                 // 3. Switch DB (IMPORTANT : instance existante)
                 await _databaseService.Open(selectedFile);
+
+                _logger.LogInfo($"Model '{Path.GetFileName(selectedFile)}' open");
 
                 await NotifyModelOpen(selectedFile);
 
@@ -924,7 +983,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("DeleteModel failed", "", ex);
+                _logger.LogError("Failed to delete model", "", ex);
                 return Result.Failure("Une erreur est survenue lors de la suppression du modèle.", ErrorCode.Unknown);
             }
         }
@@ -960,6 +1019,8 @@ namespace Toltech.App.Services
                 // 1. duplication fichier
                 File.Copy(sourcePath, newFilePath, overwrite: false);
 
+                _logger.LogInfo($"Successfully duplicated {fileName}", "");
+
                 // 2. mise à jour modèle actif
                 ModelManager.ModelActif = newFilePath;
 
@@ -974,11 +1035,12 @@ namespace Toltech.App.Services
                     "Modèle dupliqué avec succès",
                     false);
 
+
                 return Result.Success();
             }
             catch (Exception ex)
             {
-                _logger.LogError("DuplicateModel failed", "", ex);
+                _logger.LogError("Failed to duplicate model", "", ex);
                 return Result.Failure("Une erreur est survenue lors de la duplication du modèle.", ErrorCode.Unknown);
             }
         }
@@ -995,7 +1057,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("DeleteMetaModel failed", "", ex);
+                _logger.LogError("Failed to delete Meta model", "", ex);
             }
         }
 
@@ -1076,6 +1138,7 @@ namespace Toltech.App.Services
                 // 5. commit état UI
                 meta.ClearDirty();
                 meta.ClearSaving();
+                _logger.LogInfo($"Model '{meta.NameData}' saved successfully");
 
                 return Result.Success();
             }
@@ -1084,7 +1147,7 @@ namespace Toltech.App.Services
                 meta.MarkOutOfSync();
                 meta.ClearSaving();
 
-                _logger.LogError("SaveModel failed", "", ex);
+                _logger.LogError("Failed to save model", "", ex);
                 return Result.Failure("Error during save operation.", ErrorCode.Unknown);
             }
         }
@@ -1108,7 +1171,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("LoadModels failed", "", ex);
+                _logger.LogError("Failed to load models", "", ex);
                 return Result<List<ModelMeta>>.Failure(
                     "Impossible de charger les modèles.",
                     ErrorCode.DatabaseError);
@@ -1176,7 +1239,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("DeletePartsAsync failed", "", ex);
+                _logger.LogError("Failed to delete parts asynchronously", "", ex);
                 return Result.Failure(
                     "Une erreur est survenue lors de la suppression des pièces.",
                     ErrorCode.Unknown);
@@ -1210,7 +1273,7 @@ namespace Toltech.App.Services
                 var renamed = await ResolveUniqueNamesAsync(list, _databaseService.NumberOfNamePartAsync);
 
                 foreach (var (original, resolved) in renamed)
-                    _logger.LogInfo($"Part renommée : \"{original}\" → \"{resolved}\"");
+                    _logger.LogInfo($"Part renamed: \"{original}\" → \"{resolved}\"");
 
                 // --- Séparation insert / update ---
                 var toInsert = list.Where(p => p.Id == 0).ToList();
@@ -1227,7 +1290,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("SavePartsAsync failed", "", ex);
+                _logger.LogError("Failed to save parts ", "", ex);
                 return Result.Failure("Erreur lors de la sauvegarde.", ErrorCode.Unknown);
             }
         }
@@ -1255,7 +1318,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("UpdatePartNameAsync failed", "", ex);
+                _logger.LogError("Failed to update part name", "", ex);
 
                 return Result.Failure(
                     "Erreur lors de la mise à jour de la pièce.",
@@ -1281,7 +1344,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("ReverseActivePartByIdAsync failed", "", ex);
+                _logger.LogError("Failed to reverse active part by ID", "", ex);
 
                 return Result.Failure(
                     "Erreur lors de la modification de l'état actif.",
@@ -1308,11 +1371,12 @@ namespace Toltech.App.Services
             try
             {
                 await _databaseService.SetActivePart_PartAsync(part);
+                _logger.LogInfo($"Fixed part changed to '{part.NamePart}' - ID: {part.Id}");
                 return Result.Success();
             }
             catch (Exception ex)
             {
-                _logger.LogError("SetActivePart_PartAsync failed", "", ex);
+                _logger.LogError("Failed to set active part", "", ex);
                 return Result.Failure("Erreur lors de la mise à jour de la pièce active.", ErrorCode.Unknown);
             }
         }
@@ -1325,7 +1389,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("SetActivePart_GetPartByIdAsyncPartAsync failed", "", ex);
+                _logger.LogError("Failed to set active part", "", ex);
                 return Result<Part>.Failure("Erreur lors de la récupération de la pièce.", ErrorCode.Unknown);
             }
         }
@@ -1342,7 +1406,7 @@ namespace Toltech.App.Services
         {
             Part newPart = CreateDefaultPart(nameNewPart);
             await InsertPartAsync(newPart);
-            _logger.LogInfo($"Création de la Part '{nameNewPart}' - ID :{newPart.Id}", nameof(DatabaseService));
+            _logger.LogInfo($"Created part '{nameNewPart}' - Id: {newPart.Id} successfully");
             return newPart;
         }
 
@@ -1373,37 +1437,37 @@ namespace Toltech.App.Services
                 // Récupère toutes les pièces du modèle.
                 var parts = await _databaseService.GetAllPartsAsync();
 
-            // Vérifie l'état actif de chaque pièce.
-            var activePartIds = new List<int>();
-             Part? FixPart = await _databaseService.GetFixedPartAsync();
+                // Vérifie l'état actif de chaque pièce.
+                var activePartIds = new List<int>();
+                Part? FixPart = await _databaseService.GetFixedPartAsync();
 
-            foreach (var part in parts)
-            {
-                // Récupère l'état IsActive depuis la base de données.
-                bool isActive = await _databaseService.GetIsActivePartAsync(part);
-
-                // Conserve uniquement les IDs des pièces actives.
-                if (isActive & !part.IsFixed)
+                foreach (var part in parts)
                 {
-                    activePartIds.Add(part.Id);
+                    // Récupère l'état IsActive depuis la base de données.
+                    bool isActive = await _databaseService.GetIsActivePartAsync(part);
+
+                    // Conserve uniquement les IDs des pièces actives.
+                    if (isActive & !part.IsFixed)
+                    {
+                        activePartIds.Add(part.Id);
+                    }
                 }
-            }
 
-            // Aucun part active : inutile d'interroger la base pour les ModelData.
-            if (activePartIds.Count == 0)
-                return Result<List<ModelData>>.Success(new List<ModelData>());  
+                // Aucun part active : inutile d'interroger la base pour les ModelData.
+                if (activePartIds.Count == 0)
+                    return Result<List<ModelData>>.Success(new List<ModelData>());
 
-            // Récupère les ModelData correspondant uniquement aux pièces actives.
-            var existingDatas = await _databaseService.GetModelDataByPartIdsAsync(activePartIds);
+                // Récupère les ModelData correspondant uniquement aux pièces actives.
+                var existingDatas = await _databaseService.GetModelDataByPartIdsAsync(activePartIds);
 
-            return Result<List<ModelData>>.Success(existingDatas);
+                return Result<List<ModelData>>.Success(existingDatas);
             }
             catch (Exception ex)
             {
-                _logger.LogError("GetActivePartsModelDataAsync failed", "", ex);
+                _logger.LogError("Failed to get active parts model data asynchronously", "", ex);
                 return Result<List<ModelData>>.Failure("Erreur lors du chargement des données du modèle.", ErrorCode.Unknown);
             }
-            }
+        }
 
         public async Task<Result<List<Requirements>>> GetAllRequirementsAsync()
         {
@@ -1414,7 +1478,7 @@ namespace Toltech.App.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("GetAllRequirementsAsync failed", "", ex);
+                _logger.LogError("Failed to get all requirements", "", ex);
                 return Result<List<Requirements>>.Failure("Erreur lors du chargement des données du modèle.", ErrorCode.Unknown);
             }
         }

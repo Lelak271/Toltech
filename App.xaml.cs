@@ -1,20 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
 using Toltech.App.Properties;
 using Toltech.App.Resources;
+using Toltech.App.Services.CAD;
 using Toltech.App.Services.Dialog;
 using Toltech.App.Services.Logging;
 using Toltech.App.Services.Notification;
 using Toltech.App.ViewModels;
-using Toltech.FreeCAD;
 using Toltech.Cad.Abstractions;
-using Toltech.Cad.Model;
+using Toltech.FreeCAD;
 using Toltech.Solver;
 using Toltech.Solver.Contracts;
-using Toltech.App.Services.CAD;
 
 namespace Toltech.App
 {
@@ -61,9 +57,9 @@ namespace Toltech.App
         public App()
         {
             Logger = new LoggerService();
-
-            DialogService = new DialogService();
             NotificationService = new NotificationService();
+            DialogService = new DialogService();
+
             UiSettings = new UiSettingsService();
 
 

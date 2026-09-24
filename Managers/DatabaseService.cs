@@ -3,7 +3,6 @@ using System.IO;
 using System.Windows;
 using SQLite;
 using Toltech.App.Models;
-using Toltech.App.Services.Logging;
 using static Toltech.App.Models.NodesDefinition;
 
 // DatabaseService
@@ -27,11 +26,8 @@ namespace Toltech.App.Services
         private SQLiteAsyncConnection _asyncDb; // Connexion à la base de données SQLite
         private string _dbPath; // Chemin d'accès à la base de données
         public static DatabaseService ActiveInstance { get; private set; } = null!;
-        private static ILoggerService _logger;
         public DatabaseService()
         {
-            _logger = App.Logger;
-
             _dbPath = EmptyDatabasePath;
 
             ActiveInstance = this;
@@ -80,10 +76,6 @@ namespace Toltech.App.Services
             _asyncDb = new SQLiteAsyncConnection(_dbPath);
 
             ActiveInstance = this;
-
-            if (!isTempPath)
-                _logger.LogInfo($"Connection opened : {modelPath}", nameof(DatabaseService));
-
         }
         public async Task CreateDatabaseAsync(string modelPath)
         {
@@ -154,14 +146,7 @@ namespace Toltech.App.Services
         {
             if (_asyncDb != null)
             {
-                try
-                {
-                    await _asyncDb.CloseAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Echec lors de la fermeture du modèle '{_asyncDb}'", nameof(DatabaseService), ex);
-                }
+                await _asyncDb.CloseAsync();
             }
         }
 
@@ -426,8 +411,6 @@ namespace Toltech.App.Services
                 dbPart.IsActive = !dbPart.IsActive;
                 await _asyncDb.UpdateAsync(dbPart);
             }
-
-            _logger.LogInfo($"Changement de la pièce fixe en '{part.NamePart}' - ID :{part.Id}", nameof(DatabaseService));
         }
         #endregion
 

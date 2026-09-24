@@ -6,8 +6,6 @@ using System.Windows;
 
 namespace Toltech.App.Services.Logging
 {
-
-
     public class LoggerService : ILoggerService
     {
         public bool IsAdminMode { get; set; }
@@ -32,8 +30,7 @@ namespace Toltech.App.Services.Logging
 
             IsAdminMode = isAdminMode;
 
-            _logFolder = Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory, "Logs");
+            _logFolder = Path.Combine(ModelManager.ToltechPath, "Logs");
 
             Directory.CreateDirectory(_logFolder);
 

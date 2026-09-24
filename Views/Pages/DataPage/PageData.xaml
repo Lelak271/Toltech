@@ -229,8 +229,15 @@
                                     VerticalContentAlignment="Center"  ToolTip="Création d'une pièce"  >
                                 <Image Source="/Asset/add_part2.png" Stretch="Uniform" />
                             </Button>
-                            <Button x:Name="BtnDeletePart" Width="40" Height="40" Margin="10,0,0,0" Padding="2" Command="{Binding DeletePartCommand}" HorizontalContentAlignment="Center" 
-                                    VerticalContentAlignment="Center"  ToolTip="Suppresion de la pièce active">
+                            <Button x:Name="BtnDeletePart"
+                                    Command="{Binding DeletePartCommand}" 
+                                    Width="40" 
+                                    Height="40"
+                                    Margin="10,0,0,0"
+                                    Padding="2"  
+                                    HorizontalContentAlignment="Center" 
+                                    VerticalContentAlignment="Center"  
+                                    ToolTip="Suppresion de la pièce active">
                                 <Image Source="/Asset/bin_part2.png" Stretch="Uniform" />
                             </Button>
 

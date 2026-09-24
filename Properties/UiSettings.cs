@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Text.Json;
+using Toltech.App.Services;
 
 namespace Toltech.App.Properties
 {
@@ -30,19 +31,12 @@ namespace Toltech.App.Properties
     /// </summary>
     public class UiSettingsService
     {
-        private readonly string _filePath;
+        private readonly string _filePath= Path.Combine(ModelManager.SettingsPath, "ui_settings.json");
 
         public UiSettings Current { get; private set; } = new();
 
-        public UiSettingsService(string fileName = "ui_settings.json")
+        public UiSettingsService()
         {
-            var folder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Toltech");
-
-            Directory.CreateDirectory(folder);
-
-            _filePath = Path.Combine(folder, fileName);
         }
 
         /// <summary>

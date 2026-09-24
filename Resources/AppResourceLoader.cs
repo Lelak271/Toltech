@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using Toltech.App.Properties;
-using Toltech.App.Resources;
 using Toltech.App.Resources.ColorTheme;
 using Toltech.App.Resources.Lang;
 
@@ -13,6 +7,7 @@ namespace Toltech.App.Resources
 {
 
     #region Other ressources
+
     /// <summary>
     /// Unités de longueur
     /// </summary>
@@ -47,7 +42,7 @@ namespace Toltech.App.Resources
     /// <summary>
     /// Propriétés modifiables par l'utilisateur 
     /// </summary>
-    public class AppSettingsData
+    public class AppSettings
     {
         public SupportedLanguage Language { get; set; } = SupportedLanguage.fr;
         public SupportedLengthUnit LengthUnit { get; set; } = SupportedLengthUnit.Millimeter;
@@ -60,19 +55,19 @@ namespace Toltech.App.Resources
         public void LoadFromUserConfig()
         {
             // Langue
-            if (Enum.TryParse(Properties.Settings.Default.Language, out SupportedLanguage lang))
+            if (Enum.TryParse(Settings.Default.Language, out SupportedLanguage lang))
                 Language = lang;
 
             // Unité de longueur
-            if (Enum.TryParse(Properties.Settings.Default.DefaultUnit, out SupportedLengthUnit lengthUnit))
+            if (Enum.TryParse(Settings.Default.DefaultUnit, out SupportedLengthUnit lengthUnit))
                 LengthUnit = lengthUnit;
 
             // Unité de masse volumique
-            if (Enum.TryParse(Properties.Settings.Default.DensityUnit, out SupportedDensityUnit densityUnit))
+            if (Enum.TryParse(Settings.Default.DensityUnit, out SupportedDensityUnit densityUnit))
                 DensityUnit = densityUnit;
 
             // Thème
-            if (Enum.TryParse(Properties.Settings.Default.Theme, out AppTheme theme))
+            if (Enum.TryParse(Settings.Default.Theme, out AppTheme theme))
                 Theme = theme;
 
         }
@@ -80,19 +75,19 @@ namespace Toltech.App.Resources
         // --- Méthodes pour sauvegarder dans les paramètres utilisateur ---
         public void SaveToUserConfig()
         {
-            Properties.Settings.Default.Language = Language.ToString();
-            Properties.Settings.Default.DefaultUnit = LengthUnit.ToString();
-            Properties.Settings.Default.AngleUnit = AngleUnit.ToString();
-            Properties.Settings.Default.DensityUnit = DensityUnit.ToString();
-            Properties.Settings.Default.Theme = Theme.ToString();
+            Settings.Default.Language = Language.ToString();
+            Settings.Default.DefaultUnit = LengthUnit.ToString();
+            Settings.Default.AngleUnit = AngleUnit.ToString();
+            Settings.Default.DensityUnit = DensityUnit.ToString();
+            Settings.Default.Theme = Theme.ToString();
 
-            Properties.Settings.Default.Save();
+            Settings.Default.Save();
 
             // Appliquer les ressources mises à jour (langue, thème…)
             AppResourceLoader.ApplySettings();
         }
     }
-   
+
     /// <summary>
     /// Chargement centraliser des ressources
     /// </summary>

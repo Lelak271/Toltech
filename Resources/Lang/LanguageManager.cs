@@ -78,7 +78,7 @@ namespace Toltech.App.Resources.Lang
         /// </summary>
         public static void ApplyFromSettings()
         {
-            var lang = LanguageHelper.GetSupportedLanguage(Properties.Settings.Default.Language);
+            SupportedLanguage lang = LanguageHelper.GetSupportedLanguage(Properties.Settings.Default.Language);
             ApplyLanguage(lang);
         }
 
@@ -87,7 +87,7 @@ namespace Toltech.App.Resources.Lang
         /// Met à jour <see cref="CurrentLanguage"/> et propage la culture à <see cref="LocalizationManager"/>.
         /// En cas d'échec, bascule sur <see cref="LanguageFallBack"/> et maintient un état cohérent.
         /// </summary>
-        public static void ApplyLanguage(SupportedLanguage language)
+        private static void ApplyLanguage(SupportedLanguage language)
         {
             _currentLanguage = language;
 

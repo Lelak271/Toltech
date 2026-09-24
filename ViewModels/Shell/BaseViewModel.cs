@@ -9,6 +9,9 @@ namespace Toltech.App.ViewModels
 {
     public abstract class BaseViewModel : INotifyPropertyChanged, IDisposable
     {
+      /// <summary>
+      /// Provides access to dialog services for user interactions.
+      /// </summary>
         protected readonly IDialogService _dialog = App.DialogService;
         protected string Loc(string key)=> LocalizationManager.Instance[key];
         public event PropertyChangedEventHandler PropertyChanged;
@@ -58,7 +61,7 @@ namespace Toltech.App.ViewModels
                 _ => Loc("Error_Unknown")
             };
 
-            _dialog.Error(message, Loc("Title_Error"));
+            _dialog.Error(result.Error, Loc("Title_Error"));
         }
 
     }

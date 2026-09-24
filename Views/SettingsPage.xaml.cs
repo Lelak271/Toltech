@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using Toltech.App.Resources;
 using Toltech.App.Resources.ColorTheme;
 using Toltech.App.Resources.Lang;
@@ -13,14 +10,14 @@ namespace Toltech.App.Views
 {
     public partial class SettingsPage : Window
     {
-        private AppSettingsData _userSettings;
+        private AppSettings _appSettings;
 
         public SettingsPage()
         {
             InitializeComponent();
 
-            _userSettings = new AppSettingsData();
-            _userSettings.LoadFromUserConfig();
+            _appSettings = new AppSettings();
+            _appSettings.LoadFromUserConfig();
 
             InitializeControlsFromSettings();
 
@@ -30,19 +27,19 @@ namespace Toltech.App.Views
         private void InitializeControlsFromSettings()
         {
             // Langue
-            SelectComboBoxItemByEnum(LanguageComboBox, _userSettings.Language);
+            SelectComboBoxItemByEnum(LanguageComboBox, _appSettings.Language);
 
             // Unité de longueur
-            SelectRadioButtonByTag(UnitStack, "Units", _userSettings.LengthUnit.ToString());
-       
+            SelectRadioButtonByTag(UnitStack, "Units", _appSettings.LengthUnit.ToString());
+
             // Unité d'angle
-            SelectRadioButtonByTag(AngleStack, "angle", _userSettings.AngleUnit.ToString());
+            SelectRadioButtonByTag(AngleStack, "angle", _appSettings.AngleUnit.ToString());
 
             // Unité de masse volumique
-            SelectComboBoxItemByEnum(DensityUnitComboBox, _userSettings.DensityUnit);
+            SelectComboBoxItemByEnum(DensityUnitComboBox, _appSettings.DensityUnit);
 
             // Thème
-            SelectListBoxItemByEnum(ThemeList, _userSettings.Theme);
+            SelectListBoxItemByEnum(ThemeList, _appSettings.Theme);
         }
 
         #region Fonctions Get / Set pour appliquer les settings à la View
@@ -122,16 +119,16 @@ namespace Toltech.App.Views
         }
 
         #endregion
-     
+
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            _userSettings.Language = GetSelectedEnumFromComboBox<SupportedLanguage>(LanguageComboBox);
-            _userSettings.LengthUnit = GetSelectedRadioButtonTagByGroupName<SupportedLengthUnit>(UnitStack, "Units") ?? _userSettings.LengthUnit;
-            _userSettings.AngleUnit = GetSelectedRadioButtonTagByGroupName<SupportedAnglehUnit>(AngleStack, "angle") ?? _userSettings.AngleUnit;
-            _userSettings.DensityUnit = GetSelectedEnumFromComboBox<SupportedDensityUnit>(DensityUnitComboBox);
-            _userSettings.Theme = GetSelectedEnumFromListBox<AppTheme>(ThemeList);
+            _appSettings.Language = GetSelectedEnumFromComboBox<SupportedLanguage>(LanguageComboBox);
+            _appSettings.LengthUnit = GetSelectedRadioButtonTagByGroupName<SupportedLengthUnit>(UnitStack, "Units") ?? _appSettings.LengthUnit;
+            _appSettings.AngleUnit = GetSelectedRadioButtonTagByGroupName<SupportedAnglehUnit>(AngleStack, "angle") ?? _appSettings.AngleUnit;
+            _appSettings.DensityUnit = GetSelectedEnumFromComboBox<SupportedDensityUnit>(DensityUnitComboBox);
+            _appSettings.Theme = GetSelectedEnumFromListBox<AppTheme>(ThemeList);
 
-            _userSettings.SaveToUserConfig();
+            _appSettings.SaveToUserConfig();
 
             this.Close();
         }

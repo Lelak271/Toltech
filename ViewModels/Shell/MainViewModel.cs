@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -12,7 +11,6 @@ using Toltech.App.ToltechCalculation.Resux;
 using Toltech.App.Utilities;
 using Toltech.App.Views.Controls.TreeView;
 using Toltech.Solver.Contracts;
-using static Toltech.App.Services.EventsManager;
 
 namespace Toltech.App.ViewModels
 {
@@ -186,7 +184,7 @@ namespace Toltech.App.ViewModels
         public string ModelActif => ModelsVM.SelectedModel?.FilePathModel ?? "";
 
         public string ModelName => ModelsVM.SelectedModel?.NameData ?? "";
-           
+
 
 
         // Pour faciliter le binding dans l'UI directement sur la liste de parts
@@ -254,7 +252,7 @@ namespace Toltech.App.ViewModels
         }
 
         public int NumberOfParts => ModelsVM.NumberOfParts;
-        public int NumberOfReq => ModelsVM.NumberOfReq; 
+        public int NumberOfReq => ModelsVM.NumberOfReq;
 
         #endregion
 
@@ -377,7 +375,7 @@ namespace Toltech.App.ViewModels
         public ICommand InsertImageCommand => PartVM.InsertImageCommand;
 
         #endregion
-      
+
         #endregion
 
 

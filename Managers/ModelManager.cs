@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Toltech.App.Properties;
 
 namespace Toltech.App.Services
 {
@@ -26,14 +27,17 @@ namespace Toltech.App.Services
 
         private static string _modelActif;
 
-        // Initialise le chemin des données avec le chemin par défaut.
-        private static string _appDataPath = AppDataPathDefault();
+        // Chemin de stockage des données de l'application.
+        // Initialisé avec le répertoire de la base de données par défaut.
+        private static string _appDataPath = AppDataPathDefault;
 
-        private static string _filepathResx = GetResultsPath();
-        private static string _temporaryToltechPath = GetTolTechTemporaryPath();
+        // Chemin du fichier de ressources.
+        private static string _filepathResx = ResultsPath;
+
+        // Chemin du répertoire temporaire Toltech.
+        private static string _temporaryToltechPath = TemporaryPath;
 
         #endregion
-
 
         #region Événements
 
@@ -58,7 +62,6 @@ namespace Toltech.App.Services
         public static event Action<string> FilePathResxChanged;
 
         #endregion
-
 
         #region Propriétés
 
@@ -142,99 +145,68 @@ namespace Toltech.App.Services
 
         #endregion
 
-
         #region Gestion des dossiers
 
         /// <summary>
-        /// Retourne le chemin du répertoire temporaire utilisé par Toltech.
-        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// Répertoire racine utilisé pour le stockage des données Toltech.
         /// </summary>
-        /// <returns>
-        /// Le chemin complet du répertoire temporaire Toltech.
-        /// </returns>
-        public static string GetTolTechTemporaryPath()
+        public static string ToltechPath
         {
-            // Récupération du répertoire temporaire de l'utilisateur.
-            string tempPath = Path.GetTempPath();
-
-            // Combinaison avec le nom du sous-dossier de l'application.
-            string usertempPath = Path.Combine(
-                tempPath,
-                "TolTech_Temp");
-
-            // Création du répertoire s'il n'existe pas.
-            if (!Directory.Exists(usertempPath))
+            get
             {
-                Directory.CreateDirectory(usertempPath);
-            }
+                string path = @"C:\Toltech";
 
-            return usertempPath;
-        }
-
-
-        /// <summary>
-        /// Retourne le chemin du répertoire de stockage des résultats Toltech
-        /// dans le dossier Documents de l'utilisateur.
-        /// Le répertoire est créé automatiquement s'il n'existe pas.
-        /// </summary>
-        /// <returns>
-        /// Le chemin complet du répertoire des résultats.
-        /// </returns>
-        public static string GetResultsPath()
-        {
-            string path = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.MyDocuments),
-                "TolTech",
-                "Results");
-
-            if (!Directory.Exists(path))
-            {
+                // Création automatique du répertoire racine.
                 Directory.CreateDirectory(path);
-            }
 
-            return path;
+                return path;
+            }
         }
+
+        /// <summary>
+        /// Répertoire utilisé pour la base de données par défaut.
+        /// </summary>
+        public static string AppDataPathDefault =>
+            GetOrCreateDirectory("BD_Default");
+
+        /// <summary>
+        /// Répertoire temporaire utilisé par Toltech.
+        /// </summary>
+        public static string TemporaryPath =>
+            GetOrCreateDirectory("Temp");
+
+        /// <summary>
+        /// Répertoire utilisé pour le stockage des résultats.
+        /// </summary>
+        public static string ResultsPath =>
+            GetOrCreateDirectory("Results");
+
+        /// <summary>
+        /// Répertoire utilisé pour le stockage des métadonnées des modèles.
+        /// </summary>
+        public static string ModelMetaPath =>
+            GetOrCreateDirectory("ModelMeta");
+
+        /// <summary>
+        /// Répertoire utilisé pour le stockage des Setting.
+        /// </summary>
+        public static string SettingsPath =>
+            GetOrCreateDirectory("Settings");
 
 
         /// <summary>
-        /// Retourne le chemin du répertoire contenant les métadonnées des modèles
-        /// Toltech dans le dossier Documents de l'utilisateur.
-        /// Le répertoire est créé automatiquement s'il n'existe pas.
+        /// Retourne le chemin d'un sous-répertoire Toltech et le crée s'il n'existe pas.
         /// </summary>
+        /// <param name="directoryName">
+        /// Nom du sous-répertoire à créer.
+        /// </param>
         /// <returns>
-        /// Le chemin complet du répertoire des métadonnées des modèles.
+        /// Chemin complet du sous-répertoire.
         /// </returns>
-        public static string GetModelMetaPath()
+        private static string GetOrCreateDirectory(string directoryName)
         {
-            string path = Path.Combine(
-                Environment.GetFolderPath(
-                    Environment.SpecialFolder.MyDocuments),
-                "TolTech",
-                "ModelMeta");
+            string path = Path.Combine(ToltechPath, directoryName);
 
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-
-            return path;
-        }
-
-
-        /// <summary>
-        /// Retourne le chemin par défaut utilisé pour le stockage des données
-        /// de la base de données Toltech.
-        /// Le répertoire est créé automatiquement s'il n'existe pas.
-        /// </summary>
-        /// <returns>
-        /// Le chemin complet du répertoire de données par défaut.
-        /// </returns>
-        public static string AppDataPathDefault()
-        {
-            string path = @"C:\Toltech\DataBase_Default";
-
-            // Crée le dossier s'il n'existe pas.
             Directory.CreateDirectory(path);
 
             return path;

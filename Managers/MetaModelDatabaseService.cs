@@ -14,17 +14,11 @@ namespace Toltech.App.Services
         private readonly ILoggerService _logger;
         public static MetaModelDatabaseService ActiveInstance { get; private set; } = null!;
 
-        public MetaModelDatabaseService(string modelPath = "")
+        public MetaModelDatabaseService()
         {
             _logger = App.Logger;
 
-            // Résolution du chemin
-            string baseFolder = string.IsNullOrEmpty(modelPath)
-                ? ModelManager.GetModelMetaPath()
-                : modelPath;
-
-            Directory.CreateDirectory(baseFolder);
-            _dbPath = Path.Combine(baseFolder, "MetaDatasModels.tolx");
+            _dbPath = Path.Combine(ModelManager.ModelMetaPath, "MetaDatasModels.tolx");
 
             // Réutilise la connexion si même chemin
             if (ActiveInstance?._dbPath == _dbPath)
@@ -85,7 +79,7 @@ namespace Toltech.App.Services
 
             await _db.DeleteAsync(modelMeta);
             _logger.LogInfo(
-                $"Suppression du modèle '{Path.GetFileNameWithoutExtension(filePath)}'",
+                $"Deleting model '{Path.GetFileNameWithoutExtension(filePath)}'",
                 nameof(MetaModelDatabaseService));
         }
 

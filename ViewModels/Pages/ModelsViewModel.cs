@@ -5,8 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using DocumentFormat.OpenXml.EMMA;
-using Microsoft.Win32;// Nécessaire pour OpenFileDialog
+using Microsoft.Win32;
 using Toltech.App.FrontEnd.Controls;
 using Toltech.App.Models;
 using Toltech.App.Services;
@@ -150,7 +149,7 @@ namespace Toltech.App.ViewModels
             var vm = this;
             _mainVM = mainVM;
             _domainService = mainVM.DomainService;
-             
+
             _notificationService = App.NotificationService;
 
             FilteredModels = new ListCollectionView(Models);
@@ -158,7 +157,7 @@ namespace Toltech.App.ViewModels
             FilteredModels.SortDescriptions.Add(
                 new SortDescription(nameof(ModelMeta.CreatedAtmodel), ListSortDirection.Descending));
 
-             _ = ReloadSafe();
+            _ = ReloadSafe();
 
             _mainVM.MetaModelSyncService.MetaChanged += OnMetaChanged;
 
@@ -308,7 +307,7 @@ namespace Toltech.App.ViewModels
 
             CurrentEditablePanel = CurrentEditablePanel == panel ? null : panel;
 
-            
+
             if (CurrentEditablePanel == null && panel.DataContext is ModelMeta meta)
             {
                 var saveResult = await _domainService.SaveModelAsync(meta);
