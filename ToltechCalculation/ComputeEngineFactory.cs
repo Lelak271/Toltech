@@ -10,20 +10,6 @@ namespace Toltech.App.ToltechCalculation
     /// </summary>
     public static class ComputeEngineFactory
     {
-        #if REAL_SOLVER
-            /// <summary>
-            /// Crée le moteur de calcul réel.
-            /// </summary>
-            /// <returns>
-            /// Une implémentation réelle de <see cref="IComputeEngine"/>.
-            /// </returns>
-            public static IComputeEngine CreateReal()
-            {
-                // La construction du moteur réel est déléguée
-                // à la factory interne du projet Toltech.Solver.
-                return Solver.ComputeEngineFactory.Create();
-            }
-        #endif
 
         /// <summary>
         /// Crée le moteur de calcul fictif.
@@ -31,11 +17,21 @@ namespace Toltech.App.ToltechCalculation
         /// <returns>
         /// Une implémentation fictive de <see cref="IComputeEngine"/>.
         /// </returns>
-        public static IComputeEngine CreateMock()
+        public static IComputeEngine Create()
         {
+            #if REAL_SOLVER
+
+            // La construction du moteur réel est déléguée
+            // à la factory interne du projet Toltech.Solver.
+            return Solver.ComputeEngineFactory.Create();
+
+            #else
+
             // Le Mock permet à l'application publique de fonctionner
             // sans distribuer le véritable moteur de calcul.
             return new MockComputeEngine();
+
+            #endif
         }
     }
 }

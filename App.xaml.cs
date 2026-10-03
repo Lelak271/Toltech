@@ -105,11 +105,7 @@ namespace Toltech.App
             {
                 // Création du moteur de calcul.
 
-                #if REAL_SOLVER
-                IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.CreateReal();
-                #else
-                IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.CreateMock();
-                #endif
+                IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.Create();
 
                 // Création du ViewModel principal.
                 MainVM = new MainViewModel(engine);
