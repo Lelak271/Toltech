@@ -40,7 +40,7 @@ jobs:
       - name: Checkout Toltech.FreeCAD
         uses: actions/checkout@v4
         with:
-          repository: Lelak271/toltech-freecad
+          repository: Lelak271/toltech-freecad 
           path: Toltech.FreeCAD
 
       # Volontairement : AUCUN checkout de Toltech.Solver (privé)
