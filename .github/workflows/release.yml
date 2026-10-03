@@ -22,25 +22,25 @@ jobs:
       - name: Checkout Toltech.Solver.Contracts
         uses: actions/checkout@v4
         with:
-          repository: Lelak271/Toltech.Solver.Contracts
+          repository: Lelak271/toltech-contracts
           path: Toltech.Solver.Contracts
 
       - name: Checkout Toltech.Solver.Mock
         uses: actions/checkout@v4
         with:
-          repository: Lelak271/Toltech.Solver.Mock
+          repository: Lelak271/toltech-solver-mock
           path: Toltech.Solver.Mock
 
       - name: Checkout Toltech.Cad
         uses: actions/checkout@v4
         with:
-          repository: Lelak271/Toltech.Cad
+          repository: Lelak271/toltech-cad
           path: Toltech.Cad
 
       - name: Checkout Toltech.FreeCAD
         uses: actions/checkout@v4
         with:
-          repository: Lelak271/Toltech.FreeCAD
+          repository: Lelak271/toltech-freecad
           path: Toltech.FreeCAD
 
       # Volontairement : AUCUN checkout de Toltech.Solver (privé)
