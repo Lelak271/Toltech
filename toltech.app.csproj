@@ -22,14 +22,14 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(SolverImpl)' == 'Real'">
-    <ProjectReference Include="..\Toltech.Engine\Toltech.Solver.csproj" />
+    <ProjectReference Include="..\Toltech.Solver\Toltech.Solver.csproj" />
   </ItemGroup>
 	
   <ItemGroup>
     <ProjectReference Include="..\Toltech.Cad\Toltech.Cad.csproj" />
     <ProjectReference Include="..\Toltech.Solver.Contracts\Toltech.Solver.Contracts.csproj" />
-    <ProjectReference Include="..\Toltech.Solver.Mock\Toltech.Solver.Mock.csproj" />
     <ProjectReference Include="..\Toltech.FreeCAD\Toltech.FreeCAD.csproj" />
+    <ProjectReference Include="..\Toltech.Solver\Toltech.Solver.csproj" />
   </ItemGroup>
 	
   <ItemGroup>

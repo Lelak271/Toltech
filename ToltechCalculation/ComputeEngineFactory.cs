@@ -1,5 +1,6 @@
 ﻿using Toltech.Solver.Contracts;
 using Toltech.Solver.Mock;
+using Toltech.Solver;
 
 namespace Toltech.App.ToltechCalculation
 {
@@ -20,6 +21,7 @@ namespace Toltech.App.ToltechCalculation
             // La construction du moteur réel est déléguée
             // à la factory interne du projet Toltech.Solver.
             return Solver.ComputeEngineFactory.Create();
+
         }
 
         /// <summary>
