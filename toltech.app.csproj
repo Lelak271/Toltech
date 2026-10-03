@@ -29,7 +29,6 @@
     <ProjectReference Include="..\Toltech.Cad\Toltech.Cad.csproj" />
     <ProjectReference Include="..\Toltech.Solver.Contracts\Toltech.Solver.Contracts.csproj" />
     <ProjectReference Include="..\Toltech.FreeCAD\Toltech.FreeCAD.csproj" />
-    <ProjectReference Include="..\Toltech.Solver\Toltech.Solver.csproj" />
   </ItemGroup>
 	
   <ItemGroup>
