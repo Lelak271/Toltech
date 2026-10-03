@@ -36,10 +36,6 @@
     <Compile Remove="Views\Controls\TreeViewAreaReq.xaml.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="C:\Users\louis\.nuget\packages\lottiesharp\2.4.3\contentFiles\any\net8.0-windows7.0\lottie_sharp.ico" />
-  </ItemGroup>
-
 	<ItemGroup>
 		<!--
         Les fichiers Python du connecteur FreeCAD sont stockés

@@ -68,12 +68,10 @@ namespace Toltech.App
                                                         AppContext.BaseDirectory,
                                                         "FreeCAD");
 
-            string freeCadDirectory = @"C:\Users\louis\AppData\Roaming\FreeCAD\v1-1";
-
             // Création de l'installateur spécifique à FreeCAD.
             var installer = new FreeCadModuleInstaller(
-                                                        freeCadPythonDirectory,
-                                                        freeCadDirectory);
+                                                        freeCadPythonDirectory
+                                                        );
 
             installer.Install();
 
