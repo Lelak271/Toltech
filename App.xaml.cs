@@ -9,7 +9,6 @@ using Toltech.App.Services.Notification;
 using Toltech.App.ViewModels;
 using Toltech.Cad.Abstractions;
 using Toltech.FreeCAD;
-using Toltech.Solver;
 using Toltech.Solver.Contracts;
 
 namespace Toltech.App
@@ -105,7 +104,12 @@ namespace Toltech.App
             try
             {
                 // Création du moteur de calcul.
-                IComputeEngine engine = ComputeEngineFactory.Create();
+
+                #if REAL_SOLVER
+                IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.CreateReal();
+                #else
+                IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.CreateMock();
+                #endif
 
                 // Création du ViewModel principal.
                 MainVM = new MainViewModel(engine);

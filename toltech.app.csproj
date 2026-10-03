@@ -9,15 +9,30 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
 	<ApplicationIcon>Asset\Logo_TT.ico</ApplicationIcon>
+  
+	<SolverImpl Condition="'$(SolverImpl)' == ''">Mock</SolverImpl>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="MatrixModels\**" />
-    <EmbeddedResource Remove="MatrixModels\**" />
-    <None Remove="MatrixModels\**" />
-    <Page Remove="MatrixModels\**" />
+  <PropertyGroup Condition="'$(SolverImpl)' == 'Real'">
+    <DefineConstants>$(DefineConstants);REAL_SOLVER</DefineConstants>
+  </PropertyGroup>
+		
+  <ItemGroup Condition="'$(SolverImpl)' == 'Mock'">
+    <ProjectReference Include="..\Toltech.Solver.Mock\Toltech.Solver.Mock.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(SolverImpl)' == 'Real'">
+    <ProjectReference Include="..\Toltech.Engine\Toltech.Solver.csproj" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\Toltech.Cad\Toltech.Cad.csproj" />
+    <ProjectReference Include="..\Toltech.ComputeEngine.Contracts\Toltech.Solver.Contracts.csproj" />
+    <ProjectReference Include="..\Toltech.Engine\Toltech.Solver.csproj" />
+    <ProjectReference Include="..\Toltech.Solver.Mock\Toltech.Solver.Mock.csproj" />
+    <ProjectReference Include="..\Toltech.FreeCAD\Toltech.FreeCAD.csproj" />
+  </ItemGroup>
+	
   <ItemGroup>
     <Compile Remove="Views\Controls\TreeViewArea.xaml.cs" />
     <Compile Remove="Views\Controls\TreeViewAreaReq.xaml.cs" />
@@ -290,9 +305,6 @@
 	<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 	<PackageReference Include="Westermo.GraphX.Controls" Version="3.1.0" />
 	<PackageReference Include="Westermo.GraphX.Logic" Version="3.1.0" />
-
-
-
   </ItemGroup>
 
   <ItemGroup>
@@ -427,16 +439,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Asset\Documentation\" />
     <Folder Include="Asset\Templates\3D_Linkages\" />
     <Folder Include="ToltechCalculation\ValidationCalculation\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Toltech.Cad\Toltech.Cad.csproj" />
-    <ProjectReference Include="..\Toltech.ComputeEngine.Contracts\Toltech.Solver.Contracts.csproj" />
-    <ProjectReference Include="..\Toltech.Engine\Toltech.Solver.csproj" />
-    <ProjectReference Include="..\Toltech.FreeCAD\Toltech.FreeCAD.csproj" />
+    <None Include=".github\workflows\release.yml" />
   </ItemGroup>
+
+
 
 
 

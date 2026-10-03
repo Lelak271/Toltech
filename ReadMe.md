@@ -23,8 +23,21 @@ The project provides tools to model mechanical assemblies, define tolerances and
 
 ## Screenshots
 
-<!-- Add application screenshots here -->
+<p align="center">
+  <img src="Asset/Documentation/MainApp.png" alt="Toltech main interface" width="900">
+</p>
 
+<p align="center">
+  <img src="Asset/Documentation/Parts.png" alt="Parts" width="160">
+  <img src="Asset/Documentation/Reqs.png" alt="Requirements" width="160">
+  <img src="Asset/Documentation/Results.png" alt="Results" width="160">
+</p>
+<p align="center">
+  <img src="Asset/Documentation/Datas.png" alt="Datas" width="160">
+  <img src="Asset/Documentation/Model.png" alt="Model" width="160">
+  <img src="Asset/Documentation/Obj.png" alt="Objects" width="160">
+
+</p>
 ## Architecture
 
 Toltech is organised into several components:
@@ -135,13 +148,12 @@ Contributions, bug reports and suggestions are welcome.
 
 Please ensure that the solution builds successfully before submitting changes.
 
-<!-- Add contribution guidelines here -->
 
 ## License
 
-<!-- Add license information here -->
+Copyright © 2026 Louis PERIER.
 
-See the `LICENSE` file for details.
+All rights reserved.
 
 ## Status
 
