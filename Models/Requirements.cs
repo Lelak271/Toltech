@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Vml;
 using SQLite;
 using Toltech.App.ViewModels;
-using Toltech.App.Views;
 
 namespace Toltech.App.Models
 {
@@ -224,7 +215,7 @@ namespace Toltech.App.Models
 
         #endregion
 
-       
+
         /// <summary>
         /// Gestion des valeurs de la DB interne
         /// Exposition dans la classe et gestion dans le VM RequirementsViewModel

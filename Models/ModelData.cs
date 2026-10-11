@@ -48,28 +48,6 @@ namespace Toltech.App.Models
 
         #endregion
 
-        /// <summary>
-        /// Types de liaison mécaniques possibles
-        /// </summary>
-        public enum OLDLinkageType
-        {
-            PointContact = 0,       // Liaison ponctuelle
-            LinearContact = 1,      // Liaison linéaire rectiligne
-            AnnularContact = 2,     // Liaison linéaire annulaire
-            PlanarContact = 3,      // Appui plan
-
-            RevoluteContact = 4,    // Liaison pivot
-            PrismaticContact = 5,   // Liaison glissière
-            CylindricalContact = 6, // Liaison pivot glissant
-
-            //HelicalContact = 7,   // Liaison hélicoïdale
-
-            SphericalContact = 8,   // Liaison rotule
-
-            //PinSlotContact = 9,   // Rotule à doigt
-
-            FixedContact = 10       // Liaison encastrement
-        }
 
         private int _selectedToleranceGroup;
         private bool _toleranceGroupLoaded;

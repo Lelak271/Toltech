@@ -227,8 +227,7 @@
                                   Height="20" 
                                   Padding="2,0,0,0" 
                                   HorizontalContentAlignment="Center"
-                                  VerticalContentAlignment="Center"  FlowDirection="RightToLeft" 
-                                  Checked="ToggleCheckBox1_Checked" Unchecked="ToggleCheckBox1_Unchecked">
+                                  VerticalContentAlignment="Center"  FlowDirection="RightToLeft" >
                             <CheckBox.Content>
                                 <Image Source="/Asset/Logo_DB_tol.png" Height="22"/>
                             </CheckBox.Content>
@@ -345,9 +344,7 @@
                                   Padding="2,0,0,0" 
                                   HorizontalContentAlignment="Center" 
                                   VerticalContentAlignment="Center" 
-                                  FlowDirection="RightToLeft" 
-                                  Checked="ToggleCheckBox2_Checked" 
-                                  Unchecked="ToggleCheckBox2_Unchecked">
+                                  FlowDirection="RightToLeft" >
                             <CheckBox.Content>
                                 <Image Source="/Asset/Logo_DB_tol.png" Height="22"/>
                             </CheckBox.Content>

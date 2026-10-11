@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
+using Toltech.App.FrontEnd.Controls;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.ToltechCalculation.Helpers;
@@ -45,6 +46,9 @@ namespace Toltech.App.ViewModels
         public ModelsViewModel ModelsVM { get; private set; }
         public ResultsViewModel ResultsVM { get; private set; }
         public V3DViewModel V3DVM { get; private set; }
+
+        public ToleranceDBViewModel ToleranceVM { get; private set; }
+
         public TreeViewAreaV3ViewModel TreeViewViewModel { get; private set; }
         public LogViewerViewModel StatusBarVM { get; private set; }
         public TreeNodeService TreeNodeService { get; private set; }
@@ -169,6 +173,8 @@ namespace Toltech.App.ViewModels
             ModelsVM = new ModelsViewModel(this);
             ResultsVM = new ResultsViewModel(this, RequirementVM);
             V3DVM = new V3DViewModel(this);
+
+            ToleranceVM = new ToleranceDBViewModel(this);
 
         }
 

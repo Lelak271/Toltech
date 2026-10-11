@@ -22,11 +22,24 @@
         </Border>
 
         <!-- DataGrid : le scroll vertical est géré par le DataGrid -->
-        <DataGrid x:Name="ToleranceGrid" Grid.Row="1" Margin="15" AutoGenerateColumns="False"
-              AlternatingRowBackground="#E9EDF2" RowBackground="White" GridLinesVisibility="All"
-              HeadersVisibility="Column" CanUserAddRows="True" CanUserDeleteRows="False" CanUserResizeRows="False"
-              IsReadOnly="False" FontSize="14" ColumnHeaderHeight="35" RowHeight="30" BorderThickness="0"
-              SelectionMode="Extended" SelectionUnit="FullRow"  >
+        <DataGrid x:Name="ToleranceGrid" 
+                  Grid.Row="1" 
+                  Margin="15" 
+                  AutoGenerateColumns="False"
+              AlternatingRowBackground="#E9EDF2" 
+                  RowBackground="White" 
+                  GridLinesVisibility="All"
+              HeadersVisibility="Column"
+                  CanUserAddRows="True" 
+                  CanUserDeleteRows="False"
+                  CanUserResizeRows="False"
+              IsReadOnly="False"
+                  FontSize="14" 
+                  ColumnHeaderHeight="35"
+                  RowHeight="30"
+                  BorderThickness="0"
+              SelectionMode="Extended" 
+                  SelectionUnit="FullRow"  >
 
             <DataGrid.ContextMenu>
                 <ContextMenu>

@@ -1,14 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
-using System.Windows.Documents;
 using System.Windows.Input;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.Services.Dialog;
 using Toltech.App.Services.Notification;
 using Toltech.App.Utilities;
-using Westermo.GraphX.Common.Exceptions;
 using static Toltech.App.Models.NodesDefinition;
 using static Toltech.App.Services.EventsManager;
 
@@ -47,9 +45,9 @@ namespace Toltech.App.ViewModels
             EventsManager.PartCrud += OnPartCrudAsync;
             EventsManager.NodeChanged += OnNodeChangedAsync;
 
-                // Gestion centrale du Chargement des Parts du modèle actif
-                EventsManager.ModelOpened += OnOpenModel;
-                //EventsManager.PartAddedOrDelete += WrapperLoadAsync;
+            // Gestion centrale du Chargement des Parts du modèle actif
+            EventsManager.ModelOpened += OnOpenModel;
+            //EventsManager.PartAddedOrDelete += WrapperLoadAsync;
             #endregion
 
             _ = LoadAsync();
@@ -99,7 +97,7 @@ namespace Toltech.App.ViewModels
         {
             // Pas concerné si ce n'est pas un PartNode
             if (e.Type != NodeType.PartNode) return Task.CompletedTask;
-           
+
             // Convertit NodeChangedEvent en PartCrudEvent
             var crudEvent = new PartCrudEvent
             {
@@ -157,24 +155,24 @@ namespace Toltech.App.ViewModels
 
         private void AddOrUpdatePart(Part part)
         {
-                var collection = _mainVM.Parts;
-                var existing = collection.FirstOrDefault(p => p.Id == part.Id);
+            var collection = _mainVM.Parts;
+            var existing = collection.FirstOrDefault(p => p.Id == part.Id);
 
-                if (existing != null)
-                {
-                    // Mise à jour des propriétés en place — préserve la référence pour le ComboBox
-                    existing.NamePart = part.NamePart;
-                    existing.IsFixed = part.IsFixed;
-                    existing.IsActive = part.IsActive;
-                }
-                else
-                {
-                    // Insertion triée par nom
-                    var insertAt = collection
-                        .TakeWhile(p => string.Compare(p.NamePart, part.NamePart) < 0)
-                        .Count();
-                    collection.Insert(insertAt, part);
-                }
+            if (existing != null)
+            {
+                // Mise à jour des propriétés en place — préserve la référence pour le ComboBox
+                existing.NamePart = part.NamePart;
+                existing.IsFixed = part.IsFixed;
+                existing.IsActive = part.IsActive;
+            }
+            else
+            {
+                // Insertion triée par nom
+                var insertAt = collection
+                    .TakeWhile(p => string.Compare(p.NamePart, part.NamePart) < 0)
+                    .Count();
+                collection.Insert(insertAt, part);
+            }
         }
 
         private void RemovePart(int partId)
@@ -300,6 +298,7 @@ namespace Toltech.App.ViewModels
             if (SelectedParts.Count == 0)
                 return;
 
+            // FIX Enlever le message box
             var result = MessageBox.Show(
                 $"Supprimer {SelectedParts.Count} pièce(s) ?",
                 "Confirmation",
@@ -359,7 +358,7 @@ namespace Toltech.App.ViewModels
             {
                 Title = Loc("Choose_an_image"),
                 Filter = $"{Loc("Picture")}|*.png;*.jpg;*.jpeg;*.bmp",
-                Multiselect = false, 
+                Multiselect = false,
             };
 
             bool? result = openFileDialog.ShowDialog();

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using SQLite;
+﻿using SQLite;
 using Toltech.App.ViewModels;
 
 namespace Toltech.App.Models

@@ -69,10 +69,23 @@ namespace Toltech.App.Views
 
         private void OpenFloatingPanelDB_Click(object sender, RoutedEventArgs e)
         {
-            var floatingWindow = new FloatingPanelDB();
-            floatingWindow.Owner = this; // Associe à la fenêtre principale
-            floatingWindow.Show(); // Non modal
+            // Récupère le ViewModel principal.
+            if (DataContext is not MainViewModel mainVM)
+                return;
+
+            // Récupère le ViewModel de la base de données.
+            var dbViewModel = mainVM.ToleranceVM;
+
+            // Crée la fenêtre en lui transmettant le ViewModel existant.
+            var floatingWindow = new FloatingPanelDB(dbViewModel)
+            {
+                Owner = this
+            };
+
+            // Affiche la fenêtre sans mode modal.
+            floatingWindow.Show();
         }
+
         private void OpenFloatingPartDB_Click(object sender, RoutedEventArgs e)
         {
             if (!ModelValidationHelper.CheckModelActif(true))
@@ -206,6 +219,7 @@ namespace Toltech.App.Views
         #endregion
 
         #endregion
+       
         private const double ResizeThreshold = 2.0; // seuil en pixels
         private void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {

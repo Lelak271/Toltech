@@ -89,6 +89,12 @@
 
     </UserControl.Resources>
 
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <MenuItem Header="Select closing tolerance..."
+                      Click="SelectClosingTolerance_Click" />
+        </ContextMenu>
+    </UserControl.ContextMenu>
 
     <Border Margin="4"
             Padding="6"
@@ -130,7 +136,7 @@
             <!-- Colonne droite -->
             <!-- ========================= -->
 
-            <StackPanel Grid.Row="0"
+            <StackPanel Orientation="Horizontal" Grid.Row="0"
                         Grid.Column="1">
 
                 <TextBox
@@ -138,12 +144,13 @@
                     HorizontalAlignment="Left"
                     IsReadOnly="True"
                     Cursor="No"
-                    Text="{Binding Id}" />
+                    Text="{Binding Id}"
+                    Visibility="Collapsed"/>
 
                 <CheckBox
                     Margin="0,4,0,0"
                     HorizontalAlignment="Right"
-                    IsChecked="{Binding UseDatabase}">
+                    IsChecked="{Binding UseDatabase, Mode=TwoWay}">
 
                     <Image Source="/Asset/Logo_DB_tol.png"
                            Height="22"/>

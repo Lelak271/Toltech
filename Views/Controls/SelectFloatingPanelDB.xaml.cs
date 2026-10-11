@@ -1,25 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Toltech.App.Services;
 using Toltech.App.Models;
+using Toltech.App.Services;
+using Toltech.App.Services.Notification;
+using Toltech.App.ViewModels;
 
 namespace Toltech.App.Front
 {
     public partial class SelectFloatingPanelDB : Window
     {
-        private DatabaseService _databaseService;
+        private readonly MainViewModel _mainVM;
+        public MainViewModel MainVM => _mainVM;
+
+        private readonly INotificationService _notificationService;
+        private readonly DomainService _domainService;
+
         public event EventHandler<ToleranceSelectedEventArgs> ToleranceSelected;
         private string currentContextTarget = string.Empty; // "Part1" ou "Part2"
 
-        public SelectFloatingPanelDB()
+        public SelectFloatingPanelDB(MainViewModel mainVM)
         {
+            _mainVM = mainVM;
+            _domainService = mainVM.DomainService;
+
             InitializeComponent();
             InitializeDataGridColumns();
             LoadTolerancesFromActiveModel();
@@ -36,9 +42,9 @@ namespace Toltech.App.Front
         public class ToleranceRow
         {
             public int Id { get; set; }
-            public string DescriptionTolInt { get; set; }
-            public string NameTolInt { get; set; }
-            public double tolInt { get; set; }
+            public string DescriptionTol { get; set; }
+            public string NameTol { get; set; }
+            public double tol { get; set; }
         }
 
         private void InitializeDataGridColumns()
@@ -74,9 +80,7 @@ namespace Toltech.App.Front
                     MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                _databaseService = new DatabaseService(); // TODO : enlever lappel db 
-                _databaseService.Open(ModelManager.ModelActif);
-                var tolerances = await _databaseService.GetTolerancesAsync();
+                var tolerances = await _domainService.GetTolerancesAsync();
 
                 if (tolerances == null || !tolerances.Any())
                 {
@@ -87,10 +91,10 @@ namespace Toltech.App.Front
 
                 var rows = tolerances.Select(tol => new ToleranceRow
                 {
-                    Id = tol.Id_tol,
-                    DescriptionTolInt = tol.DescriptionTolInt,
-                    NameTolInt = tol.NameTolInt,
-                    tolInt = tol.tolInt,
+                    Id = tol.Id,
+                    DescriptionTol = tol.DescriptionTol,
+                    NameTol = tol.NameTol,
+                    tol = tol.Tol,
                 }).ToList();
 
                 Application.Current.Dispatcher.Invoke(() =>
@@ -111,34 +115,28 @@ namespace Toltech.App.Front
         {
             try
             {
-                if (_databaseService == null)
-                {
-                    MessageBox.Show("Service base de données non initialisé.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
                 foreach (var item in ToleranceGrid.Items)
                 {
                     if (item is ToleranceRow tol)
                     {
-                        var toleranceToSave = new DBTolerances
+                        var toleranceToSave = new Tolerance
                         {
-                            Id_tol = tol.Id,
-                            DescriptionTolInt = tol.DescriptionTolInt,
-                            NameTolInt = tol.NameTolInt.ToString(),
-                            tolInt = tol.tolInt,
+                            Id = tol.Id,
+                            DescriptionTol = tol.DescriptionTol,
+                            NameTol = tol.NameTol.ToString(),
+                            Tol = tol.tol,
                         };
 
-                        if (toleranceToSave.Id_tol == 0)
+                        if (toleranceToSave.Id == 0)
                         {
                             // Création d'une nouvelle tolérance
-                            await _databaseService.InsertToleranceAsync(toleranceToSave);
+                            await _domainService.InsertToleranceAsync(toleranceToSave);
                             UpdateUI();
                         }
                         else
                         {
                             // Mise à jour d'une tolérance existante
-                            await _databaseService.UpdateToleranceAsync(toleranceToSave);
+                            await _domainService.UpdateToleranceAsync(toleranceToSave);
                         }
                     }
                 }
@@ -190,9 +188,9 @@ namespace Toltech.App.Front
             if (ToleranceGrid.SelectedItem is ToleranceRow selectedRow)
             {
                 int selectedId = selectedRow.Id;
-                string selectedName = selectedRow.NameTolInt;
-                string selectedDescription = selectedRow.DescriptionTolInt;
-                string selectedTol = selectedRow.tolInt.ToString(); // Conversion double -> string
+                string selectedName = selectedRow.NameTol;
+                string selectedDescription = selectedRow.DescriptionTol;
+                string selectedTol = selectedRow.tol.ToString(); // Conversion double -> string
 
                 OnToleranceChosen(selectedId, selectedName, selectedDescription, selectedTol);
             }

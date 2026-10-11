@@ -9,13 +9,8 @@
         Title="Tolérances"
         Width="1000" Height="600"
         WindowStartupLocation="CenterOwner"
-        Background="#F4F4F4"
-        FontFamily="Segoe UI"
+        FontFamily="Segoe UI "
         >
-
-    <Window.DataContext>
-        <vm:ToleranceDBViewModel />
-    </Window.DataContext>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -25,12 +20,20 @@
         </Grid.RowDefinitions>
 
         <!-- Bandeau supérieur -->
-        <Border Background="#2D3E50" Padding="15" Margin="5" CornerRadius="6" Grid.Row="0">
-            <TextBlock Text="Liste des tolérances du modèle actif" Foreground="White" FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <Border Background="#2D3E50" 
+                Padding="15" 
+                Margin="5" 
+                CornerRadius="6">
+            <TextBlock Text="Liste des tolérances du modèle actif" 
+                       FontSize="20" 
+                       FontWeight="SemiBold" 
+                       VerticalAlignment="Center"/>
         </Border>
 
         <!-- DataGrid -->
-        <DataGrid ItemsSource="{Binding Tolerances}" Grid.Row="1" Margin="15"
+        <DataGrid ItemsSource="{Binding Tolerances}" 
+                  Grid.Row="1" 
+                  Margin="15"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
@@ -41,9 +44,9 @@
                   >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Nom" Binding="{Binding NameTolInt}"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding DescriptionTolInt}"/>
-                <DataGridTextColumn Header="Tol Int" Binding="{Binding tolInt}"/>
+                <DataGridTextColumn Header="Nom" Binding="{Binding NameTol}"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding DescriptionTol}"/>
+                <DataGridTextColumn Header="Tol Int" Binding="{Binding Tol}"/>
             </DataGrid.Columns>
 
             <DataGrid.ContextMenu>

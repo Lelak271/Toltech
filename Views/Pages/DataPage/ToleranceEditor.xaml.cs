@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using Toltech.App.Front;
+using Toltech.App.Models;
+using Toltech.App.ViewModels;
 
 namespace Toltech.App.Views.Pages.DataPage
 {
@@ -21,11 +12,18 @@ namespace Toltech.App.Views.Pages.DataPage
     /// </summary>
     public partial class ToleranceEditor : UserControl
     {
+
+        private readonly MainViewModel _mainVM;
+        public MainViewModel MainVM => _mainVM;
+
         public ToleranceEditor()
         {
+            _mainVM = App.MainVM; 
+
             InitializeComponent();
         }
 
+        #region Properties Control
         public string PlaceholderName
         {
             get => (string)GetValue(PlaceholderNameProperty);
@@ -75,6 +73,61 @@ namespace Toltech.App.Views.Pages.DataPage
                 typeof(ToleranceEditor),
                 new PropertyMetadata(false));
 
+        #endregion
 
+        /// <summary>
+        /// Ouvre la fenêtre de sélection d'une tolérance issue de la base de données.
+        /// </summary>
+        private void SelectClosingTolerance_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            // Récupère le ModelData associé à ce composant.
+            // Cette approche suppose que le DataContext du composant
+            // est directement un objet ModelData.
+            if (DataContext is not ToleranceSlotViewModel toleranceSlotViewModel)
+                return;
+
+            // Crée la fenêtre de sélection existante.
+            var floatingDbWindow = new SelectFloatingPanelDB(_mainVM);
+
+            // Récupère la fenêtre propriétaire.
+            var ownerWindow = Window.GetWindow(this);
+
+            if (ownerWindow != null)
+                floatingDbWindow.Owner = ownerWindow;
+
+            // Abonne l'événement qui renvoie la tolérance sélectionnée.
+            floatingDbWindow.ToleranceSelected +=
+                (s, args) => OnToleranceSelected(toleranceSlotViewModel, args);
+
+            // Affiche la fenêtre de sélection de manière modale.
+            floatingDbWindow.ShowDialog();
+        }
+
+        /// <summary>
+        /// Traite la tolérance sélectionnée dans la fenêtre de la base de données.
+        /// </summary>
+        private void OnToleranceSelected(
+            ToleranceSlotViewModel toleranceSlotViewModel,
+            SelectFloatingPanelDB.ToleranceSelectedEventArgs args)
+        {
+            if (toleranceSlotViewModel == null)
+                return;
+
+            // Récupère le ModelData associé au slot.
+            var modelData = toleranceSlotViewModel.ModelData;
+
+            if (modelData == null) 
+                return;
+
+            // TODO 
+            // Mettre en place la logique pour mettre a jour le bon Id tolerance 
+            // Mettre la logique dans Domainservice
+
+            // Affecte l'identifiant de la tolérance sélectionnée en base.
+            modelData.Id = args.ToleranceID;
+        }
     }
+
 }

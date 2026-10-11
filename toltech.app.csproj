@@ -9,18 +9,26 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
 	<ApplicationIcon>Asset\Logo_TT.ico</ApplicationIcon>
-  
+
+	  <!--
+        Mock is used by default.
+        The private Solver is enabled explicitly with:
+        dotnet run -p:SolverImpl=Real
+    -->
 	<SolverImpl Condition="'$(SolverImpl)' == ''">Mock</SolverImpl>
   </PropertyGroup>
 
+	<!-- Enable the REAL_SOLVER compilation symbol only when using the real solver -->
   <PropertyGroup Condition="'$(SolverImpl)' == 'Real'">
     <DefineConstants>$(DefineConstants);REAL_SOLVER</DefineConstants>
   </PropertyGroup>
-		
+
+	<!-- Public version -->
   <ItemGroup Condition="'$(SolverImpl)' == 'Mock'">
     <ProjectReference Include="..\Toltech.Solver.Mock\Toltech.Solver.Mock.csproj" />
   </ItemGroup>
 
+	<!-- Private development version -->
   <ItemGroup Condition="'$(SolverImpl)' == 'Real'">
     <ProjectReference Include="..\Toltech.Solver\Toltech.Solver.csproj" />
   </ItemGroup>
@@ -34,10 +42,6 @@
   <ItemGroup>
     <Compile Remove="Views\Controls\TreeViewArea.xaml.cs" />
     <Compile Remove="Views\Controls\TreeViewAreaReq.xaml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="C:\Users\louis\.nuget\packages\lottiesharp\2.4.3\contentFiles\any\net8.0-windows7.0\lottie_sharp.ico" />
   </ItemGroup>
 
 	<ItemGroup>

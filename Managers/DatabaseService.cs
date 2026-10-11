@@ -22,7 +22,6 @@ namespace Toltech.App.Services
         private const string EmptyDatabaseFileName = "template_db.tolx";
         private string EmptyDatabasePath => Path.Combine(ModelManager.TemporaryToltechPath, EmptyDatabaseFileName);
 
-        private static string _modelPath = "template_db.tolx";
         private SQLiteAsyncConnection _asyncDb; // Connexion à la base de données SQLite
         private string _dbPath; // Chemin d'accès à la base de données
         public static DatabaseService ActiveInstance { get; private set; } = null!;
@@ -135,7 +134,7 @@ namespace Toltech.App.Services
 
             await db.CreateTableAsync<Requirements>();
             await db.CreateTableAsync<ModelData>();
-            await db.CreateTableAsync<DBTolerances>();
+            await db.CreateTableAsync<Tolerance>();
             await db.CreateTableAsync<NodesDefinition>();
             await db.CreateTableAsync<ModelDB>();
             await db.CreateTableAsync<Part>();
@@ -213,7 +212,7 @@ namespace Toltech.App.Services
         /// </summary>
         /// <param name="tolerances"></param>
         /// <returns></returns>
-        public async Task InsertToleranceAsync(DBTolerances tolerances)
+        public async Task InsertToleranceAsync(Tolerance tolerances)
         {
             await _asyncDb.InsertAsync(tolerances);
         }
@@ -565,28 +564,28 @@ namespace Toltech.App.Services
         #region Fonction DBTolerances
 
         // Fonction pour mettre à jour les données Tolérances
-        public async Task UpdateToleranceAsync(DBTolerances tolerances)
+        public async Task UpdateToleranceAsync(Tolerance tolerances)
         {
             await _asyncDb.UpdateAsync(tolerances);
         }
 
         // Fonction pour supprimer les données Tolérances
-        public async Task DeleteToleranceAsync(DBTolerances tolerances)
+        public async Task DeleteToleranceAsync(Tolerance tolerances)
         {
             await _asyncDb.DeleteAsync(tolerances);
         }
 
         //   Fonction pour récupérer toutes les données de DB Tolérances
-        public async Task<List<DBTolerances>> GetTolerancesAsync()
+        public async Task<List<Tolerance>> GetTolerancesAsync()
         {
-            return await _asyncDb.Table<DBTolerances>().ToListAsync();
+            return await _asyncDb.Table<Tolerance>().ToListAsync();
         }
 
         // Récuperation de tolerance par ID
-        public async Task<DBTolerances> GetTolerancesByIdAsync(int id)
+        public async Task<Tolerance> GetTolerancesByIdAsync(int id)
         {
             Debug.WriteLine("tet");
-            return await _asyncDb.FindAsync<DBTolerances>(id);
+            return await _asyncDb.FindAsync<Tolerance>(id);
         }
 
         #endregion

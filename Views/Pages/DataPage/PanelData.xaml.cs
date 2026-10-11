@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Toltech.App.Front;
 using Toltech.App.Models;
-using Toltech.App.Resources.Lang;
 using Toltech.App.Services;
 using Toltech.App.Utilities;
 using Toltech.App.ViewModels;
@@ -16,7 +15,6 @@ using Toltech.Cad.Model;
 using Toltech.Solver.Contracts;
 using static Toltech.App.Models.NodesDefinition;
 using static Toltech.App.Services.EventsManager;
-using static Toltech.App.Utilities.LinkageTypeExtensions;
 
 namespace Toltech.App.FrontEnd.Controls
 {
@@ -52,86 +50,6 @@ namespace Toltech.App.FrontEnd.Controls
                     Value = type
                 });
             }
-
-            #region Click droit
-
-            ContextMenu lienDbContextMenu = new ContextMenu();
-
-            MenuItem lienDbMenuItem = new MenuItem
-            {
-                Header = "Lien DB"
-            };
-            lienDbMenuItem.Click += LienDbMenuItem_Click;
-
-            lienDbContextMenu.Items.Add(lienDbMenuItem);
-
-
-
-            // === Zone Pièce 1 ===
-            //NameTol1Part1.ContextMenu = lienDbContextMenu;
-            //descriptionPart1.ContextMenu = lienDbContextMenu;
-            //Tol1Text.ContextMenu = lienDbContextMenu;
-
-            //NameTol1Part1.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part1";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart1.IsChecked == true;
-            //};
-            //descriptionPart1.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part1";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart1.IsChecked == true;
-            //};
-            //Tol1Text.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part1";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart1.IsChecked == true;
-            //};
-
-            //// === Zone Int ===
-            //NameTolInt.ContextMenu = lienDbContextMenu;
-            //descriptionPartInt.ContextMenu = lienDbContextMenu;
-            //TolIntText.ContextMenu = lienDbContextMenu;
-
-            //NameTolInt.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Int";
-            //    lienDbMenuItem.IsEnabled = CheckBoxTolInt.IsChecked == true;
-            //};
-            //descriptionPartInt.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Int";
-            //    lienDbMenuItem.IsEnabled = CheckBoxTolInt.IsChecked == true;
-            //};
-            //TolIntText.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Int";
-            //    lienDbMenuItem.IsEnabled = CheckBoxTolInt.IsChecked == true;
-            //};
-
-            //// === Zone Pièce 2 ===
-            //NameTol2Part2.ContextMenu = lienDbContextMenu;
-            //descriptionPart2.ContextMenu = lienDbContextMenu;
-            //Tol2Text.ContextMenu = lienDbContextMenu;
-
-            //NameTol2Part2.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part2";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart2.IsChecked == true;
-            //};
-            //descriptionPart2.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part2";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart2.IsChecked == true;
-            //};
-            //Tol2Text.ContextMenuOpening += (s, e) =>
-            //{
-            //    currentContextTarget = "Part2";
-            //    lienDbMenuItem.IsEnabled = CheckBoxPart2.IsChecked == true;
-            //};
-
-            #endregion
-
         }
 
         private void OnUnloaded(
@@ -416,51 +334,6 @@ namespace Toltech.App.FrontEnd.Controls
         }
         #endregion
 
-        #region Fonctions principales
-        private void LienDbMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var floatingDbWindow = new SelectFloatingPanelDB();
-            floatingDbWindow.ToleranceSelected += FloatingDbWindow_ToleranceSelected;
-
-            // Correction : Utilisation de Window.GetWindow pour définir le propriétaire
-            var ownerWindow = Window.GetWindow(this);
-            if (ownerWindow != null)
-            {
-                floatingDbWindow.Owner = ownerWindow;
-            }
-
-            floatingDbWindow.ShowDialog();
-        }
-
-        private void FloatingDbWindow_ToleranceSelected(object sender, SelectFloatingPanelDB.ToleranceSelectedEventArgs e)
-        {
-
-
-            //if (currentContextTarget == "Part1")
-            //{
-            //    this.IdTol1.Text = e.ToleranceID.ToString();
-            //    this.NameTol1Part1.Text = e.ToleranceName;
-            //    this.descriptionPart1.Text = e.ToleranceDescription;
-            //    this.Tol1Text.Text = e.ToleranceValue;
-            //}
-            //else if (currentContextTarget == "Part2")
-            //{
-            //    this.IdTol2.Text = e.ToleranceID.ToString();
-            //    this.NameTol2Part2.Text = e.ToleranceName;
-            //    this.descriptionPart2.Text = e.ToleranceDescription;
-            //    this.Tol2Text.Text = e.ToleranceValue;
-            //}
-            //else if (currentContextTarget == "Int")
-            //{
-            //    this.IdTolInt.Text = e.ToleranceID.ToString();
-            //    this.NameTolInt.Text = e.ToleranceName;
-            //    this.descriptionPartInt.Text = e.ToleranceDescription;
-            //    this.TolIntText.Text = e.ToleranceValue;
-            //}
-        }
-
-        #endregion
-
         #region CheckBox Events
         // Méthodes pour NExtr
         public void ToggleCheckBoxNExtr_Checked(object sender, EventArgs e) { }
@@ -548,9 +421,7 @@ namespace Toltech.App.FrontEnd.Controls
         // Fenêtre affichée pendant la sélection d'un point.
         private CadPointSelectionWindow? _cadSelectionWindow;
 
-        private async void PickPointMenuItem_Executed(
-    object sender,
-    ExecutedRoutedEventArgs e)
+        private async void PickPointMenuItem_Executed(object sender,ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is not TextBox textBox)
                 return;
@@ -609,9 +480,8 @@ namespace Toltech.App.FrontEnd.Controls
                 _pointTargetTextBox = null;
             }
         }
-        private async void PickEdgeMenuItem_Executed(
-    object sender,
-    ExecutedRoutedEventArgs e)
+      
+        private async void PickEdgeMenuItem_Executed(object sender,ExecutedRoutedEventArgs e)
         {
             if (e.Parameter is not TextBox textBox)
                 return;
@@ -671,9 +541,7 @@ namespace Toltech.App.FrontEnd.Controls
             }
         }
 
-        private void OnSelectionChanged(
-            object? sender,
-            CadSelection selection)
+        private void OnSelectionChanged(object? sender, CadSelection selection)
         {
             switch (selection.Type)
             {
@@ -758,6 +626,7 @@ namespace Toltech.App.FrontEnd.Controls
                 _directionTargetTextBox = null;
             });
         }
+     
         private void ClosePointSelectionWindow()
         {
             if (_cadSelectionWindow is null)

@@ -13,7 +13,6 @@
              xmlns:conv="clr-namespace:Toltech.App.Converters"
              xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
              xmlns:cad="clr-namespace:Toltech.App.Services.CAD"
-             xmlns:Contract="clr-namespace:Toltech.Solver.Contracts;assembly=Toltech.ComputeEngine.Contracts"
              mc:Ignorable="d"
              Width="1000" Height="Auto"
              HorizontalAlignment="Stretch"
@@ -130,7 +129,8 @@
   
         
     </UserControl.Resources>
-    
+
+
     <Grid  Margin="0" ShowGridLines="False" Width="auto" >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>

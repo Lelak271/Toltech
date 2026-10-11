@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Toltech.App.Models;
 using Toltech.App.Services.Logging;
 using Toltech.App.Services.Notification;
@@ -1428,7 +1427,35 @@ namespace Toltech.App.Services
 
         #endregion
 
-        #region Visualization 
+        #region Service Tolerance 
+
+        // Récupère toutes les tolérances.
+        public Task<List<Tolerance>> GetTolerancesAsync()
+        {
+            return _databaseService.GetTolerancesAsync();
+        }
+
+        // Insère une nouvelle tolérance.
+        public Task InsertToleranceAsync(Tolerance tolerance)
+        {
+            return _databaseService.InsertToleranceAsync(tolerance);
+        }
+
+        // Met à jour une tolérance existante.
+        public Task UpdateToleranceAsync(Tolerance tolerance)
+        {
+            return _databaseService.UpdateToleranceAsync(tolerance);
+        }
+
+        // Supprime une tolérance.
+        public Task DeleteToleranceAsync(Tolerance tolerance)
+        {
+            return _databaseService.DeleteToleranceAsync(tolerance);
+        }
+
+        #endregion
+
+        #region Visualization 3D 
 
         public async Task<Result<List<ModelData>>> GetActivePartsModelDataAsync()
         {

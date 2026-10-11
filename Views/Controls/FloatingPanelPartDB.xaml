@@ -124,10 +124,7 @@
                     Width="120"
                     Margin="5"
                     Command="{Binding SaveCommand}"/>
-            <Button Content="test"
-                    Width="120"
-                    Margin="5"
-                    Command="{Binding TestCommand}"/>
+            
         </StackPanel>
 
     </Grid>

@@ -39,6 +39,10 @@ namespace Toltech.App.ViewModels
             _model.PropertyChanged += Model_PropertyChanged;
         }
 
+        public ModelData ModelData
+        {
+            get => _model;
+        }
         public string Name
         {
             get => _name.Value;
@@ -91,6 +95,11 @@ namespace Toltech.App.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #region
+
+        #endregion
+
     }
 
 }

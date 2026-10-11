@@ -1,14 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Toltech.App.ViewModels;
-using static Toltech.App.Models.ModelData;
-
-namespace Toltech.App.Models
+﻿namespace Toltech.App.Models
 {
-
 
     /// <summary>
     /// Mémorise le dernier groupe de tolérance sélectionné pour chaque modèle

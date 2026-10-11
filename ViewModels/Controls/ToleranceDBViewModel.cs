@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
 using Toltech.App.Models;
 using Toltech.App.Services;
-using Toltech.App.ViewModels;
+using Toltech.App.Services.Notification;
 using TtCore = Toltech.App.ViewModels;
 
 namespace Toltech.App.ViewModels
 {
     public class ToleranceDBViewModel : BaseViewModel
     {
-        private readonly DatabaseService _databaseService;
+        private readonly MainViewModel _mainVM;
+        public MainViewModel MainVM => _mainVM;
+
+        private readonly DomainService _domainService;
+
+        private readonly INotificationService _notificationService;
+
 
         private ObservableCollection<ToleranceRow> _selectedTolerances
             = new ObservableCollection<ToleranceRow>();
@@ -23,16 +28,10 @@ namespace Toltech.App.ViewModels
         }
 
 
-        public ToleranceDBViewModel()
+        public ToleranceDBViewModel(MainViewModel mainVM)
         {
-            if (string.IsNullOrEmpty(ModelManager.ModelActif))
-            {
-                MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            _databaseService = new DatabaseService(); // TODO : enlever lappel db 
-            // TODO : Lors du refactor reprendre instance unique de DB
-            _databaseService.Open(ModelManager.ModelActif);
+            _mainVM = mainVM;
+            _domainService = mainVM.DomainService;
 
             Tolerances = new ObservableCollection<ToleranceRow>();
 
@@ -82,17 +81,17 @@ namespace Toltech.App.ViewModels
             await ExecuteBusyAsync("Chargement des tolérances...", async () =>
             {
                 Tolerances.Clear();
-                var tolerances = await _databaseService.GetTolerancesAsync();
+                var tolerances = await _domainService.GetTolerancesAsync();
                 if (tolerances == null || !tolerances.Any()) return;
 
                 foreach (var tol in tolerances)
                 {
                     Tolerances.Add(new ToleranceRow
                     {
-                        Id = tol.Id_tol,
-                        NameTolInt = tol.NameTolInt,
-                        DescriptionTolInt = tol.DescriptionTolInt,
-                        tolInt = tol.tolInt
+                        Id = tol.Id,
+                        NameTol = tol.NameTol,
+                        DescriptionTol = tol.DescriptionTol,
+                        Tol = tol.Tol
                     });
                 }
             });
@@ -104,18 +103,18 @@ namespace Toltech.App.ViewModels
             {
                 foreach (var tol in Tolerances)
                 {
-                    var dbTol = new DBTolerances
+                    var dbTol = new Tolerance
                     {
-                        Id_tol = tol.Id,
-                        NameTolInt = tol.NameTolInt,
-                        DescriptionTolInt = tol.DescriptionTolInt,
-                        tolInt = tol.tolInt
+                        Id = tol.Id,
+                        NameTol = tol.NameTol,
+                        DescriptionTol = tol.DescriptionTol,
+                        Tol = tol.Tol
                     };
 
-                    if (dbTol.Id_tol == 0)
-                        await _databaseService.InsertToleranceAsync(dbTol);
+                    if (dbTol.Id == 0)
+                        await _domainService.InsertToleranceAsync(dbTol);
                     else
-                        await _databaseService.UpdateToleranceAsync(dbTol);
+                        await _domainService.UpdateToleranceAsync(dbTol);
                 }
             });
 
@@ -126,37 +125,39 @@ namespace Toltech.App.ViewModels
         {
             await ExecuteBusyAsync("Création d'une tolérance...", async () =>
             {
-                var newTol = new DBTolerances();
-                await _databaseService.InsertToleranceAsync(newTol);
+                var newTol = new Tolerance();
+                await _domainService.InsertToleranceAsync(newTol);
                 Tolerances.Add(new ToleranceRow
                 {
-                    Id = newTol.Id_tol,
-                    NameTolInt = newTol.NameTolInt,
-                    DescriptionTolInt = newTol.DescriptionTolInt,
-                    tolInt = newTol.tolInt
+                    Id = newTol.Id,
+                    NameTol = newTol.NameTol,
+                    DescriptionTol = newTol.DescriptionTol,
+                    Tol = newTol.Tol
                 });
             });
+            LoadTolerancesAsync();
+
         }
 
         public async Task DeleteToleranceAsync(ToleranceRow tol)
         {
             if (tol == null) return;
 
-            var result = MessageBox.Show($"Confirmez-vous la suppression de {tol.NameTolInt} ?",
+            var result = MessageBox.Show($"Confirmez-vous la suppression de {tol.NameTol} ?",
                                          "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes) return;
 
             await ExecuteBusyAsync("Suppression...", async () =>
             {
-                var dbTol = new DBTolerances
+                var dbTol = new Tolerance
                 {
-                    Id_tol = tol.Id,
-                    NameTolInt = tol.NameTolInt,
-                    DescriptionTolInt = tol.DescriptionTolInt,
-                    tolInt = tol.tolInt
+                    Id = tol.Id,
+                    NameTol = tol.NameTol,
+                    DescriptionTol = tol.DescriptionTol,
+                    Tol = tol.Tol
                 };
 
-                await _databaseService.DeleteToleranceAsync(dbTol);
+                await _domainService.DeleteToleranceAsync(dbTol);
                 Tolerances.Remove(tol);
             });
         }
@@ -182,15 +183,15 @@ namespace Toltech.App.ViewModels
 
                 foreach (var tol in toDelete)
                 {
-                    var dbTol = new DBTolerances
+                    var dbTol = new Tolerance
                     {
-                        Id_tol = tol.Id,
-                        NameTolInt = tol.NameTolInt,
-                        DescriptionTolInt = tol.DescriptionTolInt,
-                        tolInt = tol.tolInt
+                        Id = tol.Id,
+                        NameTol = tol.NameTol,
+                        DescriptionTol = tol.DescriptionTol,
+                        Tol = tol.Tol
                     };
 
-                    await _databaseService.DeleteToleranceAsync(dbTol);
+                    await _domainService.DeleteToleranceAsync(dbTol);
                     Tolerances.Remove(tol);
                 }
 
@@ -220,11 +221,11 @@ namespace Toltech.App.ViewModels
     }
 
     // DTO pour DataGrid
-    public class ToleranceRow
+    public class ToleranceRow 
     {
         public int Id { get; set; }
-        public string NameTolInt { get; set; }
-        public string DescriptionTolInt { get; set; }
-        public double tolInt { get; set; }
+        public string NameTol { get; set; }
+        public string DescriptionTol { get; set; }
+        public double Tol { get; set; }
     }
 }
