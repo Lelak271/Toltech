@@ -195,6 +195,26 @@ namespace Toltech.App.Services
 
 
         /// <summary>
+        /// Répertoire contenant les modèles 3D des liaisons.
+        /// </summary>
+        public static string LinkageTemplateDirectory
+        {
+            get
+            {
+                string path = Path.Combine(
+                    AppContext.BaseDirectory,
+                    "Asset",
+                    "Templates",
+                    "3D_Linkages");
+
+                // Création automatique du répertoire si nécessaire.
+                Directory.CreateDirectory(path);
+
+                return path;
+            }
+        }
+
+        /// <summary>
         /// Retourne le chemin d'un sous-répertoire Toltech et le crée s'il n'existe pas.
         /// </summary>
         /// <param name="directoryName">

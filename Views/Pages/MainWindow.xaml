@@ -1,394 +1,495 @@
-﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                     xmlns:ui="http://schemas.toltech/ui"
-                     xmlns:Fluent="urn:fluent-ribbon"
-                     x:Class="Toltech.App.Views.MainWindow"
-                     xmlns:views="clr-namespace:Toltech.App.Views"
-                     xmlns:controls="clr-namespace:Toltech.App.FrontEnd.Controls"
-                     xmlns:vm="clr-namespace:Toltech.App.ViewModels"
-                     xmlns:conv="clr-namespace:Toltech.App.Converters"
-                     xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
-                     Width="1200"
-                     Height="600"
-                     FlowDirection="LeftToRight"
-                     WindowStyle="None"
-                     Background="White"
-                     WindowState="Normal"
-                     WindowStartupLocation="CenterScreen"
-                     ResizeMode="CanResize"
-                     x:Name="MainWindowApp"
-                     >
-    <!--SourceInitialized="MainWindow_SourceInitialized"-->
-    
-    <WindowChrome.WindowChrome>
-        <WindowChrome UseAeroCaptionButtons="False"
-                      CaptionHeight="35"
-                      ResizeBorderThickness="5"
-                      GlassFrameThickness="0"
-                      NonClientFrameEdges="None" 
-                      CornerRadius="0"
-                      />
-    </WindowChrome.WindowChrome>
-    
-    <Window.Resources>
+﻿<ui:FluentWindow
+    x:Class="Toltech.App.Views.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:views="clr-namespace:Toltech.App.Views"
+    xmlns:controls="clr-namespace:Toltech.App.FrontEnd.Controls"
+    xmlns:vm="clr-namespace:Toltech.App.ViewModels"
+    xmlns:conv="clr-namespace:Toltech.App.Converters"
+    xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
+    x:Name="MainWindowApp"
+    Width="1200"
+    Height="600"
+    ExtendsContentIntoTitleBar="True"
+    WindowBackdropType="None"
+    WindowCornerPreference="Default"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Normal"
+    ResizeMode="CanResize"
+    FlowDirection="LeftToRight"
+    >
+
+    <ui:FluentWindow.Resources>
 
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <conv:BoolToGridLengthConverter x:Key="BoolToGridLengthConverter"/>
         <conv:DensityUnitToSymbolConverter x:Key="DensityUnitToSymbolConverter"/>
-        
-        <Style TargetType="{x:Type Fluent:QuickAccessToolBar}"
-              BasedOn="{StaticResource {x:Type Fluent:QuickAccessToolBar}}">
-            <Setter Property="MinWidth" Value="35"/>
+
+        <!-- ===== Remplacement des RibbonGroupBox : GroupBox avec titre en bas ===== -->
+        <Style x:Key="RibbonGroupStyle" TargetType="GroupBox">
+            <Setter Property="Margin" Value="0,0,2,0"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="GroupBox">
+                        <Border BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,1,0"
+                                Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <ContentPresenter Grid.Row="0" VerticalAlignment="Center"/>
+                                <ContentPresenter Grid.Row="1"
+                                                  ContentSource="Header"
+                                                  HorizontalAlignment="Center"
+                                                  Margin="0,4,0,0"
+                                                  TextElement.FontSize="11"
+                                                  TextElement.Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-    </Window.Resources>
+        <!-- Bouton "grande icône" (équivalent SizeDefinition=Large) -->
+        <Style x:Key="RibbonLargeButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="MinWidth" Value="64"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+        </Style>
 
-    <Border x:Name="RootContainer" Padding="0" Margin="0" BorderThickness="0" BorderBrush="Transparent"> 
-        <Grid x:Name="GridApplication" Margin="0" ShowGridLines="False" >
+        <!-- Bouton "ligne" (équivalent SizeDefinition=Middle / Small) -->
+        <Style x:Key="RibbonSmallButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style x:Key="RibbonIconStyle" TargetType="Image">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+    </ui:FluentWindow.Resources>
+
+    <Grid x:Name="GridApplication" Margin="0" ShowGridLines="False">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="40"/>
+            <!-- TitleBar -->
+            <RowDefinition Height="160"/>
+            <!-- Ruban (tabs + commandes) -->
             <RowDefinition Height="35"/>
+            <!-- Navigation -->
             <RowDefinition Height="*"/>
+            <!-- Contenu -->
         </Grid.RowDefinitions>
 
         <Grid.Background>
-            <!--<ImageBrush ImageSource="/Asset/Capg.png" Stretch="UniformToFill" AlignmentX="Center" AlignmentY="Center"/>-->
-            <!--<ImageBrush ImageSource="/Asset/TheBatman.jpg" Stretch="UniformToFill" AlignmentX="Center" AlignmentY="Center"/>-->
-            <ImageBrush ImageSource="/Asset/FontStars.jpg" Stretch="UniformToFill" AlignmentX="Center" AlignmentY="Center"/>
-            <!--<SolidColorBrush Color="{DynamicResource PrimaryBackgroundColor}"/>-->
+            <!--<ImageBrush ImageSource="/Asset/FontStars.jpg" Stretch="UniformToFill" AlignmentX="Center" AlignmentY="Center"/>-->
+            <!--<SolidColorBrush Color="{DynamicResource ApplicationBackgroundBrush}"/>-->
+            <DynamicResource ResourceKey="ApplicationBackgroundBrush"/>
         </Grid.Background>
-        
-        <Border x:Name="AppTitleBar" Grid.Row="0" Height="35"  >
-                <DockPanel LastChildFill="True" Margin="0">
-                <!-- Titre à gauche -->
-                <TextBlock  DockPanel.Dock="Left" VerticalAlignment="Center" Margin="10,0">
 
-                <Run Text="TOLTECH Application -" />
-                <Run Text="" />
-                <Run Text="{Binding ModelName, Mode=OneWay}" />
-                <!--<Run Text="Version 0.0.2"
-                     FontSize="11"
-                     Foreground="Gray"
-                     BaselineAlignment="Center" />-->
-                </TextBlock>
+        <!-- ======================= TITLE BAR ======================= -->
+        <!-- Les boutons Minimize / Maximize / Close sont gérés nativement par WPF-UI -->
+        <ui:TitleBar x:Name="AppTitleBar"
+                     Grid.Row="0"
+                     Title="{Binding ModelName, StringFormat='TOLTECH Application - {0}'}"/>
 
-                <!-- Boutons à droite -->
-                <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    DockPanel.Dock="Right">
-                    <!-- Test Binding MainVM -->
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE921;" FontSize="10"  Click="Minimize_Click" Style="{DynamicResource WindowButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True" Width="45" />
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE739;" FontSize="10" Click="Maximize_Click" Style="{DynamicResource WindowButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True" Width="45"/>
-                    <Button FontFamily="Segoe MDL2 Assets" Content="&#xE106;" FontSize="10"  Click="Close_Click" Style="{DynamicResource CloseButtonStyle}" WindowChrome.IsHitTestVisibleInChrome="True" Width="45"/>
-                </StackPanel>
-            </DockPanel>
-        </Border>
+        <!-- ======================= "RIBBON" (TabControl) ======================= -->
+        <TabControl x:Name="AppRibbon"
+                    Grid.Row="1"
+                    Padding="0"
+                    Background="{DynamicResource ControlFillColorDefaultBrush}">
 
+            <!-- ===== Onglet Modèle ===== -->
+            <TabItem Header="{lang:Loc RibbonTabModel}">
+                <StackPanel Orientation="Horizontal" Margin="4">
 
-        <!--=======================  RIBBON ======================= -->
-        <Fluent:Ribbon x:Name="AppRibbon" Grid.Row="1" Height="auto" >
+                    <GroupBox Header="{lang:Loc Test}" Style="{StaticResource RibbonGroupStyle}">
+                        <ui:Button Padding="5"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   IsDefault="True">
+                            <Image Source="/Asset/logo_toltech.png" Height="48"/>
+                        </ui:Button>
+                    </GroupBox>
 
-            <Fluent:RibbonTabItem Header="{lang:Loc RibbonTabModel}">
-                    <Fluent:RibbonGroupBox Header="{lang:Loc Test}" Width="auto"  >
-                    <Button Padding="5"  HorizontalAlignment="Center" VerticalAlignment="Center"  IsDefault="True"  >
-                        <Image Source="/Asset/logo_toltech.png"   HorizontalAlignment="Center" VerticalAlignment="Center"  />
-                    </Button>
-                </Fluent:RibbonGroupBox>
+                    <GroupBox Header="{lang:Loc GroupModels}" Style="{StaticResource RibbonGroupStyle}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                    <Fluent:RibbonGroupBox  Header="{lang:Loc GroupModels}"  Width="Auto" Height="auto">
-                    <Grid Margin="5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                            <Fluent:Button Grid.Row="0" Grid.Column="0" 
-                                           Header="{lang:Loc CreateWord}" 
-                                           Icon="/Asset/add_model2.png" 
-                                           SizeDefinition="Middle" 
-                                           Command="{Binding CreateModelCommand}"  
-                                           ToolTip="{lang:Loc TipCreateModel}"  />
-                            <Fluent:Button Grid.Row="0" 
-                                           Grid.Column="1" 
-                                           Header="{lang:Loc OpenWord}" 
-                                           Icon="/Asset/open_model2.png"
-                                           SizeDefinition="Middle" 
-                                           Command="{Binding OpenModelFileCommand}"  
-                                           ToolTip="{lang:Loc TipOpenModel}"/>
-                            <Fluent:Button Grid.Row="1" 
-                                           Grid.Column="0" 
-                                           Header="{lang:Loc Link}" 
-                                           Icon="/Asset/Associate_modele.png"
-                                           SizeDefinition="Middle" 
-                                           Command="{Binding OpenRegisterWindowCommand}"  
-                                           ToolTip="{DynamicResource TipLinkModel}"/>
-                            <Fluent:Button Grid.Row="1" 
-                                           Grid.Column="1" 
-                                           Header="{lang:Loc DuplicateWord}" 
-                                           Icon="/Asset/duplicate_model2.png" 
-                                           SizeDefinition="Middle"  
-                                           Command="{Binding DuplicateActiveModelCommand}"  
-                                           ToolTip="{DynamicResource TipDuplicateModel}"/>
-                            <Fluent:Button Grid.Row="2" 
-                                           Grid.Column="0" 
-                                           Header="{lang:Loc DeleteWord}"
-                                           Icon="/Asset/bin_model2.png" 
-                                           SizeDefinition="Middle"
-                                           Command="{Binding DeleteActiveModelCommand}" 
-                                           ToolTip="{DynamicResource TipDeleteModel}"/>
+                            <ui:Button Grid.Row="0" Grid.Column="0"
+                                       Style="{StaticResource RibbonSmallButtonStyle}"
+                                       Content="{lang:Loc CreateWord}"
+                                       Command="{Binding CreateModelCommand}"
+                                       ToolTip="{lang:Loc TipCreateModel}">
+                                <ui:Button.Icon>
+                                    <ui:ImageIcon Source="/Asset/add_model2.png" Width="16" Height="16"/>
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Grid.Row="0" Grid.Column="1"
+                                       Style="{StaticResource RibbonSmallButtonStyle}"
+                                       Content="{lang:Loc OpenWord}"
+                                       Command="{Binding OpenModelFileCommand}"
+                                       ToolTip="{lang:Loc TipOpenModel}">
+                                <ui:Button.Icon>
+                                    <ui:ImageIcon Source="/Asset/open_model2.png" Width="16" Height="16"/>
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Grid.Row="1" Grid.Column="0"
+                                       Style="{StaticResource RibbonSmallButtonStyle}"
+                                       Content="{lang:Loc Link}"
+                                       Command="{Binding OpenRegisterWindowCommand}"
+                                       ToolTip="{DynamicResource TipLinkModel}">
+                                <ui:Button.Icon>
+                                    <ui:ImageIcon Source="/Asset/Associate_modele.png" Width="16" Height="16"/>
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Grid.Row="1" Grid.Column="1"
+                                       Style="{StaticResource RibbonSmallButtonStyle}"
+                                       Content="{lang:Loc DuplicateWord}"
+                                       Command="{Binding DuplicateActiveModelCommand}"
+                                       ToolTip="{DynamicResource TipDuplicateModel}">
+                                <ui:Button.Icon>
+                                    <ui:ImageIcon Source="/Asset/duplicate_model2.png" Width="16" Height="16"/>
+                                </ui:Button.Icon>
+                            </ui:Button>
+                            <ui:Button Grid.Row="2" Grid.Column="0"
+                                       Style="{StaticResource RibbonSmallButtonStyle}"
+                                       Content="{lang:Loc DeleteWord}"
+                                       Command="{Binding DeleteActiveModelCommand}"
+                                       ToolTip="{DynamicResource TipDeleteModel}">
+                                <ui:Button.Icon>
+                                    <ui:ImageIcon Source="/Asset/bin_model2.png" Width="16" Height="16"/>
+                                </ui:Button.Icon>
+                            </ui:Button>
                         </Grid>
-                </Fluent:RibbonGroupBox>
+                    </GroupBox>
 
-                <Fluent:RibbonGroupBox Header="{lang:Loc GroupParts}" Height="100">
-                    <Grid Margin="5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Fluent:Button Grid.Row="0"
-                                       Grid.Column="0" 
-                                       Header="{lang:Loc CreateWord}" 
-                                       Icon="/Asset/add_part2.png" 
-                                       SizeDefinition="Large" 
-                                       Command="{Binding CreatePartCommand}" 
-                                       ToolTip="{DynamicResource TipCreatePart}"/>
-                        <Fluent:Button Grid.Row="0" 
-                                       Grid.Column="1"  
-                                       Header="{lang:Loc DeleteWord}"  
-                                       Icon="/Asset/bin_part2.png"  
-                                       SizeDefinition="Large" 
-                                       Command="{Binding ShowWindowDeletePartCommand}" 
-                                       ToolTip="{DynamicResource TipDeletePart}"/>
-                    </Grid>
-                </Fluent:RibbonGroupBox>
-
-                <Fluent:RibbonGroupBox Header="{lang:Loc GroupRequirements}" Height="100">
-                    <Grid Margin="5">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <Fluent:Button Grid.Row="0" 
-                                       Grid.Column="0" 
-                                       Header="{lang:Loc CreateWord}"
-                                       Icon="/Asset/add_req2.png" 
-                                       SizeDefinition="Large" 
-                                       ToolTip="{DynamicResource TipCreateReq}"
-                                       Command="{Binding CreateRequirementCommand}" />
-                        <Fluent:Button Grid.Row="0" Grid.Column="1" 
-                                       Header="{lang:Loc DeleteWord}" 
-                                       Icon="/Asset/bin_req2.png" SizeDefinition="Large" 
-                                       ToolTip="{DynamicResource TipDeleteReq}"
-                                       Command="{Binding ShowWindowDeletePartCommand}"/>
-                    </Grid>
-                </Fluent:RibbonGroupBox>
-
-                <Fluent:RibbonGroupBox Header="{lang:Loc InformationWord}" Width="auto" >
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0" >
-                        <TextBlock Text="{lang:Loc EditionModel}" />
-                        <TextBlock x:Name="TitleInfo"  Text="{Binding ModelName}" Margin="5,0"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0"  >
-                        <TextBlock Text="{lang:Loc GroupPathModel}"  HorizontalAlignment="Center" />
-                        <TextBlock x:Name="PathModel" Text="{Binding ModelActif}"  Margin="5,0" Width="auto" TextWrapping="NoWrap" ToolTip="{DynamicResource TipCopyPath}" 
-                                       />
-                        <Button Width="30" Height="25" Margin="0,0,5,0" HorizontalAlignment="Left" ToolTip="{DynamicResource TipMoveModel}">
-                            <Button.Background>
-                                <ImageBrush  Stretch="UniformToFill" />
-                            </Button.Background>
-                        </Button>
-                    </StackPanel>
-                </Fluent:RibbonGroupBox>
-            </Fluent:RibbonTabItem>
-
-            <Fluent:RibbonTabItem Header="{lang:Loc CalculsWord}" Visibility="Visible" >
-                <Fluent:RibbonGroupBox Header="{lang:Loc GroupValidation}" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Fluent:Button x:Name="CheckInverseButton" 
-                                   Header="{lang:Loc BtnIsostatisme}"
-                                   Click="CheckInverseButton_Click"
-                                   Icon="/Asset/HyperstatismeLogo2.png" />
-                    <Fluent:Button x:Name="AfficherMatriceButton"
-                                   Header="{lang:Loc BtnMatrixPreview}"
-                                   Click="AfficherMatriceButton_Click" 
-                                   Margin="20,0,0,0"
-                                   Icon="/Asset/TestGrapheButton.png"/>
-                    <Fluent:Button x:Name="dded"
-                                   Header="{lang:Loc BtnGraph}" 
-                                   Click="GenerateGraph_Click"
-                                   Margin="20,0,0,0" 
-                                   Icon="/Asset/Graphe.png"  />
-                </Fluent:RibbonGroupBox>
-
-                <Fluent:RibbonGroupBox Header="Étude" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Fluent:Button x:Name="BtnCalculs" Header="Calculs" Icon="/Asset/Logo_DB_tol.png" LargeIcon="/Asset/Logo_DB_tol.png" Size="Large" Click="GenerateGraph_Click" ToolTip="Lancer les calculs d'analyse et d'étude"/>
-                    <Fluent:Button x:Name="BtnExportExcel" Header="Excel" Icon="/Asset/Logo_Excel.png" Size="Small" Click="GenerateGraph_Click" ToolTip="Exporter les résultats vers Excel"/>
-                    <Fluent:Button x:Name="BtnExportGsheet" Header="GSheet" Icon="/Asset/Logo_GSheet.png" Size="Small" Click="GenerateGraph_Click" ToolTip="Exporter les résultats vers Google Sheets"/>
-                </Fluent:RibbonGroupBox>
-            </Fluent:RibbonTabItem>
-            
-            <Fluent:RibbonTabItem Header="{lang:Loc RibbonTabDatabase}">
-                <Fluent:RibbonGroupBox Header="{lang:Loc GroupDatabaseLinks}" Width="auto" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Fluent:Button x:Name="OpenDataBaseButton" Header="{lang:Loc BtnTol}" Click="OpenFloatingPanelDB_Click" Icon="/Asset/Logo_DB_tol.png" />
-                    <Fluent:Button x:Name="OpenDataBasePartButton" Header="{lang:Loc BtnPart}" Click="OpenFloatingPartDB_Click" Icon="/Asset/Logo_DB_EXI.png" Margin="20,0,0,0" />
-                    <Fluent:Button x:Name="OpenDataBaseModelButton" Header="{lang:Loc BtnMod}" Click="OpenFloatingPanelDB_Click" Icon="/Asset/Logo_DB_MODEL.png" Margin="20,0,0,0" />
-                </Fluent:RibbonGroupBox>
-            </Fluent:RibbonTabItem>
-
-            <Fluent:RibbonTabItem Header="{lang:Loc AnalyseWord}" Visibility="Collapsed" >
-                <Fluent:RibbonGroupBox Header="Options">
-                    <Fluent:Button Header="Sauvegarder" />
-                    <Fluent:Button Header="Exporter CSV" />
-                </Fluent:RibbonGroupBox>
-            </Fluent:RibbonTabItem>
-
-            <Fluent:RibbonTabItem Header="{lang:Loc RibbonTabParameter}">
-                <Fluent:RibbonGroupBox Header="Options">
-                        <Fluent:Button Header="{lang:Loc RibbonTabParameter}" Click="OpenFloatingParametre_Click">
-                        <Fluent:Button.Icon>
-                            <Path Width="16" Height="16" Stretch="Uniform" Fill="Black" Data="M12.94,7.5 C12.94,7.25 12.92,7 12.88,6.75 L14.78,5.3 L13.8,3.2 L11.65,3.8 C11.3,3.53 10.93,3.32 10.53,3.18 L10.05,1 L7.95,1 L7.47,3.18 C7.07,3.32 6.7,3.53 6.35,3.8 L4.2,3.2 L3.22,5.3 L5.12,6.75 C5.08,7 5.06,7.25 5.06,7.5 C5.06,7.75 5.08,8 5.12,8.25 L3.22,9.7 L4.2,11.8 L6.35,11.2 C6.7,11.47 7.07,11.68 7.47,11.82 L7.95,14 L10.05,14 L10.53,11.82 C10.93,11.68 11.3,11.47 11.65,11.2 L13.8,11.8 L14.78,9.7 L12.88,8.25 C12.92,8 12.94,7.75 12.94,7.5 Z M9,10.5 C7.62,10.5 6.5,9.38 6.5,8 C6.5,6.62 7.62,5.5 9,5.5 C10.38,5.5 11.5,6.62 11.5,8 C11.5,9.38 10.38,10.5 9,10.5 Z" />
-                        </Fluent:Button.Icon>
-                    </Fluent:Button>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{lang:Loc ParamSentence}" FontWeight="Bold" Margin="0,0,0,5"/>
-
-                        <StackPanel Orientation="Horizontal" Margin="5,0">
-                            <TextBlock Text="{lang:Loc LanguageLabel}" />
-                            <TextBlock Text=" : " />
-                            <TextBlock Text="{DynamicResource  Language}" />
+                    <GroupBox Header="{lang:Loc GroupParts}" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Command="{Binding CreatePartCommand}"
+                                       ToolTip="{DynamicResource TipCreatePart}">
+                                <StackPanel>
+                                    <Image Source="/Asset/add_part2.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc CreateWord}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Command="{Binding ShowWindowDeletePartCommand}"
+                                       ToolTip="{DynamicResource TipDeletePart}">
+                                <StackPanel>
+                                    <Image Source="/Asset/bin_part2.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc DeleteWord}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="5,0">
-                            <TextBlock Text="{lang:Loc UnitLabel}" />
-                            <TextBlock Text=" : " />
-                            <TextBlock Text="{DynamicResource DefaultUnit}" />
-                            <TextBlock Text=" / " />
-                            <TextBlock Text="{DynamicResource DefaultAngle}" />
-                            <TextBlock Text=" / " />
-                            <TextBlock Text="{DynamicResource DensityUnit}" />
+                    </GroupBox>
+
+                    <GroupBox Header="{lang:Loc GroupRequirements}" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Command="{Binding CreateRequirementCommand}"
+                                       ToolTip="{DynamicResource TipCreateReq}">
+                                <StackPanel>
+                                    <Image Source="/Asset/add_req2.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc CreateWord}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <!-- NB : la commande d'origine était ShowWindowDeletePartCommand (copier-coller ?) -->
+                            <ui:Button Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Command="{Binding ShowWindowDeletePartCommand}"
+                                       ToolTip="{DynamicResource TipDeleteReq}">
+                                <StackPanel>
+                                    <Image Source="/Asset/bin_req2.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc DeleteWord}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
                         </StackPanel>
-                        
-                    </StackPanel>
-                </Fluent:RibbonGroupBox>
-            </Fluent:RibbonTabItem>
+                    </GroupBox>
 
-            
-        </Fluent:Ribbon>
+                    <GroupBox Header="{lang:Loc InformationWord}" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="{lang:Loc EditionModel}"/>
+                                <TextBlock x:Name="TitleInfo" Text="{Binding ModelName}" Margin="5,0"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{lang:Loc GroupPathModel}"/>
+                                <TextBlock x:Name="PathModel"
+                                           Text="{Binding ModelActif}"
+                                           Margin="5,0"
+                                           TextWrapping="NoWrap"
+                                           ToolTip="{DynamicResource TipCopyPath}"/>
+                                <ui:Button Width="30" Height="25" Padding="0"
+                                           ToolTip="{DynamicResource TipMoveModel}"
+                                           Icon="{ui:SymbolIcon FolderArrowRight24}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
 
-        <!--=======================  Navigation Tab ======================= -->
+                </StackPanel>
+            </TabItem>
+
+            <!-- ===== Onglet Calculs ===== -->
+            <TabItem Header="{lang:Loc CalculsWord}" Visibility="Visible">
+                <StackPanel Orientation="Horizontal" Margin="4">
+
+                    <GroupBox Header="{lang:Loc GroupValidation}" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button x:Name="CheckInverseButton"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Click="CheckInverseButton_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/HyperstatismeLogo2.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnIsostatisme}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button x:Name="AfficherMatriceButton"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Margin="20,2,2,2"
+                                       Click="AfficherMatriceButton_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/TestGrapheButton.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnMatrixPreview}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button x:Name="dded"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Margin="20,2,2,2"
+                                       Click="GenerateGraph_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/Graphe.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnGraph}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <GroupBox Header="Étude" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button x:Name="BtnCalculs"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Click="GenerateGraph_Click"
+                                       ToolTip="Lancer les calculs d'analyse et d'étude">
+                                <StackPanel>
+                                    <Image Source="/Asset/Logo_DB_tol.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="Calculs" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <StackPanel VerticalAlignment="Center">
+                                <ui:Button x:Name="BtnExportExcel"
+                                           Style="{StaticResource RibbonSmallButtonStyle}"
+                                           Content="Excel"
+                                           Click="GenerateGraph_Click"
+                                           ToolTip="Exporter les résultats vers Excel">
+                                    <ui:Button.Icon>
+                                        <ui:ImageIcon Source="/Asset/Logo_Excel.png" Width="16" Height="16"/>
+                                    </ui:Button.Icon>
+                                </ui:Button>
+                                <ui:Button x:Name="BtnExportGsheet"
+                                           Style="{StaticResource RibbonSmallButtonStyle}"
+                                           Content="GSheet"
+                                           Click="GenerateGraph_Click"
+                                           ToolTip="Exporter les résultats vers Google Sheets">
+                                    <ui:Button.Icon>
+                                        <ui:ImageIcon Source="/Asset/Logo_GSheet.png" Width="16" Height="16"/>
+                                    </ui:Button.Icon>
+                                </ui:Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+
+                </StackPanel>
+            </TabItem>
+
+            <!-- ===== Onglet Base de données ===== -->
+            <TabItem Header="{lang:Loc RibbonTabDatabase}">
+                <StackPanel Orientation="Horizontal" Margin="4">
+                    <GroupBox Header="{lang:Loc GroupDatabaseLinks}" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button x:Name="OpenDataBaseButton"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Click="OpenFloatingPanelDB_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/Logo_DB_tol.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnTol}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button x:Name="OpenDataBasePartButton"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Margin="20,2,2,2"
+                                       Click="OpenFloatingPartDB_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/Logo_DB_EXI.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnPart}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button x:Name="OpenDataBaseModelButton"
+                                       Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Margin="20,2,2,2"
+                                       Click="OpenFloatingPanelDB_Click">
+                                <StackPanel>
+                                    <Image Source="/Asset/Logo_DB_MODEL.png" Style="{StaticResource RibbonIconStyle}"/>
+                                    <TextBlock Text="{lang:Loc BtnMod}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
+            <!-- ===== Onglet Analyse (masqué) ===== -->
+            <TabItem Header="{lang:Loc AnalyseWord}" Visibility="Collapsed">
+                <StackPanel Orientation="Horizontal" Margin="4">
+                    <GroupBox Header="Options" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Style="{StaticResource RibbonSmallButtonStyle}" Content="Sauvegarder"/>
+                            <ui:Button Style="{StaticResource RibbonSmallButtonStyle}" Content="Exporter CSV"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
+            <!-- ===== Onglet Paramètres ===== -->
+            <TabItem Header="{lang:Loc RibbonTabParameter}">
+                <StackPanel Orientation="Horizontal" Margin="4">
+                    <GroupBox Header="Options" Style="{StaticResource RibbonGroupStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:Button Style="{StaticResource RibbonLargeButtonStyle}"
+                                       Click="OpenFloatingParametre_Click">
+                                <StackPanel>
+                                    <ui:SymbolIcon Symbol="Settings24" FontSize="28" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{lang:Loc RibbonTabParameter}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0">
+                                <TextBlock Text="{lang:Loc ParamSentence}" FontWeight="Bold" Margin="0,0,0,5"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="5,0">
+                                    <TextBlock Text="{lang:Loc LanguageLabel}"/>
+                                    <TextBlock Text=" : "/>
+                                    <TextBlock Text="{DynamicResource Language}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="5,0">
+                                    <TextBlock Text="{lang:Loc UnitLabel}"/>
+                                    <TextBlock Text=" : "/>
+                                    <TextBlock Text="{DynamicResource DefaultUnit}"/>
+                                    <TextBlock Text=" / "/>
+                                    <TextBlock Text="{DynamicResource DefaultAngle}"/>
+                                    <TextBlock Text=" / "/>
+                                    <TextBlock Text="{DynamicResource DensityUnit}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
+        </TabControl>
+
+        <!-- ======================= Navigation Tab ======================= -->
         <StackPanel x:Name="AppTabItems" Grid.Row="2" Orientation="Vertical">
-            <TabControl Name="TabNavigation" SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}" Width="auto" >
-                <!--<TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabGeneral}"  Width="auto"/>-->
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="🏠"  Width="75" FontSize="15" Padding="0"/>
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabModels}" Width="auto"    HorizontalContentAlignment="Center"  />
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabModeling}" Width="auto"    HorizontalContentAlignment="Center"  />
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabRequirements}" Width="auto"    HorizontalContentAlignment="Center"  />
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabResults}" Width="auto"    HorizontalContentAlignment="Center" />
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="{lang:Loc TabV3D}"  Width="auto"    HorizontalContentAlignment="Center"  />
-                <!--<TabItem Header="TEst Req PAge"  Width="auto"    HorizontalContentAlignment="Center"  />-->
+            <TabControl Name="TabNavigation"
+                        SelectedIndex="{Binding SelectedTabIndex, Mode=TwoWay}"
+                        Width="Auto">
+                <TabItem  Header="🏠" Width="45" FontSize="15" Padding="0" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabModels}" Width="Auto" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabModeling}" Width="Auto" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabRequirements}" Width="Auto" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabResults}" Width="Auto" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabV3D}" Width="Auto" HorizontalContentAlignment="Center"/>
             </TabControl>
-            <Border Visibility="Visible"    Height="1"  Background="Gray" HorizontalAlignment="Stretch"  Margin="10,-5,10,0"/>
+            <Border Height="1" Background="Gray" HorizontalAlignment="Stretch" Margin="10,-5,10,0"/>
         </StackPanel>
 
-        <ContentControl Content="{Binding SelectedPage}" Grid.Row="3" >
+        <!-- ======================= Contenu ======================= -->
+        <ContentControl Content="{Binding SelectedPage}" Grid.Row="3">
             <ContentControl.Resources>
-
                 <DataTemplate DataType="{x:Type vm:HomePageViewModel}">
-                    <views:HomePage />
+                    <views:HomePage/>
                 </DataTemplate>
-
                 <DataTemplate DataType="{x:Type vm:ModelsViewModel}">
-                    <views:PageModels />
+                    <views:PageModels/>
                 </DataTemplate>
-                
                 <DataTemplate DataType="{x:Type vm:DatasViewModel}">
-                    <views:PageData />
+                    <views:PageData/>
                 </DataTemplate>
-                
                 <DataTemplate DataType="{x:Type vm:RequirementsViewModel}">
-                    <views:PageReq />
+                    <views:PageReq/>
                 </DataTemplate>
-
                 <DataTemplate DataType="{x:Type vm:ResultsViewModel}">
-                    <views:PageResultats />
+                    <views:PageResultats/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:V3DViewModel}">
-                    <views:VSTWindow />
+                    <views:VSTWindow/>
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>
 
-            <Grid x:Name="LoggerGrid" Grid.Row="3" Height="33"  VerticalAlignment="Bottom">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="6"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <!-- ======================= Logger ======================= -->
+        <Grid x:Name="LoggerGrid" Grid.Row="3" Height="33" VerticalAlignment="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Height" Value="auto"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusBarVM.IsExpanded}" Value="False">
-                                <Setter Property="Height" Value="30"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                
-                <!-- Zone de resize -->
-                <Thumb Grid.Row="0"
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Height" Value="Auto"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding StatusBarVM.IsExpanded}" Value="False">
+                            <Setter Property="Height" Value="30"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
+            <!-- Zone de resize -->
+            <Thumb Grid.Row="0"
                    Cursor="SizeNS"
                    DragDelta="ResizeThumb_DragDelta"
-                   Visibility="{Binding StatusBarVM.IsExpanded,Converter={StaticResource BoolToVisibilityConverter}}"/>
+                   Visibility="{Binding StatusBarVM.IsExpanded, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <!-- Contenu logger -->
-                <controls:LogViewerControl
-                    Grid.Row="1"
-                    DataContext="{Binding StatusBarVM}" 
-                    VerticalAlignment="Stretch"
-                    />
+            <!-- Contenu logger -->
+            <controls:LogViewerControl Grid.Row="1"
+                                       DataContext="{Binding StatusBarVM}"
+                                       VerticalAlignment="Stretch"/>
+        </Grid>
 
-
-            </Grid>
-            
-            <!--<controls:LogViewerControl
-                        Grid.Row="3"
-                        MaxHeight="150"
-                        DataContext="{Binding StatusBarVM}"
-                        Panel.ZIndex="989"
-                        VerticalAlignment="Bottom"/>-->    
-
-        <!-- Couche overlay pour notifications -->
+        <!-- ======================= Overlay notifications ======================= -->
         <Grid Grid.Row="3"
-              x:Name="NotificationLayer"  
-              IsHitTestVisible="True"   
+              x:Name="NotificationLayer"
+              IsHitTestVisible="True"
               Panel.ZIndex="999">
-            <ContentPresenter Content="{Binding CurrentNotification}" 
-                              x:Name="NotificationHost"  
-                              HorizontalAlignment="Left" 
-                              VerticalAlignment="Bottom"  
+            <ContentPresenter x:Name="NotificationHost"
+                              Content="{Binding CurrentNotification}"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Bottom"
                               Margin="10"/>
         </Grid>
-        
+
     </Grid>
-    </Border>
-</Window>
+</ui:FluentWindow>

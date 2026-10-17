@@ -45,12 +45,6 @@ namespace Toltech.App
         private FreeCadHttpServer? _freeCadHttpServer;
 
 
-        public string TemplateDirectory = Path.Combine(
-                                                AppContext.BaseDirectory,
-                                                "Asset",
-                                                "Templates",
-                                                "Linkages");
-
         #endregion
 
         public App()

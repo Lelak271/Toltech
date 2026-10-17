@@ -1,8 +1,9 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using Toltech.App.Front;
-using Toltech.App.Models;
+using Toltech.App.Services;
 using Toltech.App.ViewModels;
+using static Toltech.App.Front.SelectFloatingPanelDB;
 
 namespace Toltech.App.Views.Pages.DataPage
 {
@@ -16,9 +17,12 @@ namespace Toltech.App.Views.Pages.DataPage
         private readonly MainViewModel _mainVM;
         public MainViewModel MainVM => _mainVM;
 
+        private readonly DomainService _domainService;
+
         public ToleranceEditor()
         {
-            _mainVM = App.MainVM; 
+            _mainVM = App.MainVM; // TODO Pas super jolie
+            _domainService = _mainVM.DomainService;
 
             InitializeComponent();
         }
@@ -108,9 +112,9 @@ namespace Toltech.App.Views.Pages.DataPage
         /// <summary>
         /// Traite la tolérance sélectionnée dans la fenêtre de la base de données.
         /// </summary>
-        private void OnToleranceSelected(
+        public async Task OnToleranceSelected(
             ToleranceSlotViewModel toleranceSlotViewModel,
-            SelectFloatingPanelDB.ToleranceSelectedEventArgs args)
+            ToleranceSelectedEventArgs Tolerance)
         {
             if (toleranceSlotViewModel == null)
                 return;
@@ -118,15 +122,13 @@ namespace Toltech.App.Views.Pages.DataPage
             // Récupère le ModelData associé au slot.
             var modelData = toleranceSlotViewModel.ModelData;
 
-            if (modelData == null) 
+            if (modelData == null)
                 return;
 
-            // TODO 
-            // Mettre en place la logique pour mettre a jour le bon Id tolerance 
-            // Mettre la logique dans Domainservice
-
-            // Affecte l'identifiant de la tolérance sélectionnée en base.
-            modelData.Id = args.ToleranceID;
+            await _domainService.UpdateModelDataToleranceAsync(
+                modelData,
+                toleranceSlotViewModel,
+                Tolerance);
         }
     }
 

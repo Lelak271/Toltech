@@ -362,21 +362,21 @@ namespace Toltech.App.FrontEnd.Controls.Dashboard
                 MessageBox.Show($"Une erreur est survenue : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
-        // Fenetre pour choisir le chemin pour l'export de l'excel (inchangé)
-        private string GetPathWithFolderBrowserDialog()
+        // Fenêtre pour choisir le chemin pour l'export de l'excel
+        private string? GetPathWithFolderBrowserDialog()
         {
-            using (var folderDialog = new System.Windows.Forms.FolderBrowserDialog())
+            var folderDialog = new Microsoft.Win32.OpenFolderDialog
             {
-                folderDialog.Description = "Sélectionnez un dossier pour sauvegarder le classeur Excel.";
-                folderDialog.SelectedPath = ModelManager.AppDataPath; // Dossier par défaut
+                Title = "Sélectionnez un dossier pour sauvegarder le classeur Excel.",
+                InitialDirectory = ModelManager.AppDataPath, // Dossier par défaut
+                Multiselect = false
+            };
 
-                var result = folderDialog.ShowDialog();
+            bool? result = folderDialog.ShowDialog(Application.Current.MainWindow);
 
-                return result == System.Windows.Forms.DialogResult.OK
-                    ? folderDialog.SelectedPath
-                    : null;
-            }
+            return result == true
+                ? folderDialog.FolderName
+                : null;
         }
 
         // Chargement du template (inchangé)

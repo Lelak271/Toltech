@@ -1,37 +1,57 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Reflection;
-using Toltech.App.Models;
 
 namespace Toltech.App.ViewModels
 {
-    /// <summary>
-    /// Adapte une propriété plate de <see cref="ModelData"/> vers un accès typé.
-    /// Ne stocke aucune donnée : redirige lecture/écriture vers le modèle.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal sealed class PropertyAdapter<T>
+    /// <summary>Accès lecture/écriture à une propriété d'un modèle, indépendant du type du modèle.</summary>
+    public interface IPropertyAdapter<TValue>
     {
-        private readonly ModelData _model;
-        private readonly PropertyInfo _property;
+        string PropertyName { get; }
+        TValue Value { get; set; }
+    }
 
-        public string PropertyName => _property.Name;
+    /// <summary>
+    /// Adaptateur générique sur le type du modèle (ModelData, Requirements...).
+    /// Construit à partir d'une expression de propriété simple : m => m.Name.
+    /// </summary>
+    public sealed class PropertyAdapter<TModel, TValue> : IPropertyAdapter<TValue>
+        where TModel : class
+    {
+        private readonly TModel _model;
+        private readonly Func<TModel, TValue> _getter;
+        private readonly Action<TModel, TValue> _setter;
 
-        public PropertyAdapter(ModelData model, Expression<Func<ModelData, T>> expression)
+        public string PropertyName { get; }
+
+        public PropertyAdapter(TModel model, Expression<Func<TModel, TValue>> property)
         {
             _model = model;
 
-            if (expression.Body is not MemberExpression member)
-                throw new ArgumentException("L'expression doit être une propriété.");
+            // Accepte m => m.Prop ainsi que m => (T)m.Prop (conversion implicite)
+            var member = property.Body as MemberExpression
+                         ?? (property.Body as UnaryExpression)?.Operand as MemberExpression;
 
-            _property = (PropertyInfo)member.Member;
+            if (member?.Member is not PropertyInfo propertyInfo)
+                throw new ArgumentException(
+                    "L'expression doit désigner directement une propriété (ex : m => m.Name).",
+                    nameof(property));
+
+            PropertyName = propertyInfo.Name;
+            _getter = property.Compile();
+
+            var setMethod = propertyInfo.GetSetMethod()
+                            ?? throw new ArgumentException(
+                                $"La propriété '{PropertyName}' n'a pas de setter public.",
+                                nameof(property));
+
+            _setter = (Action<TModel, TValue>)Delegate.CreateDelegate(
+                typeof(Action<TModel, TValue>), setMethod);
         }
 
-        public T Value
+        public TValue Value
         {
-            get => (T)_property.GetValue(_model)!;
-            set => _property.SetValue(_model, value);
+            get => _getter(_model);
+            set => _setter(_model, value);
         }
     }
 }

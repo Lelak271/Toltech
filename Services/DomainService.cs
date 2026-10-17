@@ -1,10 +1,13 @@
 ﻿using System.IO;
+using DocumentFormat.OpenXml.InkML;
 using Toltech.App.Models;
 using Toltech.App.Services.Logging;
 using Toltech.App.Services.Notification;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.Utilities;
 using Toltech.App.Utilities.Result;
+using Toltech.App.ViewModels;
+using static Toltech.App.Front.SelectFloatingPanelDB;
 using static Toltech.App.Services.EventsManager;
 
 namespace Toltech.App.Services
@@ -1452,6 +1455,50 @@ namespace Toltech.App.Services
         {
             return _databaseService.DeleteToleranceAsync(tolerance);
         }
+
+        /// <summary>
+        /// Affecte une tolérance issue de la base de données au ModelData.
+        /// </summary>
+        /// <param name="modelData">Donnée du modèle à mettre à jour.</param>
+        /// <param name="toleranceSlotViewModel">Emplacement de la tolérance concernée.</param>
+        /// <param name="toleranceId">Identifiant de la tolérance sélectionnée.</param>
+        public async Task UpdateModelDataToleranceAsync(
+            ModelData modelData,
+            ToleranceSlotViewModel toleranceSlotViewModel,
+            ToleranceSelectedEventArgs tolerance)
+        {
+            if (modelData == null)
+                return;
+
+            if (toleranceSlotViewModel == null)
+                return;
+
+            var toleranceKind = toleranceSlotViewModel.Kind;
+            var tolerancePosition = toleranceSlotViewModel.Position;
+
+            // TODO :
+            // Affecter toleranceId à l'emplacement correspondant dans ModelData,
+            // en fonction de toleranceKind et tolerancePosition.
+
+            // Persister les modifications en base de données.
+            bool updated = modelData.SetToleranceDatabaseReference(
+                             toleranceKind,
+                             tolerancePosition,
+                             tolerance.ToleranceID,
+                             true);
+
+            if (updated)
+            {
+                await _databaseService.UpdateAsync(modelData);
+            }
+            else
+            {
+                // Gérer ici l'échec de l'affectation.
+                return;
+            }
+
+        }
+
 
         #endregion
 

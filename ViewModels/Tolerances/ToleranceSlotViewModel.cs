@@ -5,44 +5,105 @@ using Toltech.App.Models;
 namespace Toltech.App.ViewModels
 {
     /// <summary>
-    /// Représente une tolérance à une position donnée (Origin, Intermediate ou Extremity).
-    /// Expose Name, Description, Value, Id, UseDatabase via des PropertyAdapter.
-    /// Relaie les PropertyChanged de ModelData vers le binding WPF.
+    /// Représente une tolérance à une position donnée
+    /// (Origin, Intermediate ou Extremity).
+    ///
+    /// Peut être associé à ModelData ou Requirements.
+    /// Expose les propriétés de tolérance via des PropertyAdapter
+    /// et relaie les notifications vers les bindings WPF.
     /// </summary>
     public sealed class ToleranceSlotViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        private readonly ModelData _model;
-        private readonly PropertyAdapter<string> _name;
-        private readonly PropertyAdapter<string> _description;
-        private readonly PropertyAdapter<double> _value;
-        private readonly PropertyAdapter<int> _id;
-        private readonly PropertyAdapter<bool> _database;
+        private readonly INotifyPropertyChanged _source;
+
+        private readonly IPropertyAdapter<string> _name;
+        private readonly IPropertyAdapter<string> _description;
+        private readonly IPropertyAdapter<double> _value;
+        private readonly IPropertyAdapter<int> _id;
+        private readonly IPropertyAdapter<bool> _database;
+
+        public ToleranceKind Kind { get; }
+
+        public TolerancePosition Position { get; }
+
+        public string DisplayName => $"{Kind}.{Position}";
+
+        /// <summary>
+        /// Modèle associé, si le slot utilise ModelData.
+        /// </summary>
+        public ModelData? ModelData { get; }
+
+        /// <summary>
+        /// Exigences associées, si le slot utilise Requirements.
+        /// </summary>
+        public Requirements? Requirements { get; }
+
+        #region Constructeur ModelData
 
         public ToleranceSlotViewModel(
-             ModelData model,
-             Expression<Func<ModelData, string>> name,
-             Expression<Func<ModelData, string>> description,
-             Expression<Func<ModelData, double>> value,
-             Expression<Func<ModelData, int>> id,
-             Expression<Func<ModelData, bool>> database)
+            ModelData model,
+            ToleranceKind kind,
+            TolerancePosition position,
+            Expression<Func<ModelData, string>> name,
+            Expression<Func<ModelData, string>> description,
+            Expression<Func<ModelData, double>> value,
+            Expression<Func<ModelData, int>> id,
+            Expression<Func<ModelData, bool>> database)
         {
-            _model = model;
+            ArgumentNullException.ThrowIfNull(model);
 
-            _name = new(model, name);
-            _description = new(model, description);
-            _value = new(model, value);
-            _id = new(model, id);
-            _database = new(model, database);
+            ModelData = model;
+            _source = model;
 
-            _model.PropertyChanged += Model_PropertyChanged;
+            Kind = kind;
+            Position = position;
+
+            _name = new PropertyAdapter<ModelData, string>(model, name);
+            _description = new PropertyAdapter<ModelData, string>(model, description);
+            _value = new PropertyAdapter<ModelData, double>(model, value);
+            _id = new PropertyAdapter<ModelData, int>(model, id);
+            _database = new PropertyAdapter<ModelData, bool>(model, database);
+
+            SubscribeToSource();
         }
 
-        public ModelData ModelData
+        #endregion
+
+        #region Constructeur Requirements
+
+        public ToleranceSlotViewModel(
+            Requirements requirements,
+            ToleranceKind kind,
+            TolerancePosition position,
+            Expression<Func<Requirements, string>> name,
+            Expression<Func<Requirements, string>> description,
+            Expression<Func<Requirements, double>> value,
+            Expression<Func<Requirements, int>> id,
+            Expression<Func<Requirements, bool>> database)
         {
-            get => _model;
+            ArgumentNullException.ThrowIfNull(requirements);
+
+            Requirements = requirements;
+            _source = requirements;
+
+            Kind = kind;
+            Position = position;
+
+            _name = new PropertyAdapter<Requirements, string>(requirements, name);
+            _description = new PropertyAdapter<Requirements, string>(requirements, description);
+            _value = new PropertyAdapter<Requirements, double>(requirements, value);
+            _id = new PropertyAdapter<Requirements, int>(requirements, id);
+            _database = new PropertyAdapter<Requirements, bool>(requirements, database);
+
+            SubscribeToSource();
         }
+
+        #endregion
+
+        #region Properties
+
         public string Name
         {
             get => _name.Value;
@@ -73,7 +134,25 @@ namespace Toltech.App.ViewModels
             set => _database.Value = value;
         }
 
-        private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        #endregion
+
+        #region Notifications
+
+        /// <summary>
+        /// Abonne la ViewModel aux modifications de sa source.
+        /// </summary>
+        private void SubscribeToSource()
+        {
+            _source.PropertyChanged += Source_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Relaye les notifications de la source vers les propriétés
+        /// exposées par cette ViewModel.
+        /// </summary>
+        private void Source_PropertyChanged(
+            object? sender,
+            PropertyChangedEventArgs e)
         {
             if (e.PropertyName == _name.PropertyName)
                 OnPropertyChanged(nameof(Name));
@@ -93,13 +172,11 @@ namespace Toltech.App.ViewModels
 
         private void OnPropertyChanged(string propertyName)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(propertyName));
         }
 
-        #region
-
         #endregion
-
     }
-
 }

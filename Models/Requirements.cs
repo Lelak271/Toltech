@@ -7,6 +7,10 @@ namespace Toltech.App.Models
 {
     public partial class Requirements : BaseViewModel
     {
+        public Requirements()
+        {
+            CreateToleranceGroups();
+        }
 
         #region Backing fields
 
@@ -394,6 +398,52 @@ namespace Toltech.App.Models
 
         #endregion
 
-    }
+        #region Tolerances Types
 
-}
+        public ToleranceGroupViewModel Basic { get; private set; }
+
+        private void CreateToleranceGroups()
+        {
+            // =====================================================
+            // N
+            // =====================================================
+
+            Basic = new ToleranceGroupViewModel(
+
+                ToleranceKind.N,
+
+                new ToleranceSlotViewModel(
+                    this,
+                    ToleranceKind.N,
+                    TolerancePosition.Extremity,
+                    x => x.NameTolExtre,
+                    x => x.Description1,
+                    x => x.tol1,
+                    x => x.Id_tol1,
+                    x => x.CheckBox1),
+
+                new ToleranceSlotViewModel(
+                    this,
+                     ToleranceKind.N,
+                    TolerancePosition.Intermediate,
+                    x => x.NameTolExtre,
+                    x => x.Description1,
+                    x => x.tol1,
+                    x => x.Id_tol1,
+                    x => x.CheckBox1),
+
+                new ToleranceSlotViewModel(
+                    this,
+                    ToleranceKind.N,
+                    TolerancePosition.Origin,
+                    x => x.NameTolOri,
+                    x => x.Description2,
+                    x => x.tol2,
+                    x => x.Id_tol2,
+                    x => x.CheckBox2));
+
+        }
+            #endregion
+        }
+
+    }

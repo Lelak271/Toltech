@@ -9,7 +9,7 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
 	<ApplicationIcon>Asset\Logo_TT.ico</ApplicationIcon>
-
+	  
 	  <!--
         Mock is used by default.
         The private Solver is enabled explicitly with:
@@ -38,6 +38,16 @@
     <ProjectReference Include="..\Toltech.Solver.Contracts\Toltech.Solver.Contracts.csproj" />
     <ProjectReference Include="..\Toltech.FreeCAD\Toltech.FreeCAD.csproj" />
   </ItemGroup>
+
+	<ItemGroup>
+		<!-- Inclut les modèles 3D dans le projet. -->
+		<Content Include="Asset\Templates\3D_Linkages\**\*.obj">
+
+			<!-- Copie les modèles dans le répertoire de sortie si nécessaire. -->
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+
+		</Content>
+	</ItemGroup>
 	
   <ItemGroup>
     <Compile Remove="Views\Controls\TreeViewArea.xaml.cs" />
@@ -294,19 +304,18 @@
 
   <ItemGroup>
 	<PackageReference Include="ClosedXML" Version="0.105.0" />
-	<PackageReference Include="CSparse" Version="4.2.0" />
 	<PackageReference Include="Dragablz" Version="0.0.3.234" />
 	<PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
-	<PackageReference Include="Fluent.Ribbon" Version="11.0.1" />
 	<PackageReference Include="HelixToolkit.Wpf" Version="2.27.3" />
 	<PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
 	<PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc5.4" />
 	<PackageReference Include="Microsoft.VisualStudio.VsixColorCompiler" Version="17.0.31709.430" />
 	<PackageReference Include="QuickGraphCore" Version="1.0.0" />
-	<PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+	<PackageReference Include="sqlite-net-pcl" Version="1.11.285" />
 	<PackageReference Include="MathNet.Numerics" Version="5.0.0" />
 	<PackageReference Include="Westermo.GraphX.Controls" Version="3.1.0" />
 	<PackageReference Include="Westermo.GraphX.Logic" Version="3.1.0" />
+	<PackageReference Include="WPF-UI" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

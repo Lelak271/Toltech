@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using Toltech.App.Resources.Lang;
 using Toltech.App.Services.Dialog;
 using Toltech.App.Utilities.Result;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Toltech.App.ViewModels
 {

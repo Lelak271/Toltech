@@ -45,3 +45,14 @@
 
 - Pop-up personnalisé pour l'état pré-calcul, en remplacement des MessageBox standards
 - Suppression via le ruban : ouvrir le TreeView flottant pour permettre la multi-sélection et la suppression groupée — à étudier si un panneau dédié est déjà affiché (data ou req)
+
+
+Le refactor sera traité progressivement, avec les objectifs suivants :
+
+Découpler ModelData des ViewModels : retirer ToleranceGroupViewModel, ToleranceSlotViewModel et CreateToleranceGroups() de cette classe.
+Créer ModelDataViewModel : y déplacer la construction des six groupes N, T1, T2, Rn, RT1 et RT2, ainsi que la propriété ToleranceGroups.
+Conserver le fonctionnement existant : garder les propriétés de tolérance persistées, SQLite et les PropertyAdapter.
+Préserver les bindings WPF : identifier les modifications nécessaires aux DataContext et aux chemins de binding.
+Vérifier l'initialisation : déterminer où ModelData est construit et quand les groupes sont actuellement créés.
+
+Priorité : améliorer la séparation entre modèle et présentation sans réécrire le système de tolérances.

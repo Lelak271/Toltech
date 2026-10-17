@@ -706,8 +706,12 @@ namespace Toltech.App.Models
 
             N = new ToleranceGroupViewModel(
 
+                ToleranceKind.N, 
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.N,
+                    TolerancePosition.Extremity,
                     x => x.NExtremityName,
                     x => x.NExtremityDescription,
                     x => x.NExtremityValue,
@@ -716,6 +720,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                     ToleranceKind.N,
+                    TolerancePosition.Intermediate,
                     x => x.NIntermediateName,
                     x => x.NIntermediateDescription,
                     x => x.NIntermediateValue,
@@ -724,6 +730,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.N,
+                    TolerancePosition.Origin,
                     x => x.NOriginName,
                     x => x.NOriginDescription,
                     x => x.NOriginValue,
@@ -736,8 +744,12 @@ namespace Toltech.App.Models
 
             T1 = new ToleranceGroupViewModel(
 
+                ToleranceKind.T1,
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T1,
+                    TolerancePosition.Extremity,
                     x => x.T1ExtremityName,
                     x => x.T1ExtremityDescription,
                     x => x.T1ExtremityValue,
@@ -746,6 +758,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T1,
+                    TolerancePosition.Intermediate,
                     x => x.T1IntermediateName,
                     x => x.T1IntermediateDescription,
                     x => x.T1IntermediateValue,
@@ -754,6 +768,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T1,
+                    TolerancePosition.Origin,
                     x => x.T1OriginName,
                     x => x.T1OriginDescription,
                     x => x.T1OriginValue,
@@ -766,8 +782,12 @@ namespace Toltech.App.Models
 
             T2 = new ToleranceGroupViewModel(
 
+                ToleranceKind.T2,
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T2,
+                    TolerancePosition.Extremity,
                     x => x.T2ExtremityName,
                     x => x.T2ExtremityDescription,
                     x => x.T2ExtremityValue,
@@ -776,6 +796,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T2,
+                    TolerancePosition.Intermediate,
                     x => x.T2IntermediateName,
                     x => x.T2IntermediateDescription,
                     x => x.T2IntermediateValue,
@@ -784,6 +806,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.T2,
+                    TolerancePosition.Origin,
                     x => x.T2OriginName,
                     x => x.T2OriginDescription,
                     x => x.T2OriginValue,
@@ -796,8 +820,12 @@ namespace Toltech.App.Models
 
             Rn = new ToleranceGroupViewModel(
 
+                ToleranceKind.Rn,
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.Rn,
+                    TolerancePosition.Extremity,
                     x => x.RnExtremityName,
                     x => x.RnExtremityDescription,
                     x => x.RnExtremityValue,
@@ -806,6 +834,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.Rn,
+                    TolerancePosition.Intermediate,
                     x => x.RnIntermediateName,
                     x => x.RnIntermediateDescription,
                     x => x.RnIntermediateValue,
@@ -814,6 +844,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.Rn,
+                    TolerancePosition.Origin,
                     x => x.RnOriginName,
                     x => x.RnOriginDescription,
                     x => x.RnOriginValue,
@@ -826,8 +858,12 @@ namespace Toltech.App.Models
 
             RT1 = new ToleranceGroupViewModel(
 
+                ToleranceKind.RT1,
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.RT1,
+                    TolerancePosition.Extremity,
                     x => x.RT1ExtremityName,
                     x => x.RT1ExtremityDescription,
                     x => x.RT1ExtremityValue,
@@ -836,6 +872,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.RT1,
+                    TolerancePosition.Intermediate,
                     x => x.RT1IntermediateName,
                     x => x.RT1IntermediateDescription,
                     x => x.RT1IntermediateValue,
@@ -844,6 +882,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.RT1,
+                    TolerancePosition.Origin,
                     x => x.RT1OriginName,
                     x => x.RT1OriginDescription,
                     x => x.RT1OriginValue,
@@ -856,8 +896,12 @@ namespace Toltech.App.Models
 
             RT2 = new ToleranceGroupViewModel(
 
+                ToleranceKind.RT2,
+
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.RT2,
+                    TolerancePosition.Extremity,
                     x => x.RT2ExtremityName,
                     x => x.RT2ExtremityDescription,
                     x => x.RT2ExtremityValue,
@@ -866,6 +910,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                   ToleranceKind.RT2,
+                    TolerancePosition.Intermediate,
                     x => x.RT2IntermediateName,
                     x => x.RT2IntermediateDescription,
                     x => x.RT2IntermediateValue,
@@ -874,6 +920,8 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
+                    ToleranceKind.RT2,
+                    TolerancePosition.Origin,
                     x => x.RT2OriginName,
                     x => x.RT2OriginDescription,
                     x => x.RT2OriginValue,
@@ -882,6 +930,54 @@ namespace Toltech.App.Models
         }
 
         #endregion
+
+        /// <summary>
+        /// Met à jour la référence vers une tolérance de la base de données
+        /// pour un emplacement donné du modèle.
+        /// </summary>
+        /// <param name="kind">Type de tolérance : N, T1, T2, Rn, RT1 ou RT2.</param>
+        /// <param name="position">Position : Origin, Intermediate ou Extremity.</param>
+        /// <param name="toleranceId">Identifiant de la tolérance en base de données.</param>
+        /// <param name="useDatabase">Indique si la tolérance utilise la base de données.</param>
+        /// <returns>True si l'emplacement existe et a été mis à jour.</returns>
+        public bool SetToleranceDatabaseReference(
+            ToleranceKind kind,
+            TolerancePosition position,
+            int toleranceId,
+            bool useDatabase)
+        {
+            string prefix = kind switch
+            {
+                ToleranceKind.N => "N",
+                ToleranceKind.T1 => "T1",
+                ToleranceKind.T2 => "T2",
+                ToleranceKind.Rn => "Rn",
+                ToleranceKind.RT1 => "RT1",
+                ToleranceKind.RT2 => "RT2",
+                _ => throw new ArgumentOutOfRangeException(nameof(kind))
+            };
+
+            string suffix = position switch
+            {
+                TolerancePosition.Origin => "Origin",
+                TolerancePosition.Intermediate => "Intermediate",
+                TolerancePosition.Extremity => "Extremity",
+                _ => throw new ArgumentOutOfRangeException(nameof(position))
+            };
+
+            string propertyPrefix = prefix + suffix;
+
+            var idProperty = GetType().GetProperty(propertyPrefix + "ToleranceId");
+            var useDatabaseProperty = GetType().GetProperty(propertyPrefix + "UseDatabase");
+
+            if (idProperty == null || useDatabaseProperty == null)
+                return false;
+
+            idProperty.SetValue(this, toleranceId);
+            useDatabaseProperty.SetValue(this, useDatabase);
+
+            return true;
+        }
 
     }
 

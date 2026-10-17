@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             xmlns:Fluent="urn:fluent-ribbon"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:Toltech.App" 
              StartupUri="Views/Pages/MainWindow.xaml"
              ShutdownMode="OnExplicitShutdown"
@@ -11,10 +11,11 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+
+                <ui:ThemesDictionary Theme="Dark" />
+                <ui:ControlsDictionary />
                 
                 <!-- Thème statique -->
-                <ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Fluent;component/Themes/Generic.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
 
 
@@ -22,6 +23,7 @@
                 <ResourceDictionary Source="pack://application:,,,/Toltech.App;component/Resources/Styles/MainStyles.xaml" />
 
 
+                
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>

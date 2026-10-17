@@ -3,17 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:conv="clr-namespace:Toltech.App.Converters"
              xmlns:core="clr-namespace:Toltech.App.Services"
              xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
              mc:Ignorable="d"
              x:Name="RootControl"
-             Width="1300"
+             HorizontalAlignment="Stretch"
+             MinHeight="200"
              d:DesignHeight="250"
              d:DesignWidth="1200">
 
     <!-- ===================== -->
-    <!-- Ressources et styles -->
+    <!-- Ressources et styles  -->
     <!-- ===================== -->
     <UserControl.Resources>
 
@@ -22,67 +24,83 @@
         <conv:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        
-        <!-- Border éditable -->
-        <Style x:Key="EditableBorderStyle" TargetType="Border">
-            <Setter Property="Background" Value="{DynamicResource PanelModelMetaPrimaryBrush}"/>
-            <Setter Property="Cursor" Value="No"/>
+
+        <!-- Carte : change d'apparence en mode édition -->
+        <Style x:Key="ModelCardStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource PanelModelMetaEditionBrush}"/>
-                    <Setter Property="Cursor" Value="Arrow"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="Background" Value="{DynamicResource ControlFillColorSecondaryBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <!-- TextBox éditable -->
-        <Style TargetType="TextBox" BasedOn="{StaticResource BaseTextBox}">
-            <Setter Property="IsReadOnly" Value="True"/>
-            <Setter Property="IsHitTestVisible" Value="False"/>
-            <Setter Property="Background" Value="{DynamicResource PanelModelMetaSecondaryBrush}"/>
+        <!-- TextBox : "label" en lecture, champ de saisie en édition -->
+        <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                    <Setter Property="IsReadOnly" Value="False"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="Background" Value="{DynamicResource PanelModelMetaEditionBrush2}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        
-        <!-- Button éditable -->
-        <Style TargetType="Button" BasedOn="{StaticResource ButtonBase}">
-            <Setter Property="IsHitTestVisible" Value="False"/>
-            <Setter Property="Background" Value="{DynamicResource PanelModelMetaSecondaryBrush}"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="Background" Value="{DynamicResource PanelModelMetaEditionBrush2}"/>
+                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <!-- ComboBox éditable -->
-        <Style TargetType="ComboBox" BasedOn="{StaticResource ComboBoxMainStyle}" >
-            <Setter Property="IsEnabled" Value="False"/>
+        <!-- Titre du modèle -->
+        <Style x:Key="ModelNameTextBoxStyle" TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="MinWidth" Value="420"/>
+            <Setter Property="MaxWidth" Value="700"/>
+        </Style>
+
+        <!-- ComboBox : désactivée hors édition -->
+        <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="0,4,0,12"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
-                    <Setter Property="IsEnabled" Value="True"/>
+                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
+        <!-- Boutons d'action -->
+        <Style x:Key="ActionButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="Padding" Value="12,6"/>
+        </Style>
 
+        <!-- Bouton Éditer / Enregistrer : devient "Primary" en édition -->
+        <Style x:Key="EditToggleButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                    <Setter Property="Appearance" Value="Primary"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
 
     </UserControl.Resources>
 
     <!-- ===================== -->
-    <!-- Conteneur principal -->
+    <!-- Conteneur principal   -->
     <!-- ===================== -->
-    <Border BorderThickness="2"
-            CornerRadius="20"
-            Padding="10"
-            BorderBrush="{DynamicResource PrimaryBorderBrush}"
-            Style="{StaticResource EditableBorderStyle}">
+    <Border Style="{StaticResource ModelCardStyle}">
 
         <Grid>
             <Grid.RowDefinitions>
@@ -91,151 +109,162 @@
             </Grid.RowDefinitions>
 
             <!-- ===================== -->
-            <!-- En-tête -->
+            <!-- En-tête               -->
             <!-- ===================== -->
-            <Grid Margin="0,0,0,10">
+            <Grid Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="0"
-                         Width="700"
-                         Height="30"
-                         FontSize="16"
-                         FontWeight="Bold"
-                         Padding="3"
-                         Text="{Binding NameData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" >
-                    <TextBox.IsReadOnly>
-                        <MultiBinding Converter="{StaticResource ActiveModelToBoolConverter}">
-                            <Binding Source="{x:Static core:ModelManager.ModelActif}" />
-                            <Binding Path="FilePathModel" />
-                        </MultiBinding>
-                    </TextBox.IsReadOnly>
-                </TextBox>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <ui:TextBox Style="{StaticResource ModelNameTextBoxStyle}"
+                                Text="{Binding NameData, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ui:TextBox.IsReadOnly>
+                            <MultiBinding Converter="{StaticResource ActiveModelToBoolConverter}">
+                                <Binding Source="{x:Static core:ModelManager.ModelActif}"/>
+                                <Binding Path="FilePathModel"/>
+                            </MultiBinding>
+                        </ui:TextBox.IsReadOnly>
+                    </ui:TextBox>
 
-                    <TextBlock Visibility="Collapsed" Grid.Column="1"
-                           Width="60"
-                           VerticalAlignment="Center"
-                           Text="{Binding IdModel}" />
+                    <!-- Indicateur de modifications non enregistrées (remplace le "*" positionné à la main) -->
+                    <TextBlock Text="●"
+                               Margin="10,0,0,0"
+                               VerticalAlignment="Center"
+                               FontSize="14"
+                               Foreground="{DynamicResource SystemFillColorCautionBrush}"
+                               Visibility="{Binding IsDirty, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                </StackPanel>
 
-                <TextBlock x:Name="ActifModel" 
-                           Grid.Column="2"
-                           HorizontalAlignment="Right"
-                           Margin="0,0,10,0"
-                           FontSize="13"
-                           FontWeight="SemiBold"
-                           Foreground="#2E7D32"
-                           Text="{lang:Loc ModelCurrentlyBeingEdited}">
-
-                     <TextBlock.Visibility>
+                <!-- Badge "modèle en cours d'édition" -->
+                <Border x:Name="ActifModelBadge"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        CornerRadius="12"
+                        Padding="12,4"
+                        Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}">
+                    <Border.Visibility>
                         <MultiBinding Converter="{StaticResource ActiveModelToVisibilityConverter}">
-                            <Binding Path="DataContext.PathModel" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
-                            <Binding Path="FilePathModel" />
+                            <Binding Path="DataContext.PathModel" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                            <Binding Path="FilePathModel"/>
                         </MultiBinding>
-                    </TextBlock.Visibility>
-                </TextBlock>
+                    </Border.Visibility>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:SymbolIcon Symbol="CheckmarkCircle24"
+                                       FontSize="16"
+                                       Margin="0,0,6,0"
+                                       Foreground="{DynamicResource SystemFillColorSuccessBrush}"/>
+                        <TextBlock x:Name="ActifModel"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                   Text="{lang:Loc ModelCurrentlyBeingEdited}"/>
+                    </StackPanel>
+                </Border>
             </Grid>
 
             <!-- ===================== -->
-            <!-- Contenu principal -->
+            <!-- Contenu principal     -->
             <!-- ===================== -->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="200"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="250"/>
-                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="Auto" MinWidth="130"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Image -->
+                <!-- Image (zone cliquable + drag & drop) -->
                 <Border Grid.Column="0"
-                        Margin="5"
+                        Margin="0,0,12,0"
                         BorderThickness="1"
-                        CornerRadius="5"
-                        BorderBrush="DarkSlateBlue"
-                        MouseLeftButtonUp="ImageBorder_MouseLeftButtonUp" 
-                        Drop="ImageBorder_Drop" 
+                        CornerRadius="8"
+                        Background="{DynamicResource ControlFillColorTertiaryBrush}"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        AllowDrop="True"
+                        Cursor="Hand"
+                        MouseLeftButtonUp="ImageBorder_MouseLeftButtonUp"
+                        Drop="ImageBorder_Drop"
                         DragOver="ImageBorder_DragOver">
                     <Grid>
                         <Image x:Name="Image_Model"
+                               Margin="4"
                                Stretch="Uniform"
-                               Opacity="0.8"
+                               RenderOptions.BitmapScalingMode="HighQuality"
                                Source="{Binding ImageData, Converter={StaticResource ByteArrayToImageConverter}}"/>
 
-                        <StackPanel Orientation="Vertical"
-                                    HorizontalAlignment="Center"
+                        <!-- Placeholder : une seule liaison de visibilité pour les 3 textes -->
+                        <StackPanel HorizontalAlignment="Center"
                                     VerticalAlignment="Center"
-                                    MaxWidth="300">
-
+                                    MaxWidth="180"
+                                    Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}">
+                            <ui:SymbolIcon Symbol="Image24"
+                                           FontSize="32"
+                                           Margin="0,0,0,8"
+                                           Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
                             <TextBlock Text="{lang:Loc Drag_and_drop_an_image_here}"
-                                       HorizontalAlignment="Center"
                                        TextAlignment="Center"
                                        TextWrapping="Wrap"
-                                       FontStyle="Italic"
-                                       Foreground="{DynamicResource SecondaryBorderBrush}"
-                                       Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
-
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
                             <TextBlock Text="{lang:Loc or}"
-                                       HorizontalAlignment="Center"
                                        TextAlignment="Center"
-                                       TextWrapping="Wrap"
                                        FontStyle="Italic"
-                                       Foreground="{DynamicResource SecondaryBorderBrush}"
-                                       Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
-
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
                             <TextBlock Text="{lang:Loc Click_to_select_one}"
-                                       HorizontalAlignment="Center"
                                        TextAlignment="Center"
                                        TextWrapping="Wrap"
-                                       FontStyle="Italic"
-                                       Foreground="{DynamicResource SecondaryBorderBrush}"
-                                       Visibility="{Binding ImageData, Converter={StaticResource NullToVisibilityConverter}}"/>
-
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
                         </StackPanel>
                     </Grid>
                 </Border>
 
                 <!-- Description + chemin -->
-                <Grid Grid.Column="1" Margin="5">
+                <Grid Grid.Column="1" Margin="0,0,12,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
-                        <RowDefinition Height="25"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBox Grid.Row="0"
-                             VerticalAlignment="Stretch"
-                             Text="{Binding DescriptionModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <ui:TextBox Grid.Row="0"
+                                VerticalAlignment="Stretch"
+                                VerticalContentAlignment="Top"
+                                AcceptsReturn="True"
+                                TextWrapping="Wrap"
+                                VerticalScrollBarVisibility="Auto"
+                                Text="{Binding DescriptionModel, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
-                    <TextBlock Grid.Row="1"
-                               VerticalAlignment="Center"
-                               Text="{Binding FilePathModel}"/>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                        <ui:SymbolIcon Symbol="Folder24"
+                                       FontSize="14"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock VerticalAlignment="Center"
+                                   FontSize="12"
+                                   TextTrimming="CharacterEllipsis"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding FilePathModel}"
+                                   ToolTip="{Binding FilePathModel}"/>
+                    </StackPanel>
                 </Grid>
 
                 <!-- Informations -->
-                <Grid Grid.Column="2" Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <TextBlock Text="{lang:Loc NumberPart}"/>
-                        <TextBlock Text="{Binding PartCount}"/>
+                <StackPanel Grid.Column="2" Margin="0,0,12,0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="{lang:Loc NumberPart}" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{Binding PartCount}" Margin="6,0,0,0" FontWeight="SemiBold"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock Text="{lang:Loc NumberReq}"/>
-                        <TextBlock Text="{Binding RequirementCount}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <TextBlock Text="{lang:Loc NumberReq}" Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        <TextBlock Text="{Binding RequirementCount}" Margin="6,0,0,0" FontWeight="SemiBold"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="2" Text="Statut :"/>
-                    <ComboBox Grid.Row="2"
-                              Margin="5,8"
-                              SelectedValue="{Binding ModelStatus, Mode=TwoWay}"
+                    <TextBlock Text="Statut :" Style="{StaticResource FieldLabelStyle}"/>
+                    <ComboBox SelectedValue="{Binding ModelStatus, Mode=TwoWay}"
                               SelectedValuePath="Content">
                         <ComboBoxItem Content="Nouveau"/>
                         <ComboBoxItem Content="En cours"/>
@@ -243,10 +272,8 @@
                         <ComboBoxItem Content="Archivé"/>
                     </ComboBox>
 
-                    <TextBlock Grid.Row="3" Text="Responsable :"/>
-                    <ComboBox Grid.Row="3"
-                              Margin="5,8"
-                              SelectedValue="{Binding ResponsibleEngineer, Mode=TwoWay}"
+                    <TextBlock Text="Responsable :" Style="{StaticResource FieldLabelStyle}"/>
+                    <ComboBox SelectedValue="{Binding ResponsibleEngineer, Mode=TwoWay}"
                               SelectedValuePath="Content">
                         <ComboBoxItem Content="User 1"/>
                         <ComboBoxItem Content="User 2"/>
@@ -254,63 +281,65 @@
                         <ComboBoxItem Content="User 4"/>
                         <ComboBoxItem Content="User 5"/>
                         <ComboBoxItem Content="User 6"/>
-                        <!--<ComboBoxItem Content="PERIER Louis"/>
-                        <ComboBoxItem Content="BABAUD-DULAC Salomé"/>
-                        <ComboBoxItem Content="POTTER Hary"/>
-                        <ComboBoxItem Content="ZIDANE Zinédine"/>-->
                     </ComboBox>
-                </Grid>
+                </StackPanel>
 
                 <!-- Boutons -->
-                <Grid Grid.Column="3" Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
+                <StackPanel Grid.Column="3">
 
-                    <Button 
-                            Command="{Binding DataContext.ToggleEditCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}"
-                            HorizontalAlignment="Stretch">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource ButtonBase}">
-                                <!-- Valeur par défaut -->
-                                <Setter Property="Content" Value="💾" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
-                                        <Setter Property="Content" Value="{lang:Loc Edit}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <TextBlock Text="*"
-                               Foreground="Black"
-                               FontWeight="Bold"
-                               Margin="25,-10,0,0"
-                               Visibility="{Binding IsDirty, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <!-- Éditer / Enregistrer -->
+                    <ui:Button Style="{StaticResource EditToggleButtonStyle}"
+                               Command="{Binding DataContext.ToggleEditCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:SymbolIcon FontSize="16">
+                                <ui:SymbolIcon.Style>
+                                    <Style TargetType="ui:SymbolIcon">
+                                        <Setter Property="Symbol" Value="Save24"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="False">
+                                                <Setter Property="Symbol" Value="Edit24"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SymbolIcon.Style>
+                            </ui:SymbolIcon>
+                            <TextBlock Text="{lang:Loc Edit}" Margin="8,0,0,0" VerticalAlignment="Center">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </ui:Button>
 
-                    <Button Grid.Row="1" 
-                            Content="{lang:Loc OpenWord}" 
-                            Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding}" 
-                            HorizontalAlignment="Stretch"/>
-                    <Button Grid.Row="2" 
-                            Content="{lang:Loc DuplicateWord}"                        
-                            Command="{Binding DataContext.DuplicateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding}" 
-                            HorizontalAlignment="Stretch"/>
-                    <Button Grid.Row="3" 
-                            Content="{lang:Loc Deleted}"
-                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                            CommandParameter="{Binding}"
-                            HorizontalAlignment="Stretch"/>
-                </Grid>
+                    <ui:Button Style="{StaticResource ActionButtonStyle}"
+                               Icon="{ui:SymbolIcon FolderOpen24}"
+                               Content="{lang:Loc OpenWord}"
+                               Command="{Binding DataContext.OpenCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                               CommandParameter="{Binding}"/>
+
+                    <ui:Button Style="{StaticResource ActionButtonStyle}"
+                               Icon="{ui:SymbolIcon Copy24}"
+                               Content="{lang:Loc DuplicateWord}"
+                               Command="{Binding DataContext.DuplicateCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                               CommandParameter="{Binding}"/>
+
+                    <ui:Button Style="{StaticResource ActionButtonStyle}"
+                               Appearance="Danger"
+                               Icon="{ui:SymbolIcon Delete24}"
+                               Content="{lang:Loc Deleted}"
+                               Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                               CommandParameter="{Binding}"/>
+                </StackPanel>
 
             </Grid>
-       
         </Grid>
     </Border>
 </UserControl>

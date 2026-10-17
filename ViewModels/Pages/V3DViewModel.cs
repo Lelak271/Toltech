@@ -6,9 +6,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using DocumentFormat.OpenXml.EMMA;
 using HelixToolkit.Wpf;
-using LiveChartsCore.VisualElements;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.Utilities;
@@ -204,7 +202,7 @@ namespace Toltech.App.ViewModels
         }
 
         #endregion
-      
+
         #endregion
 
         #region Commands
@@ -248,7 +246,7 @@ namespace Toltech.App.ViewModels
             //    OnPropertyChanged(nameof(SelectedCadObjectColor));
             //};
 
-            _linkageTemplateDirectory = ((App)System.Windows.Application.Current).TemplateDirectory; // TODO revoir l'appel
+            _linkageTemplateDirectory = ModelManager.LinkageTemplateDirectory; // TODO revoir l'appel
         }
 
         #region Import OBJ

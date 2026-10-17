@@ -1,9 +1,6 @@
 ﻿using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Input;
-using Microsoft.Xaml.Behaviors;
 
 namespace Toltech.App.Converters
 {

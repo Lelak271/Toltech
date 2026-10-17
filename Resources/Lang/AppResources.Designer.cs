@@ -1024,7 +1024,7 @@ namespace Toltech.App.Resources.Lang {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à 🟢 Model Currently Being Edited.
+        ///   Recherche une chaîne localisée semblable à Model Currently Being Edited.
         /// </summary>
         public static string ModelCurrentlyBeingEdited {
             get {

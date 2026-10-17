@@ -10,30 +10,34 @@
       xmlns:mainVM="clr-namespace:Toltech.App.Resources"
       xmlns:conv="clr-namespace:Toltech.App.Converters"
       xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800" 
       Loaded="Page_Loaded"
       x:Name="ReqPage"
-             >
+      Foreground="{DynamicResource TextFillColorPrimaryBrush}">
 
     <UserControl.Resources>
         <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter"/>
         <conv:EnumEqualsToVisibilityConverter x:Key="EnumEqualsToVisibilityConverter"/>
         <conv:BooleanToImageConverter x:Key="EyeConverter"
-                               TrueImage="pack://application:,,,/Asset/Graphe.png"
-                               FalseImage="pack://application:,,,/Asset/eyehide.png"/>
+                                      TrueImage="pack://application:,,,/Asset/Graphe.png"
+                                      FalseImage="pack://application:,,,/Asset/eyehide.png"/>
+
+        
     </UserControl.Resources>
-    
+
     <DockPanel LastChildFill="True" >
 
-        <!-- Zone de l'arborescence du modèle (à gauche, largeur fixe) -->
-        <Border DockPanel.Dock="Left" Style="{DynamicResource BorderThemeStyle}">
+        <!-- ======================= Arborescence (gauche, largeur fixe) ======================= -->
+        <Border DockPanel.Dock="Left" Style="{StaticResource PageCardStyle}">
             <Grid Name="GridTreeViewReq" Width="250" >
                 <localControls:TreeViewAreaV3 x:Name="TreeViewReq" DataContext="{Binding TreeVM}"/>
             </Grid>
         </Border>
 
-        <Border Style="{DynamicResource BorderThemeStyle}" Margin="10,0,0,0">
+        <!-- ======================= Zone principale ======================= -->
+        <Border Style="{StaticResource PageCardStyle}" Margin="12,0,0,0">
             <Grid  x:Name="MainGridReq"   ShowGridLines="False" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="70"/>
@@ -41,8 +45,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <Border x:Name="HeaderPageReq" Grid.Row="0"  Margin="5,15,5,0" CornerRadius="10">
+                <!-- ===================== EN-TÊTE ===================== -->
+                <Border x:Name="HeaderPageReq" Grid.Row="0" Margin="16,12"  >
                     <Grid ShowGridLines="False" >
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="0"/>
@@ -52,18 +56,20 @@
                         </Grid.ColumnDefinitions>
 
                         <!-- Zone d'affichage des TextBlock -->
-                        <StackPanel Orientation="Horizontal" Grid.Column="1">
-                            <StackPanel Orientation="Vertical" Margin="10,0">
-                                <TextBlock Margin="10,0" FontSize="15" HorizontalAlignment="Left" >
+                        <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+                            <StackPanel Orientation="Vertical" >
+                                <TextBlock FontSize="14" HorizontalAlignment="Left" >
                                     <Run Text="{lang:Loc NumberPart}" />
                                     <Run Text=" " /> 
-                                    <Run Text="{Binding NumberOfParts,Mode=OneWay}" />
+                                    <Run Text="{Binding NumberOfParts,Mode=OneWay}" FontWeight="SemiBold"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                                 </TextBlock>
 
-                                <TextBlock Margin="10,0" FontSize="15" HorizontalAlignment="Left">
+                                <TextBlock FontSize="14" HorizontalAlignment="Left">
                                     <Run Text="{lang:Loc NumberReq}" />
                                     <Run Text=" " /> 
-                                    <Run Text="{Binding NumberOfReq,Mode=OneWay}" />
+                                    <Run Text="{Binding NumberOfReq,Mode=OneWay}" FontWeight="SemiBold"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
                                 </TextBlock>
                             </StackPanel>
 
@@ -71,7 +77,7 @@
 
                         <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" Grid.Column="2">
                             <StackPanel Orientation="Vertical" Margin="10,0">
-                                <TextBlock Margin="10,0" FontSize="15" HorizontalAlignment="Left" >
+                                <TextBlock Margin="10,0" FontSize="14" HorizontalAlignment="Left" >
                                     <Run Text="{lang:Loc Folder}" />
                                     <Run Text=" : " />
                                     <Run Text="{Binding CurrentFolder, UpdateSourceTrigger=PropertyChanged}" />
@@ -82,35 +88,36 @@
                         </StackPanel>
 
                         <!-- Groupe des boutons à droite -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0" Grid.Column="3">
-                            <Button x:Name="BtnCreateReq" Width="40" Height="40" Margin="0,0,0,0" Padding="2" Command="{Binding CreateRequirementCommand}" HorizontalContentAlignment="Center" 
-                                     VerticalContentAlignment="Center"  ToolTip="Création d'une pièce"  >
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="3">
+                            <ui:Button x:Name="BtnCreateReq" 
+                                       Margin="8,0,0,0" 
+                                       Command="{Binding CreateRequirementCommand}" 
+                                       Style="{StaticResource HeaderIconButtonStyle}" 
+                                       ToolTip="Création d'une pièce"  >
                                 <Image Source="/Asset/add_req2.png" Stretch="Uniform" />
-                            </Button>
-                            <Button x:Name="BtnDeleteReq" Width="40" Height="40" Margin="10,0,0,0" Padding="2"  Command="{Binding DeleteRequirementCommand}" HorizontalContentAlignment="Center" 
-                                      VerticalContentAlignment="Center"  ToolTip="{Binding ToolTipDeletePart}"  ToolTipService.ShowDuration="6000">
+                            </ui:Button>
+                            <ui:Button x:Name="BtnDeleteReq"
+                                       Margin="8,0,0,0" 
+                                       Command="{Binding DeleteRequirementCommand}" 
+                                       Style="{StaticResource HeaderIconButtonStyle}"
+                                       ToolTip="{Binding ToolTipDeletePart}" 
+                                       ToolTipService.ShowDuration="6000">
                                 <Image Source="/Asset/bin_req2.png" Stretch="Uniform" />
-                            </Button>
+                            </ui:Button>
 
-                            <Border Style="{DynamicResource BorderThemeStyle}" Width="1" Height="40" Margin="10,0" />
+                            <Border Background="{DynamicResource DividerStrokeColorDefaultBrush}" Width="1" Height="40" Margin="8,0" />
 
-                            <Button x:Name="MultiEditButton" Width="40" Height="40" Margin="10,0,0,0" Padding="2"   Click="MultiEdit_Click"
-                                      HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Edition multiple des données" >
-                                <Viewbox Stretch="Uniform">
-                                    <Grid Margin="40">
-                                        <Image Source="/Asset/MultiEdit.png" Stretch="Uniform"/>
-                                    </Grid>
-                                </Viewbox>
-                            </Button>
-                            <Button x:Name="SaveButton"
-                                    Content="💾" 
-                                    FontSize="25"
-                                    Width="40" 
-                                    Height="40" 
-                                    Margin="10,0,0,0" 
-                                    Padding="0"  
-                                    Command="{Binding SaveCommand}"
-                                    ToolTip="Sauvegade totale" />
+                            <ui:Button x:Name="MultiEditButton"
+                                       Style="{StaticResource HeaderIconButtonStyle}"
+                                       ToolTip="Edition multiple des données" >
+                                <Image Source="/Asset/MultiEdit.png" Stretch="Uniform"/>
+                            </ui:Button>
+                            <ui:Button x:Name="SaveButton"
+                                        Style="{StaticResource HeaderIconButtonStyle}"
+                                        Icon="{ui:SymbolIcon Save24}" FontSize="35"
+                                        Margin="8,0,0,0" 
+                                        Command="{Binding SaveCommand}"
+                                        ToolTip="Sauvegade totale" />
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -119,9 +126,9 @@
                     <Border.Effect>
                         <DropShadowEffect Color="Black" Direction="270" ShadowDepth="3" BlurRadius="6" Opacity="0.4"/>
                     </Border.Effect>
-                    <Border Style="{DynamicResource BorderThemeStyle}" Height="1" Margin="20,0,20,0" VerticalAlignment="Bottom"/>
+                    <Border Background="{DynamicResource DividerStrokeColorDefaultBrush}" Height="1" Margin="20,0,20,0" VerticalAlignment="Bottom"/>
                 </Border>
-                
+
                 <!-- Zone de saisie des valeurs -->
                 <Grid x:Name="GridItems" Grid.Row="2" ShowGridLines="False">
                     <Grid.RowDefinitions>
@@ -133,7 +140,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        
+
                         <StackPanel Grid.Row="0"
                                     Orientation="Horizontal"
                                     HorizontalAlignment="Right"
@@ -150,7 +157,7 @@
                             <ComboBox Width="160"
                                       Margin="0,0,0,0"
                                       ItemsSource="{Binding ViewModes}"
-                                      SelectedItem="{Binding ViewMode, Mode=TwoWay}" /> 
+                                      SelectedItem="{Binding ViewMode, Mode=TwoWay}" />
                         </StackPanel>
 
 
@@ -169,7 +176,7 @@
                                  Focusable="False"
                                  SelectionMode="Single"
                                  Margin="0,30,0,0"
-                                 ItemContainerStyle="{DynamicResource ListBoxReqs}">    
+                                 ItemContainerStyle="{DynamicResource ListBoxReqs}">
 
                             <!-- Panel virtualisant -->
                             <ListBox.ItemsPanel>
@@ -207,71 +214,125 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Border Style="{DynamicResource BorderThemeStyle}" Height="1" Margin="10 0 10 0"/>
+                        <Border Background="{DynamicResource DividerStrokeColorDefaultBrush}" Height="1" Margin="10,0,10,0"/>
                         <TextBlock Grid.Row="1" Text="Page de modélisation pour l'application TOLTECH - Développée par Louis PERIER"
                    FontSize="20" HorizontalAlignment="Center" Margin="5"/>
                     </Grid>
 
-                    <!--Header flottant-->  
-                    <Grid x:Name="FloatingHeader" Grid.Row="0" Height="Auto" VerticalAlignment="Top" Panel.ZIndex="10">
+                    <!-- Header flottant : filtres d'affichage -->
+                    <Grid x:Name="FloatingHeader"
+      Grid.Row="0"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Top"
+      Panel.ZIndex="10">
+
+                        <!-- Animation verticale du header -->
                         <Grid.RenderTransform>
                             <TranslateTransform x:Name="HeaderTransform" Y="0"/>
                         </Grid.RenderTransform>
 
-                        <!-- votre StackHeaderButtons inchangé -->
-                        <StackPanel x:Name="StackHeaderButtons" MouseEnter="FloatingHeader_MouseEnter" MouseLeave="FloatingHeader_MouseLeave"
-                    Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,150,5">
+                        <!-- Conteneur des filtres -->
+                        <Border HorizontalAlignment="Stretch"
+            Background="Transparent"
+            Panel.ZIndex="2"
+            MouseEnter="FloatingHeader_MouseEnter"
+            MouseLeave="FloatingHeader_MouseLeave">
 
-                            <ToggleButton Tag="1" IsChecked="{Binding IsEyeVisible1, Mode=TwoWay}" Opacity="0.8" Margin="0,0,10,0" Style="{DynamicResource ToggleButtonEye}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
-                                    <TextBlock Text="{lang:Loc Part1}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <!--
+            UniformGrid répartit les filtres équitablement.
+            Le WrapPanel permet un retour à la ligne si nécessaire.
+        -->
+                            <WrapPanel x:Name="StackHeaderButtons"
+                   Orientation="Horizontal"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top">
 
-                                    <Border Width="20" Height="20" Background="{DynamicResource IconPrimaryBrush}">
-                                        <Border.OpacityMask>
-                                            <ImageBrush ImageSource="{Binding IsEyeVisible1, Converter={StaticResource EyeConverter}}"
-                                                         Stretch="Uniform"/>
-                                        </Border.OpacityMask>
-                                    </Border>
-                                </StackPanel>
-                            </ToggleButton>
+                                <!-- Filtre : Part 1 -->
+                                <Border MinWidth="100"
+                    Padding="10,5"
+                    
+                    Background="Transparent">
 
-                            <ToggleButton Tag="2" IsChecked="{Binding IsEyeVisible2, Mode=TwoWay}" Opacity="0.8" Margin="0,0,10,0" Style="{DynamicResource ToggleButtonEye}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="{lang:Loc Part2}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <Border Width="20" Height="20" Background="{DynamicResource IconPrimaryBrush}">
-                                        <Border.OpacityMask>
-                                            <ImageBrush ImageSource="{Binding IsEyeVisible2, Converter={StaticResource EyeConverter}}"
-                                                         Stretch="Uniform"/>
-                                        </Border.OpacityMask>
-                                    </Border>
-                                </StackPanel>
-                            </ToggleButton>
+                                    <StackPanel HorizontalAlignment="Center">
 
-                            <ToggleButton Tag="3" IsChecked="{Binding IsEyeVisible3, Mode=TwoWay}" Opacity="0.8" Margin="0,0,10,0" Style="{DynamicResource ToggleButtonEye}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="{lang:Loc Coordinate}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <Border Width="20" Height="20" Background="{DynamicResource IconPrimaryBrush}">
-                                        <Border.OpacityMask>
-                                            <ImageBrush ImageSource="{Binding IsEyeVisible3, Converter={StaticResource EyeConverter}}"
-                                                         Stretch="Uniform"/>
-                                        </Border.OpacityMask>
-                                    </Border>
-                                </StackPanel>
-                            </ToggleButton>
+                                        <ui:TextBlock Text="{lang:Loc Part1}"
+                                  HorizontalAlignment="Center"
+                                  TextAlignment="Center"
+                                  TextWrapping="Wrap"
+                                  />
 
-                            <ToggleButton Tag="4" IsChecked="{Binding IsEyeVisible4, Mode=TwoWay}" Opacity="0.8" Margin="0,0,10,0" Style="{DynamicResource ToggleButtonEye}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <TextBlock Text="{lang:Loc Comment}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <Border Width="20" Height="20" Background="{DynamicResource IconPrimaryBrush}">
-                                        <Border.OpacityMask>
-                                            <ImageBrush ImageSource="{Binding IsEyeVisible4, Converter={StaticResource EyeConverter}}"
-                                                         Stretch="Uniform"/>
-                                        </Border.OpacityMask>
-                                    </Border>
-                                </StackPanel>
-                            </ToggleButton>
-                            
-                        </StackPanel>
+                                        <ui:ToggleSwitch Tag="1"
+                                     HorizontalAlignment="Center"
+                                     IsChecked="{Binding IsEyeVisible1, Mode=TwoWay}"
+                                     Opacity="0.8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Filtre : Part 2 -->
+                                <Border MinWidth="100"
+                    Padding="10,5"
+                    
+                    Background="Transparent">
+
+                                    <StackPanel HorizontalAlignment="Center">
+
+                                        <ui:TextBlock Text="{lang:Loc Part2}"
+                                  HorizontalAlignment="Center"
+                                  TextAlignment="Center"
+                                  TextWrapping="Wrap"
+                                  />
+
+                                        <ui:ToggleSwitch Tag="2"
+                                     HorizontalAlignment="Center"
+                                     IsChecked="{Binding IsEyeVisible2, Mode=TwoWay}"
+                                     Opacity="0.8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Filtre : Coordonnées -->
+                                <Border MinWidth="100"
+                    Padding="10,5"
+                    
+                    Background="Transparent">
+
+                                    <StackPanel HorizontalAlignment="Center">
+
+                                        <ui:TextBlock Text="{lang:Loc Coordinate}"
+                                  HorizontalAlignment="Center"
+                                  TextAlignment="Center"
+                                  TextWrapping="Wrap"
+                                  />
+
+                                        <ui:ToggleSwitch Tag="3"
+                                     HorizontalAlignment="Center"
+                                     IsChecked="{Binding IsEyeVisible3, Mode=TwoWay}"
+                                     Opacity="0.8"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Filtre : Commentaire -->
+                                <Border MinWidth="100"
+                    Padding="10,5"
+                    
+                    Background="Transparent">
+
+                                    <StackPanel HorizontalAlignment="Center">
+
+                                        <ui:TextBlock Text="{lang:Loc Comment}"
+                                  HorizontalAlignment="Center"
+                                  TextAlignment="Center"
+                                  TextWrapping="Wrap"
+                                  />
+
+                                        <ui:ToggleSwitch Tag="4"
+                                     HorizontalAlignment="Center"
+                                     IsChecked="{Binding IsEyeVisible4, Mode=TwoWay}"
+                                     Opacity="0.8"/>
+                                    </StackPanel>
+                                </Border>
+
+                            </WrapPanel>
+                        </Border>
                     </Grid>
                 </Grid>
             </Grid>

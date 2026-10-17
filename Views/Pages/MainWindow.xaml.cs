@@ -9,11 +9,12 @@ using Toltech.App.Services;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.Utilities;
 using Toltech.App.ViewModels;
+using Wpf.Ui.Controls;
 
 
 namespace Toltech.App.Views
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         private MainViewModel MainVM => DataContext as MainViewModel;
 

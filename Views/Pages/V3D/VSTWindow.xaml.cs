@@ -1,14 +1,15 @@
 ﻿using System.Collections.Specialized;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
-using Microsoft.Win32;
-using Toltech.App.ViewModels;
-using Toltech.App.Utilities.Object3D;
 using HelixToolkit.Wpf;
+using Microsoft.Win32;
+using Toltech.App.Utilities.Object3D;
+using Toltech.App.ViewModels;
 
 namespace Toltech.App.Views
 {
@@ -216,33 +217,66 @@ namespace Toltech.App.Views
             return dialog.ShowDialog() == true ? dialog.FileName : null;
         }
 
+        // Couleurs personnalisées conservées entre deux ouvertures (format COLORREF 0x00BBGGRR)
+        private static readonly int[] _customColors = Enumerable.Repeat(0x00FFFFFF, 16).ToArray();
+
         private Color? RequestColorPicker(Color initial)
         {
-            using (var dialog = new System.Windows.Forms.ColorDialog
-            {
-                FullOpen = true,
-                Color = System.Drawing.Color.FromArgb(initial.A, initial.R, initial.G, initial.B)
-            })
-            {
-                var owner = new Win32WindowWrapper(Window.GetWindow(this));
+            const int CC_RGBINIT = 0x00000001;
+            const int CC_FULLOPEN = 0x00000002;
+            const int CC_ANYCOLOR = 0x00000100;
 
-                if (dialog.ShowDialog(owner) != System.Windows.Forms.DialogResult.OK)
-                    return null;
+            IntPtr customPtr = Marshal.AllocHGlobal(16 * sizeof(int));
+            try
+            {
+                Marshal.Copy(_customColors, 0, customPtr, 16);
 
-                var c = dialog.Color;
-                return Color.FromArgb(c.A, c.R, c.G, c.B);
+                var owner = Window.GetWindow(this);
+
+                var cc = new CHOOSECOLOR
+                {
+                    lStructSize = Marshal.SizeOf<CHOOSECOLOR>(),
+                    hwndOwner = owner is null ? IntPtr.Zero : new WindowInteropHelper(owner).Handle,
+                    rgbResult = initial.R | (initial.G << 8) | (initial.B << 16),
+                    lpCustColors = customPtr,
+                    Flags = CC_RGBINIT | CC_FULLOPEN | CC_ANYCOLOR
+                };
+
+                if (!ChooseColor(ref cc))
+                    return null; // annulé
+
+                Marshal.Copy(customPtr, _customColors, 0, 16);
+
+                byte r = (byte)(cc.rgbResult & 0xFF);
+                byte g = (byte)((cc.rgbResult >> 8) & 0xFF);
+                byte b = (byte)((cc.rgbResult >> 16) & 0xFF);
+
+                // La boîte native n'a pas de canal alpha : on conserve celui de la couleur initiale
+                return Color.FromArgb(initial.A, r, g, b);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(customPtr);
             }
         }
 
-        private sealed class Win32WindowWrapper : System.Windows.Forms.IWin32Window
+        [StructLayout(LayoutKind.Sequential)]
+        private struct CHOOSECOLOR
         {
-            public IntPtr Handle { get; }
-
-            public Win32WindowWrapper(Window window)
-            {
-                Handle = new WindowInteropHelper(window).Handle;
-            }
+            public int lStructSize;
+            public IntPtr hwndOwner;
+            public IntPtr hInstance;
+            public int rgbResult;
+            public IntPtr lpCustColors;
+            public int Flags;
+            public IntPtr lCustData;
+            public IntPtr lpfnHook;
+            public IntPtr lpTemplateName;
         }
+
+        [DllImport("comdlg32.dll", EntryPoint = "ChooseColorW", CharSet = CharSet.Unicode, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ChooseColor(ref CHOOSECOLOR lpcc);
 
         private void BackgroundStyleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
