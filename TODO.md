@@ -46,7 +46,8 @@
 - Pop-up personnalisé pour l'état pré-calcul, en remplacement des MessageBox standards
 - Suppression via le ruban : ouvrir le TreeView flottant pour permettre la multi-sélection et la suppression groupée — à étudier si un panneau dédié est déjà affiché (data ou req)
 
-
+--- 
+17/10/2026
 Le refactor sera traité progressivement, avec les objectifs suivants :
 
 Découpler ModelData des ViewModels : retirer ToleranceGroupViewModel, ToleranceSlotViewModel et CreateToleranceGroups() de cette classe.
@@ -56,3 +57,27 @@ Préserver les bindings WPF : identifier les modifications nécessaires aux Data
 Vérifier l'initialisation : déterminer où ModelData est construit et quand les groupes sont actuellement créés.
 
 Priorité : améliorer la séparation entre modèle et présentation sans réécrire le système de tolérances.
+
+---
+19/10/2026
+Refactor du modèle de tolérances
+Centraliser les tolérances dans le modèle Tolerance : supprimer progressivement les nombreuses propriétés de tolérance actuellement présentes dans ModelData et utiliser une référence vers un objet Tolerance pour chaque tolérance associée à une position donnée.
+Gérer les sources de tolérances : permettre à chaque tolérance d'être liée à une base de données interne ou externe, tout en conservant une architecture extensible.
+Prévoir l'interopérabilité des données : anticiper la compatibilité avec des sources de données externes, notamment les formats Excel, CSV et JSON.
+Introduire des tolérances locales temporaires : permettre de créer des tolérances propres à une analyse, sans les enregistrer dans la base de données permanente. Leur attribuer un identifiant temporaire distinctif, par exemple à partir de int.MaxValue en décrémentant, afin d'éviter les collisions avec les identifiants persistants.
+Garantir l'indépendance des analyses : une tolérance temporaire doit pouvoir être utilisée, modifiée et supprimée dans le contexte d'une analyse sans affecter les données permanentes ni les autres analyses.
+
+Objectif : dissocier les données géométriques et d'assemblage de la gestion des tolérances, simplifier ModelData et préparer Toltech à exploiter plusieurs sources de tolérances.
+
+---
+22/10/2026 
+Liste des tâches à réalisées
+
+Corriger les NumberBox liés au point de direction dans le panel REC.
+Mieux gérer les NumberBox : refuser les lettres, accepter les points et les virgules comme séparateur décimal.
+Empêcher les ComboBox d’afficher la même pièce : afficher un message d’erreur si la pièce est déjà sélectionnée.
+Ajouter la sauvegarde automatique quand on active ou désactive une donnée.
+Adapter le ruban principal : les images sont rognées à certains endroits.
+Ajouter un bouton light mode / dark mode en haut à droite de la fenêtre principale.
+Corriger l’affichage des données inversées dans le TreeView (priorité faible).
+Pour l’attribut, afficher uniquement le nœud sélectionné et non tous ses parents (priorité faible).

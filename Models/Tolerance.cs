@@ -9,8 +9,8 @@ namespace Toltech.App.Models
     {
         #region Backing fields
 
-        private string _descriptionTol;
-        private string _nameTol;
+        private string _description;
+        private string _name;
         private double _tol;
 
         #endregion
@@ -20,16 +20,16 @@ namespace Toltech.App.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; } // Identifiant unique de la tolérance
 
-        public string DescriptionTol
+        public string Description
         {
-            get => _descriptionTol;
-            set => SetAndDirty(ref _descriptionTol, value);
+            get => _description;
+            set => SetAndDirty(ref _description, value);
         }
 
-        public string NameTol
+        public string Name
         {
-            get => _nameTol;
-            set => SetAndDirty(ref _nameTol, value);
+            get => _name;
+            set => SetAndDirty(ref _name, value);
         }
 
         public double Tol

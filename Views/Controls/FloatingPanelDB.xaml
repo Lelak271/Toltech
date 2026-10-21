@@ -5,12 +5,41 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:Toltech.App.ViewModels"
         xmlns:behaviors="clr-namespace:Toltech.App.Behaviors"
+        xmlns:conv="clr-namespace:Toltech.App.Converters"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         mc:Ignorable="d"
         Title="Tolérances"
         Width="1000" Height="600"
         WindowStartupLocation="CenterOwner"
-        FontFamily="Segoe UI "
-        >
+        FontFamily="Segoe UI">
+
+    <Window.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+        <!-- Texte du bandeau : change selon le mode -->
+        <Style x:Key="BannerTextStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Text" Value="Liste des tolérances du modèle actif"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelectionMode}" Value="True">
+                    <Setter Property="Text" Value="Sélectionnez la tolérance à lier"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid : multi-sélection en mode CRUD, sélection unique en mode sélection -->
+        <Style x:Key="ToleranceGridStyle" TargetType="DataGrid">
+            <Setter Property="SelectionMode" Value="Extended"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelectionMode}" Value="True">
+                    <Setter Property="SelectionMode" Value="Single"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -20,58 +49,135 @@
         </Grid.RowDefinitions>
 
         <!-- Bandeau supérieur -->
-        <Border Background="#2D3E50" 
-                Padding="15" 
-                Margin="5" 
+        <Border Grid.Row="0"
+                Background="#2D3E50"
+                Padding="15"
+                Margin="5"
                 CornerRadius="6">
-            <TextBlock Text="Liste des tolérances du modèle actif" 
-                       FontSize="20" 
-                       FontWeight="SemiBold" 
-                       VerticalAlignment="Center"/>
+            <TextBlock Style="{StaticResource BannerTextStyle}"/>
         </Border>
 
-        <!-- DataGrid -->
-        <DataGrid ItemsSource="{Binding Tolerances}" 
-                  Grid.Row="1" 
+        <!-- DataGrid (commune aux deux modes) -->
+        <DataGrid Grid.Row="1"
                   Margin="15"
+                   MouseDoubleClick="Tolerances_MouseDoubleClick"
+                  Style="{StaticResource ToleranceGridStyle}"
+                  ItemsSource="{Binding Tolerances}"
+                  SelectedItem="{Binding SelectedTolerance, Mode=TwoWay}"
+                  IsReadOnly="{Binding IsSelectionMode}"
+                  behaviors:DataGridSelectedItemsBehavior.Enable="True"
+                  behaviors:DataGridSelectedItemsBehavior.SelectedItems="{Binding SelectedTolerances}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   CanUserDeleteRows="False"
-                  SelectionMode="Extended"
+                  CanUserResizeRows="False"
                   SelectionUnit="FullRow"
-                  behaviors:DataGridSelectedItemsBehavior.Enable="True"
-                  behaviors:DataGridSelectedItemsBehavior.SelectedItems="{Binding SelectedTolerances}"
-                  >
+                  AlternatingRowBackground="#E9EDF2"
+                  RowBackground="White"
+                  GridLinesVisibility="All"
+                  HeadersVisibility="Column"
+                  FontSize="14"
+                  ColumnHeaderHeight="35"
+                  RowHeight="30"
+                  BorderThickness="0">
+
+            <DataGrid.Resources>
+                <!-- En-tête -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#3A4C63"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Padding" Value="10,5"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+                <!-- Cellules -->
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Padding" Value="8,2"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Style>
+            </DataGrid.Resources>
+ 
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                <DataGridTextColumn Header="Nom" Binding="{Binding NameTol}"/>
-                <DataGridTextColumn Header="Description" Binding="{Binding DescriptionTol}"/>
+                <DataGridTextColumn Header="Nom" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}"/>
                 <DataGridTextColumn Header="Tol Int" Binding="{Binding Tol}"/>
             </DataGrid.Columns>
 
+            <!-- Menu contextuel : seule la partie qui diffère entre les deux modes -->
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Ajouter" 
-                              Command="{Binding CreateCommand}"
-                              CommandParameter="{Binding}" />
-                    <MenuItem Header="Supprimer" 
-                              Command="{Binding DeleteCommand}"
-                              CommandParameter="{Binding}" />
+                    <!-- Mode sélection -->
+                    <MenuItem Header="Lier à la Db"
+                              Command="{Binding LinkedCommand}"
+                              Visibility="{Binding IsSelectionMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                        
+                        <MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="Link24"
+                           FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <!-- Séparateur entre les modes -->
+                    <Separator Visibility="{Binding IsSelectionMode,
+                                    Converter={StaticResource BoolToVisibilityConverter},
+                                    ConverterParameter=Invert}"/>
+
+                    <!-- Mode CRUD : créer une tolérance -->
+                    <MenuItem Header="Ajouter une tolérance"
+              Command="{Binding CreateCommand}"
+              CommandParameter="{Binding}"
+              Visibility="{Binding IsSelectionMode,
+                                   Converter={StaticResource BoolToVisibilityConverter},
+                                   ConverterParameter=Invert}">
+
+                        <MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="AddCircle24"
+                           FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+
+                    <!-- Mode CRUD : supprimer une tolérance -->
+                    <MenuItem Header="Supprimer"
+              Command="{Binding DeleteCommand}"
+              CommandParameter="{Binding}"
+              Visibility="{Binding IsSelectionMode,
+                                   Converter={StaticResource BoolToVisibilityConverter},
+                                   ConverterParameter=Invert}">
+
+                        <MenuItem.Icon>
+                            <ui:SymbolIcon Symbol="Delete24"
+                           FontSize="16"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                 </ContextMenu>
             </DataGrid.ContextMenu>
         </DataGrid>
 
-        <!-- Boutons -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2" FlowDirection="RightToLeft">
-            <Button Content="Enregistrer" Width="120" Height="30" Margin="10"
-                    Command="{Binding SaveCommand}" />
-            <Button Content="Créer" Width="120" Height="30" Margin="10"
-                    Command="{Binding CreateCommand}" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Row="2" FlowDirection="RightToLeft">
-            <Button Content="Supprimer" Width="120" Height="30" Margin="10"
-                    Command="{Binding DeleteCommand}" />
- 
-        </StackPanel>
+        <!-- Boutons CRUD : uniquement en mode CRUD (la ligne se réduit à 0 sinon) -->
+        <Grid Grid.Row="2"
+              Margin="5"
+              Visibility="{Binding IsSelectionMode, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=Invert}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Content="Supprimer"
+                    Width="120" Height="30" Margin="10"
+                    HorizontalAlignment="Left"
+                    Command="{Binding DeleteCommand}"/>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Créer"
+                        Width="120" Height="30" Margin="10"
+                        Command="{Binding CreateCommand}"/>
+                <Button Content="Enregistrer"
+                        Width="120" Height="30" Margin="10"
+                        Command="{Binding SaveCommand}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 
 namespace Toltech.App.ViewModels
 {
@@ -23,8 +21,7 @@ namespace Toltech.App.ViewModels
     }
 
     /// <summary>
-    /// Commande synchrone sans paramètre. Cas le plus courant dans les VM de Toltech
-    /// (CadSelectCommand, CadMeasureCommand, ResetSelectedTransformCommand, ...).
+    /// Commande synchrone sans paramètre. 
     /// </summary>
     public sealed class RelayCommand : CommandBase
     {
@@ -43,7 +40,6 @@ namespace Toltech.App.ViewModels
 
     /// <summary>
     /// Commande synchrone avec paramètre typé (ex : CopyPointComponentCommand,
-    /// CommandParameter="X"/"Y"/"Z").
     /// </summary>
     public sealed class RelayCommand<T> : CommandBase
     {

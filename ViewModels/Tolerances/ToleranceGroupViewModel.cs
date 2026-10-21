@@ -7,7 +7,9 @@
         T2,
         Rn,
         RT1,
-        RT2
+        RT2, 
+
+        R
     }
 
     public enum TolerancePosition

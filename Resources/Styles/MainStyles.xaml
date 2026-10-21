@@ -172,99 +172,60 @@
     </Style>
 
     <!-- ========================================================= -->
-    <!-- NumberBox personnalisé : sélection d'un point CAO          -->
+    <!-- BASE : contient tout le menu contextuel                    -->
     <!-- ========================================================= -->
-    <Style x:Key="NumericBoxCadPointStyle"
-       TargetType="{x:Type ui:NumberBox}"  BasedOn="{StaticResource {x:Type ui:NumberBox}}"> 
+    <Style x:Key="NumericBoxCadBaseStyle"
+       TargetType="{x:Type ui:NumberBox}"
+       BasedOn="{StaticResource {x:Type ui:NumberBox}}">
 
         <Setter Property="ContextMenu">
             <Setter.Value>
+                <ContextMenu Padding="4" HasDropShadow="True">
 
-                <ContextMenu Padding="4"
-                         HasDropShadow="True">
+                    <!-- Sélection CAO (titre fourni par le style dérivé) -->
+                    <MenuItem FontWeight="SemiBold"
+                          Header="{Binding PlacementTarget.(cad:CadCommand.Header),
+                                   RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
 
-                    <!-- ================================================= -->
-                    <!-- Sélection CAO                                     -->
-                    <!-- ================================================= -->
-
-                    <MenuItem Header="Sélectionner un point dans la CAO"
-                          FontWeight="SemiBold">
-
-                        <!-- FreeCAD -->
+                        <!-- FreeCAD (commande fournie par le style dérivé) -->
                         <MenuItem Header="FreeCAD"
-                              Command="{x:Static cad:CadCommands.PickPoint}"
+                              Command="{Binding PlacementTarget.(cad:CadCommand.Command),
+                                        RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
                               CommandTarget="{Binding PlacementTarget,
-                                  RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
+                                        RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"
                               CommandParameter="{Binding PlacementTarget,
-                                  RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
-
+                                        RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}">
                             <MenuItem.Icon>
-                                <Image Source="/Asset/Logos/FreeCAD.png"
-                                   Width="20"
-                                   Height="20"
-                                   Stretch="Uniform"/>
+                                <Image Source="/Asset/Logos/FreeCAD.png" Width="20" Height="20" Stretch="Uniform"/>
                             </MenuItem.Icon>
-
                         </MenuItem>
 
-                        <!-- CATIA V5 -->
-                        <MenuItem Header="CATIA V5"
-                              IsEnabled="False">
-
+                        <MenuItem Header="CATIA V5" IsEnabled="False">
                             <MenuItem.Icon>
-                                <Image Source="/Asset/Logos/CATIAV5.png"
-                                   Width="20"
-                                   Height="20"
-                                   Stretch="Uniform"/>
+                                <Image Source="/Asset/Logos/CATIAV5.png" Width="20" Height="20" Stretch="Uniform"/>
                             </MenuItem.Icon>
-
                         </MenuItem>
 
-                        <!-- SOLIDWORKS -->
-                        <MenuItem Header="SOLIDWORKS"
-                              IsEnabled="False">
-
+                        <MenuItem Header="SOLIDWORKS" IsEnabled="False">
                             <MenuItem.Icon>
-                                <Image Source="/Asset/Logos/SOLIDWORKS.png"
-                                   Width="20"
-                                   Height="20"
-                                   Stretch="Uniform"/>
+                                <Image Source="/Asset/Logos/SOLIDWORKS.png" Width="20" Height="20" Stretch="Uniform"/>
                             </MenuItem.Icon>
-
                         </MenuItem>
 
-                        <!-- Siemens NX -->
-                        <MenuItem Header="Siemens NX"
-                              IsEnabled="False">
-
+                        <MenuItem Header="Siemens NX" IsEnabled="False">
                             <MenuItem.Icon>
-                                <Image Source="/Asset/Logos/Siemens_NX.png"
-                                   Width="20"
-                                   Height="20"
-                                   Stretch="Uniform"/>
+                                <Image Source="/Asset/Logos/Siemens_NX.png" Width="20" Height="20" Stretch="Uniform"/>
                             </MenuItem.Icon>
-
                         </MenuItem>
 
-                        <!-- Inventor -->
-                        <MenuItem Header="Inventor"
-                              IsEnabled="False">
-
+                        <MenuItem Header="Inventor" IsEnabled="False">
                             <MenuItem.Icon>
-                                <Image Source="/Asset/Logos/Inventor.png"
-                                   Width="20"
-                                   Height="20"
-                                   Stretch="Uniform"/>
+                                <Image Source="/Asset/Logos/Inventor.png" Width="20" Height="20" Stretch="Uniform"/>
                             </MenuItem.Icon>
-
                         </MenuItem>
-
                     </MenuItem>
 
-                    <!-- ================================================= -->
-                    <!-- Actions classiques                                -->
-                    <!-- ================================================= -->
-
+                    <!-- Actions classiques -->
                     <Separator/>
 
                     <MenuItem Header="Copier"
@@ -276,150 +237,29 @@
                           Command="ApplicationCommands.Paste"
                           CommandTarget="{Binding PlacementTarget,
                               RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
-
                 </ContextMenu>
-
             </Setter.Value>
         </Setter>
-
     </Style>
-    
 
-    <!-- TextBox personnalisé CAD EDGE -->
-    <Style x:Key="NumericBoxCadEdgetStyle"
-            TargetType="{x:Type ui:NumberBox}"
-            BasedOn="{StaticResource {x:Type ui:NumberBox}}">
+    <!-- ========================================================= -->
+    <!-- Dérivé : sélection d'un POINT                              -->
+    <!-- ========================================================= -->
+    <Style x:Key="NumericBoxCadPointStyle"
+       TargetType="{x:Type ui:NumberBox}"
+       BasedOn="{StaticResource NumericBoxCadBaseStyle}">
+        <Setter Property="cad:CadCommand.Header" Value="Sélectionner un point dans la CAO"/>
+        <Setter Property="cad:CadCommand.Command" Value="{x:Static cad:CadCommands.PickPoint}"/>
+    </Style>
 
-        <Setter Property="ContextMenu">
-            <Setter.Value>
-
-                <ContextMenu
-                Padding="4"
-                HasDropShadow="True">
-
-                    <!-- ===================================================== -->
-                    <!-- Sélection CAO                                        -->
-                    <!-- ===================================================== -->
-
-                    <MenuItem
-                    Header="Sélectionner une arrête dans la CAO"
-                    FontWeight="SemiBold">
-
-                        <!-- ============================= -->
-                        <!-- FreeCAD                         -->
-                        <!-- ============================= -->
-
-                        <MenuItem
-                        Header="FreeCAD"
-                        IsEnabled="True"
-                        Command="{x:Static cad:CadCommands.PickEdge}"
-                        CommandTarget="{Binding PlacementTarget,
-                            RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                        CommandParameter="{Binding PlacementTarget,
-                            RelativeSource={RelativeSource AncestorType=ContextMenu}}">
-
-                            <MenuItem.Icon>
-                                <Image
-                                Source="/Asset/Logos/FreeCAD.png"
-                                Height="20" />
-                            </MenuItem.Icon>
-
-                        </MenuItem>
-
-
-                        <!-- ============================= -->
-                        <!-- CATIA V5                        -->
-                        <!-- ============================= -->
-
-                        <MenuItem
-                        Header="CATIA V5"
-                        IsEnabled="False">
-
-                            <MenuItem.Icon>
-                                <Image
-                                Source="/Asset/Logos/CATIAV5.png"
-                                Height="20" />
-                            </MenuItem.Icon>
-
-                        </MenuItem>
-
-
-                        <!-- ============================= -->
-                        <!-- SOLIDWORKS                      -->
-                        <!-- ============================= -->
-
-                        <MenuItem
-                        Header="SOLIDWORKS"
-                        IsEnabled="False">
-
-                            <MenuItem.Icon>
-                                <Image
-                                Source="/Asset/Logos/SOLIDWORKS.png"
-                                Height="20" />
-                            </MenuItem.Icon>
-
-                        </MenuItem>
-
-
-                        <!-- ============================= -->
-                        <!-- Siemens NX                      -->
-                        <!-- ============================= -->
-
-                        <MenuItem
-                        Header="Siemens NX"
-                        IsEnabled="False">
-
-                            <MenuItem.Icon>
-                                <Image
-                                Source="/Asset/Logos/Siemens_NX.png"
-                                Height="20" />
-                            </MenuItem.Icon>
-
-                        </MenuItem>
-
-
-                        <!-- ============================= -->
-                        <!-- Inventor                        -->
-                        <!-- ============================= -->
-
-                        <MenuItem
-                        Header="Inventor"
-                        IsEnabled="False">
-
-                            <MenuItem.Icon>
-                                <Image
-                                Source="/Asset/Logos/Inventor.png"
-                                Height="20" />
-                            </MenuItem.Icon>
-
-                        </MenuItem>
-
-                    </MenuItem>
-
-
-                    <!-- ===================================================== -->
-                    <!-- Actions classiques du TextBox                       -->
-                    <!-- ===================================================== -->
-
-                    <Separator />
-
-                    <MenuItem
-                    Header="Copier"
-                    Command="ApplicationCommands.Copy"
-                    CommandTarget="{Binding PlacementTarget,
-                        RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-
-                    <MenuItem
-                    Header="Coller"
-                    Command="ApplicationCommands.Paste"
-                    CommandTarget="{Binding PlacementTarget,
-                        RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
-
-                </ContextMenu>
-
-            </Setter.Value>
-        </Setter>
-
+    <!-- ========================================================= -->
+    <!-- Dérivé : sélection d'une ARÊTE                             -->
+    <!-- ========================================================= -->
+    <Style x:Key="NumericBoxCadEdgeStyle"
+       TargetType="{x:Type ui:NumberBox}"
+       BasedOn="{StaticResource NumericBoxCadBaseStyle}">
+        <Setter Property="cad:CadCommand.Header" Value="Sélectionner une arête dans la CAO"/>
+        <Setter Property="cad:CadCommand.Command" Value="{x:Static cad:CadCommands.PickEdge}"/>
     </Style>
 
     <Style x:Key="AlphabeticTextBoxStyle" TargetType="TextBox">
@@ -439,96 +279,6 @@
                         <TextBlock Text="{lang:Loc DefaultUnit}" />
                     </StackPanel>
                 </ToolTip>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    
-    <Style x:Key="ButtonBase" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="5,5" />
-        <Setter Property="Margin" Value="2" />
-        <Setter Property="Cursor" Value="Hand" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-
-                    <Border x:Name="Bd"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        Padding="{TemplateBinding Padding}"
-                        CornerRadius="3">
-
-                        <ContentPresenter
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        RecognizesAccessKey="True"/>
-
-                    </Border>
-
-                    <ControlTemplate.Triggers>
-
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd"
-                                Property="Background"
-                                Value="{DynamicResource AccentHoverBrush}"/>
-                        </Trigger>
-
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bd"
-                                Property="Opacity"
-                                Value="0.85"/>
-                        </Trigger>
-
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd"
-                                Property="Opacity"
-                                Value="0.5"/>
-                        </Trigger>
-
-                    </ControlTemplate.Triggers>
-
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-
-    </Style>
-
-    <Style TargetType="Button" BasedOn="{StaticResource ButtonBase}">
-        <Setter Property="Margin" Value="2"/>
-    </Style>
-    
-    <Style x:Key="ToggleButtonEye" TargetType="ToggleButton">
-        <Setter Property="Width" Value="130" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border x:Name="Bd"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="6"
-                        Padding="5" >
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PrimaryBackgroundBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="False">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource TertiaryBackgroundBrush}"/>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
@@ -587,8 +337,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-
 
     <Style x:Key="CustomDragablzTabItemStyle" TargetType="dragablz:DragablzItem"  BasedOn="{StaticResource TrapezoidDragableTabItemStyle}">
         <!-- Couleurs personnalisables -->
@@ -654,229 +402,6 @@
         </Setter>
     </Style>
 
-    <!-- TODO IsReadOnly =true pas implementable avec le style, il faut faire un style spécifique pour les TextBox en lecture seule-->
-    <Style x:Key="ComboBoxMainStyle"
-           TargetType="ComboBox"
-           BasedOn="{StaticResource {x:Type ComboBox}}">
-
-        
-        <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,4" />
-        <Setter Property="Margin" Value="5,8" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Cursor" Value="Hand" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ComboBox">
-                    <Grid>
-
-                        <!-- BORDURE PRINCIPALE -->
-                        <Border x:Name="MainBorder"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4">
-
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="30"/>
-                                </Grid.ColumnDefinitions>
-                                
-                                <TextBox x:Name="PART_EditableTextBox"
-                                     Style="{x:Null}"
-                                     HorizontalAlignment="Left"
-                                     VerticalAlignment="Stretch"
-                                     Margin="3,3,23,3"
-                                     Focusable="True"
-                                     Background="Transparent"
-                                     Visibility="Hidden"
-                                     IsReadOnly="{TemplateBinding IsReadOnly}" />
-                               
-                                <!-- Contenu sélectionné -->
-                                <!--<ContentPresenter
-                                Margin="8,0,0,0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Stretch"
-                                Content="{TemplateBinding SelectionBoxItem}"
-                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />-->
-                                <ContentPresenter
-                                Margin="8,0,0,0"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Stretch"
-                                Content="{TemplateBinding SelectionBoxItem}"
-                                ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
-                                ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                RecognizesAccessKey="True"
-                                    />
-
-                                <!-- Flèche -->
-                                <Path Grid.Column="1"
-                                  VerticalAlignment="Center"
-                                  HorizontalAlignment="Center"
-                                  Fill="{DynamicResource PrimaryForegroundBrush}"
-                                  Data="M 0 0 L 8 0 L 4 5 Z"/>
-                            </Grid>
-                        </Border>
-
-                        <!-- Toggle invisible -->
-                        <ToggleButton
-                        Background="Transparent"
-                        BorderThickness="0"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch"
-                        IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
-
-                        <!-- POPUP -->
-                        <Popup x:Name="Popup"
-                           Placement="Bottom"
-                           IsOpen="{TemplateBinding IsDropDownOpen}"
-                           AllowsTransparency="True"
-                           Focusable="False"
-                           PopupAnimation="Slide">
-
-                            <Border Background="{DynamicResource PrimaryBackgroundBrush}"
-                                BorderBrush="{DynamicResource PrimaryBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,2,0,0"
-                                MaxHeight="250"
-                                Width="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
-                                HorizontalAlignment="Stretch">
-
-                                <ScrollViewer >
-                                    <ItemsPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                                </ScrollViewer>
-
-                            </Border>
-                        </Popup>
-                    </Grid>
-
-                    <!-- TRIGGERS -->
-                    <ControlTemplate.Triggers>
-
-                        <!-- Focus -->
-                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                            <Setter TargetName="MainBorder"
-                                Property="BorderBrush"
-                                Value="{DynamicResource AccentBrush}" />
-                        </Trigger>
-
-                        <!-- Disabled -->
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground"
-                                Value="{DynamicResource DisabledBrush}" />
-                        </Trigger>
-
-                    </ControlTemplate.Triggers>
-
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="ComboBoxItem"
-       BasedOn="{StaticResource {x:Type ComboBoxItem}}">
-
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Background" Value="Red"/>
-    </Style>
-
-    <Style x:Key="CustomComboBoxItemStyle"
-       TargetType="ComboBoxItem">
-
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}" />
-        <Setter Property="Padding" Value="8,6" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ComboBoxItem">
-                    <Border x:Name="border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{DynamicResource SecondaryBorderBrush}"
-                        BorderThickness="0,0,0,1"
-                        Padding="{TemplateBinding Padding}"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch">
-
-                        <ContentPresenter VerticalAlignment="Stretch" 
-                                          HorizontalAlignment="Stretch" />
-                    </Border>
-
-                    <ControlTemplate.Triggers>
-
-                        <!-- Hover -->
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border"
-                                Property="Background"
-                                Value="{DynamicResource AccentHoverBrush}" />
-                        </Trigger>
-
-                        <!-- Selected -->
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="border"
-                                Property="Background"
-                                Value="{DynamicResource AccentBrush}" />
-                            <Setter Property="Foreground"
-                                Value="{DynamicResource PrimaryBackgroundBrush}" />
-                        </Trigger>
-
-                        <!-- Disabled -->
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground"
-                                Value="{DynamicResource DisabledBrush}" />
-                        </Trigger>
-
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="ComboBox"
-       BasedOn="{StaticResource ComboBoxMainStyle}">
-    </Style>
-
-    <Style x:Key="ComboBoxStyle2"
-       TargetType="ComboBox"
-       BasedOn="{StaticResource {x:Type ComboBox}}">
-
-        <Setter Property="Background" Value="{DynamicResource SecondaryBackgroundBrush}" />
-        <Setter Property="Foreground" Value="{DynamicResource PrimaryForegroundBrush}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBorderBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="6,4" />
-
-    </Style>
-
-    
-    <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource WindowButtonStyle}">
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#AA0000"/>
-                            <Setter Property="Foreground" Value="White"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#770000"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <Style x:Key="ListBoxReqs" TargetType="ListBoxItem">
         <Setter Property="Padding" Value="0"/>
@@ -983,78 +508,5 @@
     </Style>
 
 
-    <!-- ===================== -->
-        <!-- CONTEXT MENU STYLE     -->
-        <!-- ===================== --><!--
-        <Style TargetType="ContextMenu">
-        <Setter Property="Background" Value="{DynamicResource Menu.Background}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource Menu.Border}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="0" />
-            <Setter Property="SnapsToDevicePixels" Value="True"/>
-            <Setter Property="HasDropShadow" Value="True"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ContextMenu">
-                        <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6"
-                            SnapsToDevicePixels="True"
-                            >
-                            <Border.Effect>
-                            <DropShadowEffect BlurRadius="8" ShadowDepth="2" Color="{DynamicResource MenuItem.Foreground.Hover}" Opacity="0.3"/>
-                            </Border.Effect>
-
-                            <StackPanel IsItemsHost="True" Margin="2"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        --><!-- ===================== -->
-        <!-- MENU ITEM STYLE        -->
-        <!-- ===================== --><!--
-        <Style TargetType="MenuItem">
-        <Setter Property="Foreground" Value="{DynamicResource MenuItem.Foreground}" />
-        <Setter Property="Background" Value="{DynamicResource MenuItem.Background}" />
-            <Setter Property="Padding" Value="8,4" />
-            <Setter Property="Margin" Value="2,1"/>
-            <Setter Property="FontSize" Value="12"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="MenuItem">
-                        <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="4"
-                            SnapsToDevicePixels="True">
-                            <ContentPresenter ContentSource="Header"
-                                          Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            --><!-- Hover --><!--
-                            <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MenuItem.Background}" />
-                            <Setter Property="Foreground" Value="{DynamicResource MenuItem.Foreground.Hover}" />
-                            </Trigger>
-
-                            --><!-- Disabled --><!--
-                            <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="{DynamicResource MenuItem.Foreground}" />
-                                <Setter Property="Opacity" Value="0.5"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>-->
 
 </ResourceDictionary>

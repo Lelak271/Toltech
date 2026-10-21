@@ -199,7 +199,6 @@
                             <ui:Button x:Name="SaveButton"
                                        Style="{StaticResource HeaderIconButtonStyle}"
                                        Margin="8,0,0,0"
-                                       Appearance="Primary"
                                        Icon="{ui:SymbolIcon Save24}" FontSize="35"
                                        Command="{Binding SaveAllCommand}"
                                        ToolTip="Sauvegade totale"/>
@@ -277,7 +276,7 @@
                         <StackPanel Grid.Column="0" Margin="20" Orientation="Vertical" HorizontalAlignment="Right">
                             <ui:Button Width="50" Height="50" Padding="0"
                                        HorizontalAlignment="Center"
-                                       Appearance="Primary"
+                                        Style="{StaticResource HeaderIconButtonStyle}"
                                        Icon="{ui:SymbolIcon Add24}"
                                        FontSize="22"
                                        Command="{Binding CreateDataCommand}"
@@ -326,7 +325,7 @@
                     <!-- Header flottant : filtres d'affichage -->
                     <Grid x:Name="FloatingHeader"
                           Grid.Row="1"
-                          HorizontalAlignment="Stretch"
+                          HorizontalAlignment="Center"
                           VerticalAlignment="Top">
 
                         <!-- Animation verticale du header -->

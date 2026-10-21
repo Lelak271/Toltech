@@ -28,10 +28,10 @@
         <!-- Carte : change d'apparence en mode édition -->
         <Style x:Key="ModelCardStyle" TargetType="Border">
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="Padding" Value="16"/>
             <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorSecondaryBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsEditable, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="True">
                     <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
@@ -48,7 +48,7 @@
                     <Setter Property="IsReadOnly" Value="True"/>
                     <Setter Property="IsHitTestVisible" Value="False"/>
                     <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>

@@ -4,7 +4,7 @@ using System.Windows.Input;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.Services.Notification;
-using TtCore = Toltech.App.ViewModels;
+using static Toltech.App.Services.EventsManager;
 
 namespace Toltech.App.ViewModels
 {
@@ -17,29 +17,29 @@ namespace Toltech.App.ViewModels
 
         private readonly INotificationService _notificationService;
 
+        private ObservableCollection<Tolerance> _selectedTolerances = new ObservableCollection<Tolerance>();
 
-        private ObservableCollection<ToleranceRow> _selectedTolerances
-            = new ObservableCollection<ToleranceRow>();
-
-        public ObservableCollection<ToleranceRow> SelectedTolerances
+        /// <summary>Lignes sélectionnées (multi-sélection, alimentée par DataGridSelectedItemsBehavior).</summary>
+        public ObservableCollection<Tolerance> SelectedTolerances
         {
             get => _selectedTolerances;
             set => SetProperty(ref _selectedTolerances, value);
         }
-
 
         public ToleranceDBViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
             _domainService = mainVM.DomainService;
 
-            Tolerances = new ObservableCollection<ToleranceRow>();
+            Tolerances = new ObservableCollection<Tolerance>();
 
             #region ICommand
-            LoadCommand = new TtCore.AsyncRelayCommand(LoadTolerancesAsync);
-            SaveCommand = new TtCore.AsyncRelayCommand(SaveTolerancesAsync);
-            CreateCommand = new TtCore.AsyncRelayCommand(CreateToleranceAsync);
-            DeleteCommand = new TtCore.AsyncRelayCommand(DeleteSelectedTolerancesAsync);
+            LoadCommand = new AsyncRelayCommand(LoadTolerancesAsync);
+            SaveCommand = new AsyncRelayCommand(SaveTolerancesAsync);
+            CreateCommand = new AsyncRelayCommand(CreateToleranceAsync);
+            DeleteCommand = new AsyncRelayCommand(DeleteSelectedTolerancesAsync);
+
+            LinkedCommand = new RelayCommand(Select, () => IsSelectionMode && SelectedTolerance is not null);
             #endregion
 
             _ = LoadTolerancesAsync();
@@ -48,7 +48,7 @@ namespace Toltech.App.ViewModels
         // ----------------------------------------------------------------
         // Collections
         // ----------------------------------------------------------------
-        public ObservableCollection<ToleranceRow> Tolerances { get; }
+        public ObservableCollection<Tolerance> Tolerances { get; }
 
         // ----------------------------------------------------------------
         // Commands
@@ -57,6 +57,7 @@ namespace Toltech.App.ViewModels
         public ICommand SaveCommand { get; }
         public ICommand CreateCommand { get; }
         public ICommand DeleteCommand { get; }
+        public ICommand LinkedCommand { get; }
 
         private bool _isBusy;
         public bool IsBusy
@@ -78,6 +79,12 @@ namespace Toltech.App.ViewModels
 
         public async Task LoadTolerancesAsync()
         {
+            if (string.IsNullOrEmpty(ModelManager.ModelActif))
+            {
+                MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             await ExecuteBusyAsync("Chargement des tolérances...", async () =>
             {
                 Tolerances.Clear();
@@ -85,79 +92,51 @@ namespace Toltech.App.ViewModels
                 if (tolerances == null || !tolerances.Any()) return;
 
                 foreach (var tol in tolerances)
-                {
-                    Tolerances.Add(new ToleranceRow
-                    {
-                        Id = tol.Id,
-                        NameTol = tol.NameTol,
-                        DescriptionTol = tol.DescriptionTol,
-                        Tol = tol.Tol
-                    });
-                }
+                    Tolerances.Add(tol);
             });
         }
 
         public async Task SaveTolerancesAsync()
         {
-            await ExecuteBusyAsync("Sauvegarde des tolérances...", async () =>
+            bool saved = await ExecuteBusyAsync("Sauvegarde des tolérances...", async () =>
             {
                 foreach (var tol in Tolerances)
                 {
-                    var dbTol = new Tolerance
-                    {
-                        Id = tol.Id,
-                        NameTol = tol.NameTol,
-                        DescriptionTol = tol.DescriptionTol,
-                        Tol = tol.Tol
-                    };
-
-                    if (dbTol.Id == 0)
-                        await _domainService.InsertToleranceAsync(dbTol);
+                    if (tol.Id == 0)
+                        await _domainService.InsertToleranceAsync(tol);
                     else
-                        await _domainService.UpdateToleranceAsync(dbTol);
+                        await _domainService.UpdateToleranceAsync(tol);
                 }
             });
 
-            MessageBox.Show("Tolérances sauvegardées avec succès.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (saved)
+                MessageBox.Show("Tolérances sauvegardées avec succès.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         public async Task CreateToleranceAsync()
         {
-            await ExecuteBusyAsync("Création d'une tolérance...", async () =>
+            bool created = await ExecuteBusyAsync("Création d'une tolérance...", async () =>
             {
                 var newTol = new Tolerance();
                 await _domainService.InsertToleranceAsync(newTol);
-                Tolerances.Add(new ToleranceRow
-                {
-                    Id = newTol.Id,
-                    NameTol = newTol.NameTol,
-                    DescriptionTol = newTol.DescriptionTol,
-                    Tol = newTol.Tol
-                });
             });
-            LoadTolerancesAsync();
 
+            // Rechargement attendu pour récupérer l'Id attribué par la base.
+            if (created)
+                await LoadTolerancesAsync();
         }
 
-        public async Task DeleteToleranceAsync(ToleranceRow tol)
+        public async Task DeleteToleranceAsync(Tolerance tol)
         {
             if (tol == null) return;
 
-            var result = MessageBox.Show($"Confirmez-vous la suppression de {tol.NameTol} ?",
+            var result = MessageBox.Show($"Confirmez-vous la suppression de {tol.Name} ?",
                                          "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
             if (result != MessageBoxResult.Yes) return;
 
             await ExecuteBusyAsync("Suppression...", async () =>
             {
-                var dbTol = new Tolerance
-                {
-                    Id = tol.Id,
-                    NameTol = tol.NameTol,
-                    DescriptionTol = tol.DescriptionTol,
-                    Tol = tol.Tol
-                };
-
-                await _domainService.DeleteToleranceAsync(dbTol);
+                await _domainService.DeleteToleranceAsync(tol);
                 Tolerances.Remove(tol);
             });
         }
@@ -183,15 +162,7 @@ namespace Toltech.App.ViewModels
 
                 foreach (var tol in toDelete)
                 {
-                    var dbTol = new Tolerance
-                    {
-                        Id = tol.Id,
-                        NameTol = tol.NameTol,
-                        DescriptionTol = tol.DescriptionTol,
-                        Tol = tol.Tol
-                    };
-
-                    await _domainService.DeleteToleranceAsync(dbTol);
+                    await _domainService.DeleteToleranceAsync(tol);
                     Tolerances.Remove(tol);
                 }
 
@@ -199,11 +170,16 @@ namespace Toltech.App.ViewModels
             });
         }
 
-
         // ----------------------------------------------------------------
         // Helper
         // ----------------------------------------------------------------
-        private async Task ExecuteBusyAsync(string message, Func<Task> action)
+
+        /// <summary>
+        /// Exécute l'action avec l'indicateur d'occupation.
+        /// Les exceptions sont affichées au lieu de remonter dans une commande async void
+        /// (ce qui ferait planter l'application). Renvoie true si l'action a réussi.
+        /// </summary>
+        private async Task<bool> ExecuteBusyAsync(string message, Func<Task> action)
         {
             IsBusy = true;
             StatusMessage = message;
@@ -211,6 +187,12 @@ namespace Toltech.App.ViewModels
             try
             {
                 await action();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erreur : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
             }
             finally
             {
@@ -218,14 +200,38 @@ namespace Toltech.App.ViewModels
                 StatusMessage = string.Empty;
             }
         }
-    }
 
-    // DTO pour DataGrid
-    public class ToleranceRow 
-    {
-        public int Id { get; set; }
-        public string NameTol { get; set; }
-        public string DescriptionTol { get; set; }
-        public double Tol { get; set; }
+        #region Sélection (mode sélection de la fenêtre)
+
+        /// <summary>
+        /// true : la fenêtre sert à choisir une seule tolérance (menu "Link DB").
+        /// false : visualisation / édition (boutons CRUD).
+        /// </summary>
+        public bool IsSelectionMode { get; init; }
+
+        private Tolerance? _selectedTolerance;
+        public Tolerance? SelectedTolerance
+        {
+            get => _selectedTolerance;
+            set => SetProperty(ref _selectedTolerance, value);
+        }
+
+        public event EventHandler<ToleranceSelectedEventArgs>? ToleranceSelected;
+
+        private void Select()
+        {
+            if (SelectedTolerance is null)
+                return;
+
+            ToleranceSelected?.Invoke(this, new ToleranceSelectedEventArgs
+            {
+                ToleranceID = SelectedTolerance.Id,
+                ToleranceName = SelectedTolerance.Name,
+                ToleranceDescription = SelectedTolerance.Description,
+                ToleranceValue = SelectedTolerance.Tol.ToString()
+            });
+        }
+
+        #endregion
     }
 }

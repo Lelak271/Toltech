@@ -220,7 +220,6 @@ namespace Toltech.App.FrontEnd.Controls
             PointYText.Text = point.Y.ToString(CultureInfo.InvariantCulture);
             PointZText.Text = point.Z.ToString(CultureInfo.InvariantCulture);
         }
-        ExecutedRoutedEventArgs
 
         private void HandleDirectionSelection(CadSelection selection)
         {

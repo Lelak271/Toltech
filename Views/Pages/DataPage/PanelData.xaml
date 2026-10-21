@@ -37,9 +37,9 @@
         <!-- ===== Carte principale : accent quand actif, atténuée quand inactif ===== -->
         <Style x:Key="ActiveAwareContainer" TargetType="Border">
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12"/>
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Active}" Value="False">
@@ -73,30 +73,12 @@
             <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
         </Style>
 
-        <!-- ================================================================== -->
-        <!-- Styles implicites : verrouillent les champs quand le panneau est    -->
-        <!-- inactif. Ils se propagent aussi aux contrôles internes de           -->
-        <!-- ToleranceEditor (comme dans la version d'origine).                  -->
-        <!-- ================================================================== -->
-        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Active}" Value="False">
-                    <Setter Property="IsReadOnly" Value="True"/>
-                    <Setter Property="IsHitTestVisible" Value="False"/>
-                    <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
         <!-- Même comportement pour ui:TextBox (le style implicite ci-dessus ne s'applique pas aux sous-classes) -->
         <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Active}" Value="False">
-                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="False"/>
                     <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
                     <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}"/>
@@ -105,22 +87,21 @@
         </Style>
 
         <Style x:Key="NumericBoxPointStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadPointStyle}">
-            <Setter Property="Background" Value="{DynamicResource PanelDataOffSecondaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                    <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsEnabled" Value="True"/>
-                    <!--<Setter Property="Background" Value="{DynamicResource PanelDataSecondaryBrush}"/>-->
+                            <!-- Aspect "désactivé", mais le contrôle reste interactif -->
+                            <Setter Property="Opacity" Value="0.5"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgetStyle}">
-            <Setter Property="Background" Value="{DynamicResource PanelDataOffSecondaryBrush}"/>
+        <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgeStyle}">
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
@@ -129,7 +110,6 @@
                     <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="True"/>
                     <Setter Property="IsEnabled" Value="True"/>
-                    <Setter Property="Background" Value="{DynamicResource PanelDataSecondaryBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -143,7 +123,6 @@
             </Style.Triggers>
         </Style>
 
-
         <!-- Conservé pour ToleranceEditor : bordure fine aux couleurs du thème -->
         <Style TargetType="Border">
             <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
@@ -155,23 +134,79 @@
         <!-- Visibilité par groupe de tolérance (1=N, 2=T1, 3=T2, 4=Rn, 5=Rt1,   -->
         <!-- 6=Rt2). Remplace 18 liaisons Visibility identiques.                 -->
         <!-- ================================================================== -->
-        <Style x:Key="TolGroup1Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=1}"/>
+        <Style x:Key="TolGroupVisibleBase" TargetType="FrameworkElement">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter}}"/>
+
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Active,
+                                       RelativeSource={RelativeSource AncestorType=localControls:PanelData}}"
+                     Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
-        <Style x:Key="TolGroup2Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=2}"/>
+
+        <Style x:Key="TolGroup1Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=1}"/>
         </Style>
-        <Style x:Key="TolGroup3Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=3}"/>
+
+        <Style x:Key="TolGroup2Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=2}"/>
         </Style>
-        <Style x:Key="TolGroup4Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=4}"/>
+
+        <Style x:Key="TolGroup3Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=3}"/>
         </Style>
-        <Style x:Key="TolGroup5Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=5}"/>
+
+        <Style x:Key="TolGroup4Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=4}"/>
         </Style>
-        <Style x:Key="TolGroup6Visible" TargetType="FrameworkElement">
-            <Setter Property="Visibility" Value="{Binding DataContext.SelectedToleranceGroup, RelativeSource={RelativeSource AncestorType=localControls:PanelData}, Converter={StaticResource SelectedGroupToVisibilityConverter}, ConverterParameter=6}"/>
+
+        <Style x:Key="TolGroup5Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=5}"/>
+        </Style>
+
+        <Style x:Key="TolGroup6Visible"
+       TargetType="FrameworkElement"
+       BasedOn="{StaticResource TolGroupVisibleBase}">
+            <Setter Property="Visibility"
+            Value="{Binding DataContext.SelectedToleranceGroup,
+                            RelativeSource={RelativeSource AncestorType=localControls:PanelData},
+                            Converter={StaticResource SelectedGroupToVisibilityConverter},
+                            ConverterParameter=6}"/>
         </Style>
 
     </UserControl.Resources>
@@ -208,7 +243,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- ============ NOM DU PANELDATA ============ -->
+                <!-- ============ NOM DE LA LIAISON ============ -->
                 <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                         Style="{StaticResource SectionBorderStyle}">
                     <ui:TextBox x:Name="NamePoText"
@@ -246,10 +281,10 @@
                 <!-- ============ PIÈCE 1 ============ -->
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Part1}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Part1}" />
                         <Border Style="{StaticResource ReadOnlyFieldBorderStyle}">
                             <TextBlock x:Name="Part1Text"
-                                       HorizontalAlignment="Left"
+                                       HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"
                                        Text="{Binding ExtremitePartId, Converter={StaticResource IdToNameConverter}, UpdateSourceTrigger=PropertyChanged}"/>
@@ -350,7 +385,7 @@
                 <!-- ============ PIÈCE 2 ============ -->
                 <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Part2}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Part2}" />
                         <ComboBox x:Name="Part2Text"
                                   VerticalAlignment="Top"
                                   MinWidth="100"
@@ -533,12 +568,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="{lang:Loc Point}" Grid.ColumnSpan="3"
-                                           Style="{StaticResource FieldLabelStyle}"/>
+                                           />
 
                                 <ui:NumberBox x:Name="PointXText" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                          Style="{StaticResource NumericBoxPointStyle}"
-                                         PlaceholderText="{lang:Loc Placeholder_PointX}"
-                                         Text="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         PlaceholderText="{lang:Loc Placeholder_PointX}" 
+                                         Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
@@ -547,7 +582,7 @@
                                 <ui:NumberBox x:Name="PointYText" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                          Style="{DynamicResource NumericBoxPointStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_PointY}"
-                                         Text="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
@@ -556,7 +591,7 @@
                                 <ui:NumberBox x:Name="PointZText" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                          Style="{DynamicResource NumericBoxPointStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_PointZ}"
-                                         Text="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                             Executed="PickPointMenuItem_Executed"/>
@@ -577,12 +612,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="{lang:Loc Direction}" Grid.ColumnSpan="3"
-                                           Style="{StaticResource FieldLabelStyle}"/>
+                                           />
 
                                 <ui:NumberBox x:Name="DirectionXText" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirX}"
-                                         Text="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
@@ -591,7 +626,7 @@
                                 <ui:NumberBox x:Name="DirectionYText" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirY}"
-                                         Text="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
@@ -600,7 +635,7 @@
                                 <ui:NumberBox x:Name="DirectionZText" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirZ}"
-                                         Text="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
@@ -615,7 +650,7 @@
                 <Border Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="4"
                         Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Comment}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Comment}" />
                         <ui:TextBox x:Name="CommentText"
                                     MinWidth="50"
                                     MinHeight="60"

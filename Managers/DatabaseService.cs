@@ -584,7 +584,6 @@ namespace Toltech.App.Services
         // Récuperation de tolerance par ID
         public async Task<Tolerance> GetTolerancesByIdAsync(int id)
         {
-            Debug.WriteLine("tet");
             return await _asyncDb.FindAsync<Tolerance>(id);
         }
 

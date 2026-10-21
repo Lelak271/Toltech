@@ -20,150 +20,6 @@
         <conv:IdToNameConverter x:Key="IdToNameConverter"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
-        <!-- Style commun des TextBox -->
-        <Style x:Key="ToleranceEditorTextBoxStyle"
-               TargetType="{x:Type TextBox}"
-               BasedOn="{StaticResource {x:Type TextBox}}">
-
-            <Setter Property="Background"
-                    Value="{DynamicResource ControlFillColorDefaultBrush}"/>
-
-            <Setter Property="Foreground"
-                    Value="{DynamicResource TextFillColorPrimaryBrush}"/>
-
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
-
-            <Setter Property="BorderThickness"
-                    Value="1"/>
-
-            <Setter Property="Padding"
-                    Value="8,5"/>
-
-            <Setter Property="HorizontalAlignment"
-                    Value="Stretch"/>
-
-            <Setter Property="VerticalAlignment"
-                    Value="Stretch"/>
-
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center"/>
-
-            <Style.Triggers>
-
-                <DataTrigger
-                    Binding="{Binding Active,
-                              RelativeSource={RelativeSource AncestorType={x:Type local:ToleranceEditor}}}"
-                    Value="True">
-
-                    <Setter Property="IsReadOnly" Value="False"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsEnabled" Value="True"/>
-
-                    <Setter Property="Background"
-                            Value="{DynamicResource ControlFillColorSecondaryBrush}"/>
-
-                </DataTrigger>
-
-            </Style.Triggers>
-
-        </Style>
-
-
-        <!-- Style des champs numériques -->
-        <Style x:Key="NumEditTextBoxStyle"
-               TargetType="{x:Type TextBox}"
-               BasedOn="{StaticResource NumericTextBoxStyle}">
-
-            <Setter Property="Background"
-                    Value="{DynamicResource ControlFillColorDefaultBrush}"/>
-
-            <Setter Property="Foreground"
-                    Value="{DynamicResource TextFillColorPrimaryBrush}"/>
-
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
-
-            <Setter Property="Padding"
-                    Value="8,5"/>
-
-            <Setter Property="HorizontalAlignment"
-                    Value="Stretch"/>
-
-            <Setter Property="VerticalAlignment"
-                    Value="Stretch"/>
-
-            <Style.Triggers>
-
-                <DataTrigger
-                    Binding="{Binding Active,
-                              RelativeSource={RelativeSource AncestorType={x:Type local:ToleranceEditor}}}"
-                    Value="True">
-
-                    <Setter Property="IsReadOnly" Value="False"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsEnabled" Value="True"/>
-
-                    <Setter Property="Background"
-                            Value="{DynamicResource ControlFillColorSecondaryBrush}"/>
-
-                </DataTrigger>
-
-            </Style.Triggers>
-
-        </Style>
-
-
-        <!-- Style du champ de tolérance -->
-        <Style x:Key="TolTextBoxStyle"
-               TargetType="{x:Type TextBox}"
-               BasedOn="{StaticResource ToleranceTextBoxStyle}">
-
-            <Setter Property="Background"
-                    Value="{DynamicResource ControlFillColorDefaultBrush}"/>
-
-            <Setter Property="Foreground"
-                    Value="{DynamicResource TextFillColorPrimaryBrush}"/>
-
-            <Setter Property="BorderBrush"
-                    Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
-
-            <Setter Property="BorderThickness"
-                    Value="1"/>
-
-            <Setter Property="Padding"
-                    Value="6,4"/>
-
-            <Setter Property="HorizontalAlignment"
-                    Value="Stretch"/>
-
-            <Setter Property="VerticalAlignment"
-                    Value="Stretch"/>
-
-            <Setter Property="HorizontalContentAlignment"
-                    Value="Center"/>
-
-            <Style.Triggers>
-
-                <DataTrigger
-                    Binding="{Binding Active,
-                              RelativeSource={RelativeSource AncestorType={x:Type local:ToleranceEditor}}}"
-                    Value="True">
-
-                    <Setter Property="IsReadOnly" Value="False"/>
-                    <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsEnabled" Value="True"/>
-
-                    <Setter Property="Background"
-                            Value="{DynamicResource ControlFillColorSecondaryBrush}"/>
-
-                </DataTrigger>
-
-            </Style.Triggers>
-
-        </Style>
-
-
         <!-- Style de la case à cocher -->
         <Style TargetType="{x:Type CheckBox}"
                BasedOn="{StaticResource {x:Type CheckBox}}">
@@ -191,8 +47,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="6"/>
 
-            <Setter Property="Background"
-                    Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorSecondaryBrush}"/>
 
         </Style>
 
@@ -224,11 +79,12 @@
             Style="{StaticResource ToleranceEditorBorderStyle}"
             >
 
-        <Grid VerticalAlignment="Center" >
+        <Grid VerticalAlignment="Center" ShowGridLines="False" >
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="90"/>
+                <ColumnDefinition Width="80"/>
+                <ColumnDefinition Width="50"/>
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
@@ -239,7 +95,8 @@
 
             <!-- Champ de nom -->
 
-            <ui:TextBox Grid.Row="0"
+            <ui:TextBox  
+                        Grid.Row="0"
                      Grid.Column="0"
                      Margin="0,0,8,0"
                      PlaceholderText="{Binding PlaceholderName,
@@ -252,13 +109,14 @@
             <!-- Lien vers la base de données -->
 
             <CheckBox Grid.Row="0"
-                      Grid.Column="1"
-                      Margin="0,0,0,0"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
-                      IsEnabled="True"
-                      IsChecked="{Binding UseDatabase, Mode=TwoWay}"
-                      ToolTip="Use tolerance from database">
+                     Grid.Column="1"
+                      x:Name="DatabaseCheckBox" 
+                          MaxWidth="5"
+                          IsEnabled="True"
+                          IsChecked="{Binding UseDatabase, 
+                                              Mode=TwoWay,
+                                              UpdateSourceTrigger=PropertyChanged}"
+                          ToolTip="Use tolerance from database">
 
                 <Image Source="/Asset/Logo_DB_tol.png"
                        Width="22"
@@ -266,9 +124,20 @@
                        Stretch="Uniform"/>
 
             </CheckBox>
+                <!--Text="{Binding Id, Mode=TwoWay}"-->
+            <ui:TextBox Grid.Row="0"
+                     Grid.Column="2" 
+                        Text="{Binding Id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            MinWidth="45"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            IsReadOnly="True"
+                            Visibility="{Binding IsChecked,
+                                         ElementName=DatabaseCheckBox,
+                                         Converter={StaticResource BoolToVisibilityConverter}}"
+                             ContextMenu="{x:Null}" />
 
-
-            <!-- Description -->
+                <!-- Description -->
 
             <ui:TextBox Grid.Row="1"
                      Grid.Column="0"
@@ -284,10 +153,11 @@
 
             <!-- Valeur de tolérance -->
 
-            <ui:TextBox Grid.Row="1"
-                     Grid.Column="1"
-                     Margin="0,6,0,0"
-                     Text="{Binding Value,
+            <ui:NumberBox Grid.Row="1"
+                     Grid.Column="1" Grid.ColumnSpan="2"
+                     Margin="20,6,20,0"
+                          SpinButtonPlacementMode="Hidden"
+                     Value="{Binding Value,
                                     Mode=TwoWay,
                                     UpdateSourceTrigger=PropertyChanged}"
                      PlaceholderText="{Binding PlaceholderTolerance,

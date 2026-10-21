@@ -128,7 +128,6 @@ namespace Toltech.App.ViewModels
                 _mainVM.PartVM.FixedPart = value;
                 UpdateIsFixedFlags(value);
                 OnPropertyChanged(nameof(FixedPart));
-                //OnPropertyChanged(nameof(FixedPartId));
 
                 UpdateFixedPartAsync(FixedPart);
             }

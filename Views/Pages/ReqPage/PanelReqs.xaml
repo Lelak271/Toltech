@@ -10,6 +10,7 @@
              xmlns:localControls="clr-namespace:Toltech.App.FrontEnd.Controls"
              xmlns:localTol="clr-namespace:Toltech.App.Views.Pages.DataPage"
              xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
+             xmlns:cad="clr-namespace:Toltech.App.Services.CAD"
              mc:Ignorable="d"
              HorizontalAlignment="Stretch"
              VerticalAlignment="Stretch"
@@ -26,9 +27,9 @@
         <!-- ===== Carte principale : accent quand actif, atténuée quand inactif ===== -->
         <Style x:Key="ActiveAwareContainer" TargetType="Border">
             <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="12"/>
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="False">
@@ -39,34 +40,17 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Section sans bordure -->
+        <!-- Section sans bordure (remplace le style implicite Border qui encadrait chaque zone) -->
         <Style x:Key="SectionBorderStyle" TargetType="Border">
             <Setter Property="Margin" Value="4"/>
             <Setter Property="Padding" Value="6"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
-        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+        <Style  TargetType="TextBlock">
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Margin" Value="0,0,0,4"/>
             <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
-        </Style>
-
-        <!-- ================================================================== -->
-        <!-- Styles implicites : verrouillent les champs quand le panneau est    -->
-        <!-- inactif.                                                            -->
-        <!-- ================================================================== -->
-        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsActive}" Value="False">
-                    <Setter Property="IsReadOnly" Value="True"/>
-                    <Setter Property="IsHitTestVisible" Value="False"/>
-                    <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}"/>
-                </DataTrigger>
-            </Style.Triggers>
         </Style>
 
         <!-- Même comportement pour ui:TextBox (le style implicite ci-dessus ne s'applique pas aux sous-classes) -->
@@ -74,7 +58,7 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="False">
-                    <Setter Property="IsReadOnly" Value="True"/>
+                    <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="False"/>
                     <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
                     <Setter Property="Foreground" Value="{DynamicResource TextFillColorDisabledBrush}"/>
@@ -83,22 +67,21 @@
         </Style>
 
         <Style x:Key="NumericBoxPointStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadPointStyle}">
-            <Setter Property="Background" Value="{DynamicResource PanelDataOffSecondaryBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                    <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="True"/>
-                    <Setter Property="IsEnabled" Value="True"/>
-                    <Setter Property="Background" Value="{DynamicResource PanelDataSecondaryBrush}"/>
+                    <!-- Aspect "désactivé", mais le contrôle reste interactif -->
+                    <Setter Property="Opacity" Value="0.5"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgetStyle}">
-            <Setter Property="Background" Value="{DynamicResource PanelDataOffSecondaryBrush}"/>
+        <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgeStyle}">
+            <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
@@ -107,7 +90,6 @@
                     <Setter Property="IsReadOnly" Value="False"/>
                     <Setter Property="IsHitTestVisible" Value="True"/>
                     <Setter Property="IsEnabled" Value="True"/>
-                    <Setter Property="Background" Value="{DynamicResource PanelDataSecondaryBrush}"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -121,11 +103,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-            <Setter Property="IsEnabled" Value="True"/>
-        </Style>
-
-        <!-- Bordure fine aux couleurs du thème -->
+        <!-- Conservé pour ToleranceEditor : bordure fine aux couleurs du thème -->
         <Style TargetType="Border">
             <Setter Property="BorderBrush" Value="{DynamicResource ControlStrokeColorDefaultBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
@@ -147,7 +125,7 @@
                 Margin="0,0,12,0"
                 Style="{StaticResource ActiveAwareContainer}">
 
-            <Grid x:Name="MainGridPanelReqs" ShowGridLines="True">
+            <Grid x:Name="MainGridPanelReqs" ShowGridLines="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" x:Name="Row0"/>
                     <RowDefinition Height="{Binding ParentViewModel.Row1Height, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}" x:Name="Row1"/>
@@ -203,7 +181,7 @@
                 <!-- ============ PIÈCE 1 ============ -->
                 <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Part1}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Part1}" />
                         <ComboBox x:Name="Part1Text"
                                   VerticalAlignment="Top"
                                   MinWidth="100"
@@ -218,14 +196,14 @@
                 <!-- Groupe 1 -->
                 <localTol:ToleranceEditor Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
                            DataContext="{Binding Basic.Extremity}"
-                           Active="{Binding DataContext.Active, ElementName=PanelDataName}"
+                           Active="{Binding DataContext.IsActive, ElementName=PanelDataName}"
                            PlaceholderName="{lang:Loc Placeholder_Tol1Name}"
                            PlaceholderDescription="{lang:Loc Placeholder_Tol1Desc}"
                            PlaceholderTolerance="{lang:Loc Placeholder_Tol1}"/>
                 <!-- Groupe2 -->
                 <localTol:ToleranceEditor Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3"
                            DataContext="{Binding Basic.Origin}"
-                           Active="{Binding DataContext.Active, ElementName=PanelDataName}"
+                           Active="{Binding DataContext.IsActive, ElementName=PanelDataName}"
                            PlaceholderName="{lang:Loc Placeholder_Tol2Name}"
                            PlaceholderDescription="{lang:Loc Placeholder_Tol2Desc}"
                            PlaceholderTolerance="{lang:Loc Placeholder_Tol2}"/>
@@ -234,7 +212,7 @@
                 <!-- ============ PIÈCE 2 ============ -->
                 <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Part2}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Part2}" />
                         <ComboBox x:Name="Part2Text"
                                   VerticalAlignment="Top"
                                   MinWidth="100"
@@ -255,6 +233,8 @@
                     <StackPanel>
                         <TextBlock Text="{lang:Loc Coordinate}"
                                    FontWeight="SemiBold"
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"
                                    Margin="0,0,0,6"/>
 
                         <Grid>
@@ -276,23 +256,38 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="{lang:Loc Point}" Grid.ColumnSpan="3"
-                                           Style="{StaticResource FieldLabelStyle}"/>
+                                           />
 
                                 <ui:NumberBox x:Name="PointX" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointX}"
-                                              Text="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        Executed="PickPointMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                                 <ui:NumberBox x:Name="PointY" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointY}"
-                                              Text="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        Executed="PickPointMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                                 <ui:NumberBox x:Name="PointZ" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointZ}"
-                                              Text="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        Executed="PickPointMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                             </Grid>
 
                             <!-- Direction -->
@@ -308,23 +303,38 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Text="{lang:Loc Direction}" Grid.ColumnSpan="3"
-                                           Style="{StaticResource FieldLabelStyle}"/>
+                                           />
 
                                 <ui:NumberBox x:Name="DirU" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirX}"
-                                              Text="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                                        Executed="PickEdgeMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                                 <ui:NumberBox x:Name="DirV" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirY}"
-                                              Text="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                                        Executed="PickEdgeMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                                 <ui:NumberBox x:Name="DirW" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                               HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirZ}"
-                                              Text="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                              Value="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ui:NumberBox.CommandBindings>
+                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                                        Executed="PickEdgeMenuItem_Executed"/>
+                                    </ui:NumberBox.CommandBindings>
+                                </ui:NumberBox>
                             </Grid>
                         </Grid>
                     </StackPanel>
@@ -334,7 +344,7 @@
                 <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4"
                         Style="{StaticResource SectionBorderStyle}">
                     <StackPanel>
-                        <TextBlock Text="{lang:Loc Comment}" Style="{StaticResource FieldLabelStyle}"/>
+                        <TextBlock Text="{lang:Loc Comment}" />
                         <ui:TextBox x:Name="CommentText"
                                     MinWidth="50"
                                     MinHeight="60"

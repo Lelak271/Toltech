@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using Wpf.Ui.Appearance;
 
 namespace Toltech.App.Resources.ColorTheme
 {
@@ -51,55 +52,29 @@ namespace Toltech.App.Resources.ColorTheme
 
             Application.Current.Dispatcher.Invoke(() =>
             {
-                ApplyFluentTheme(theme);
+                ApplyWPF_UITheme(theme);
                 ApplyColorTheme(theme);
             });
         }
 
         #region Fluent theme & AppColor
 
-        private static void ApplyFluentTheme(AppTheme theme)
+        private static void ApplyWPF_UITheme(AppTheme theme)
         {
-            var merged = Application.Current.Resources.MergedDictionaries;
-            string fluentFile = GetFluentThemeFile(theme);
-
-            var fluentUri = new Uri(FluentAssemblyUri + fluentFile, UriKind.Absolute);
-
-            // Suppression des anciens thèmes Fluent
-            for (int i = merged.Count - 1; i >= 0; i--)
+            switch (theme)
             {
-                var src = merged[i].Source?.OriginalString;
+                case AppTheme.Light:
+                    ApplicationThemeManager.Apply(ApplicationTheme.Light);
+                    break;
 
-                if (src != null &&
-                    src.Contains("/Fluent;component/Themes/") &&
-                    !src.EndsWith("Generic.xaml", StringComparison.OrdinalIgnoreCase))
-                {
-                    merged.RemoveAt(i);
-                }
-            }
+                case AppTheme.Dark:
+                    ApplicationThemeManager.Apply(ApplicationTheme.Dark);
+                    break;
 
-            // Ajouter le dictionnaire uniquement si ce n'est pas Generic.xaml
-            if (!fluentFile.EndsWith("Generic.xaml", StringComparison.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    // Test d'existence de la ressource
-                    var resourceInfo = Application.GetResourceStream(fluentUri);
-                    if (resourceInfo != null)
-                    {
-                        merged.Add(new ResourceDictionary { Source = fluentUri });
-                    }
-                    else
-                    {
-                        // Optionnel : log ou traitement si la ressource n'existe pas
-                        Debug.WriteLine($"La ressource {fluentUri} est introuvable.");
-                    }
-                }
-                catch (IOException ex)
-                {
-                    // Optionnel : log ou traitement de l'erreur
-                    Debug.WriteLine($"Erreur lors de l'accès à {fluentUri}: {ex.Message}");
-                }
+                case AppTheme.System:
+                default:
+                    ApplicationThemeManager.ApplySystemTheme();
+                    break;
             }
         }
 
@@ -130,18 +105,6 @@ namespace Toltech.App.Resources.ColorTheme
         #endregion
 
         #region Mapping fichiers
-
-        private static string GetFluentThemeFile(AppTheme theme)
-        {
-            return theme switch
-            {
-                AppTheme.Light => "Generic.xaml",
-                AppTheme.Dark => "Themes/Dark.Blue.xaml",
-                AppTheme.System => "System.xaml",
-                AppTheme.ColorBlind => "Generic.xaml",
-                _ => "Generic.xaml"
-            };
-        }
 
         private static string GetThemeFileName(AppTheme theme)
         {

@@ -140,6 +140,19 @@ namespace Toltech.App.Services
         public static event Func<ArrowChangedEvent, Task> ArrowChanged;
         public static Task RaiseArrowChangedAsync(ArrowChangedEvent e) => InvokeAsync(ArrowChanged, e);
 
+
+        /// <summary>
+        /// Données de la tolérance choisie dans la fenêtre de sélection de la base de données.
+        /// (Auparavant imbriquée dans SelectFloatingPanelDB.)
+        /// </summary>
+        public class ToleranceSelectedEventArgs : EventArgs
+        {
+            public string ToleranceName { get; set; } = string.Empty;
+            public string ToleranceDescription { get; set; } = string.Empty;
+            public string ToleranceValue { get; set; } = string.Empty;
+            public int ToleranceID { get; set; }
+        }
+
     }
 
 }

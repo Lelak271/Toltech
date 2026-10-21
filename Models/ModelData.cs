@@ -373,6 +373,14 @@ namespace Toltech.App.Models
             #region Proprietes de tolérances
             #region N
 
+            NOriginToleranceId = db.NOriginToleranceId;
+            NIntermediateToleranceId = db.NIntermediateToleranceId;
+            NExtremityToleranceId = db.NExtremityToleranceId;
+
+            NOriginUseDatabase = db.NOriginUseDatabase;
+            NIntermediateUseDatabase = db.NIntermediateUseDatabase;
+            NExtremityUseDatabase = db.NExtremityUseDatabase;
+
             NOriginValue = db.NOriginValue;
             NIntermediateValue = db.NIntermediateValue;
             NExtremityValue = db.NExtremityValue;
@@ -387,6 +395,13 @@ namespace Toltech.App.Models
             #endregion
 
             #region T1
+            T1OriginToleranceId = db.T1OriginToleranceId;
+            T1IntermediateToleranceId = db.T1IntermediateToleranceId;
+            T1ExtremityToleranceId = db.T1ExtremityToleranceId;
+
+            T1OriginUseDatabase = db.T1OriginUseDatabase;
+            T1IntermediateUseDatabase = db.T1IntermediateUseDatabase;
+            T1ExtremityUseDatabase = db.T1ExtremityUseDatabase;
 
             T1OriginValue = db.T1OriginValue;
             T1IntermediateValue = db.T1IntermediateValue;
@@ -402,6 +417,13 @@ namespace Toltech.App.Models
             #endregion
 
             #region T2
+            T2OriginToleranceId = db.T2OriginToleranceId;
+            T2IntermediateToleranceId = db.T2IntermediateToleranceId;
+            T2ExtremityToleranceId = db.T2ExtremityToleranceId;
+
+            T2OriginUseDatabase = db.T2OriginUseDatabase;
+            T2IntermediateUseDatabase = db.T2IntermediateUseDatabase;
+            T2ExtremityUseDatabase = db.T2ExtremityUseDatabase;
 
             T2OriginValue = db.T2OriginValue;
             T2IntermediateValue = db.T2IntermediateValue;
@@ -418,6 +440,14 @@ namespace Toltech.App.Models
 
             #region Rn
 
+            RnOriginToleranceId = db.RnOriginToleranceId;
+            RnIntermediateToleranceId = db.RnIntermediateToleranceId;
+            RnExtremityToleranceId = db.RnExtremityToleranceId;
+
+            RnOriginUseDatabase = db.RnOriginUseDatabase;
+            RnIntermediateUseDatabase = db.RnIntermediateUseDatabase;
+            RnExtremityUseDatabase = db.RnExtremityUseDatabase;
+
             RnOriginValue = db.RnOriginValue;
             RnIntermediateValue = db.RnIntermediateValue;
             RnExtremityValue = db.RnExtremityValue;
@@ -433,6 +463,14 @@ namespace Toltech.App.Models
 
             #region RT1
 
+            RT1OriginToleranceId = db.RT1OriginToleranceId;
+            RT1IntermediateToleranceId = db.RT1IntermediateToleranceId;
+            RT1ExtremityToleranceId = db.RT1ExtremityToleranceId;
+
+            RT1OriginUseDatabase = db.RT1OriginUseDatabase;
+            RT1IntermediateUseDatabase = db.RT1IntermediateUseDatabase;
+            RT1ExtremityUseDatabase = db.RT1ExtremityUseDatabase;
+
             RT1OriginValue = db.RT1OriginValue;
             RT1IntermediateValue = db.RT1IntermediateValue;
             RT1ExtremityValue = db.RT1ExtremityValue;
@@ -447,6 +485,14 @@ namespace Toltech.App.Models
             #endregion
 
             #region RT2
+
+            RT2OriginToleranceId = db.RT2OriginToleranceId;
+            RT2IntermediateToleranceId = db.RT2IntermediateToleranceId;
+            RT2ExtremityToleranceId = db.RT2ExtremityToleranceId;
+
+            RT2OriginUseDatabase = db.RT2OriginUseDatabase;
+            RT2IntermediateUseDatabase = db.RT2IntermediateUseDatabase;
+            RT2ExtremityUseDatabase = db.RT2ExtremityUseDatabase;
 
             RT2OriginValue = db.RT2OriginValue;
             RT2IntermediateValue = db.RT2IntermediateValue;

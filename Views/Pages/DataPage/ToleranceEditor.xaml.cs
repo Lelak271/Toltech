@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using Toltech.App.Front;
 using Toltech.App.Services;
 using Toltech.App.ViewModels;
-using static Toltech.App.Front.SelectFloatingPanelDB;
+using static Toltech.App.Services.EventsManager;
 
 namespace Toltech.App.Views.Pages.DataPage
 {
@@ -16,6 +16,8 @@ namespace Toltech.App.Views.Pages.DataPage
 
         private readonly MainViewModel _mainVM;
         public MainViewModel MainVM => _mainVM;
+        private ToleranceSlotViewModel? VM =>
+    DataContext as ToleranceSlotViewModel;
 
         private readonly DomainService _domainService;
 
@@ -119,17 +121,35 @@ namespace Toltech.App.Views.Pages.DataPage
             if (toleranceSlotViewModel == null)
                 return;
 
-            // Récupère le ModelData associé au slot.
-            var modelData = toleranceSlotViewModel.ModelData;
 
-            if (modelData == null)
-                return;
+            if (toleranceSlotViewModel.Kind == ToleranceKind.R)
+            {
+                var requirement = toleranceSlotViewModel.Requirements;
 
-            await _domainService.UpdateModelDataToleranceAsync(
-                modelData,
-                toleranceSlotViewModel,
-                Tolerance);
+                if (requirement == null)
+                    return;
+
+                await VM.UpdateRequirementsToleranceAsync(
+                    Tolerance);
+            }
+            else
+            {
+                // Récupère le ModelData associé au slot.
+                var modelData = toleranceSlotViewModel.ModelData;
+
+                if (modelData == null)
+                    return;
+
+                await VM.UpdateModelDataToleranceAsync(
+                    Tolerance);
+            }
+
+
+
+
+
         }
+
     }
 
 }

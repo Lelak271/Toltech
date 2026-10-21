@@ -405,16 +405,16 @@ namespace Toltech.App.Models
         private void CreateToleranceGroups()
         {
             // =====================================================
-            // N
+            // R
             // =====================================================
 
             Basic = new ToleranceGroupViewModel(
 
-                ToleranceKind.N,
+                ToleranceKind.R,
 
                 new ToleranceSlotViewModel(
                     this,
-                    ToleranceKind.N,
+                    ToleranceKind.R,
                     TolerancePosition.Extremity,
                     x => x.NameTolExtre,
                     x => x.Description1,
@@ -424,7 +424,7 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
-                     ToleranceKind.N,
+                     ToleranceKind.R,
                     TolerancePosition.Intermediate,
                     x => x.NameTolExtre,
                     x => x.Description1,
@@ -434,7 +434,7 @@ namespace Toltech.App.Models
 
                 new ToleranceSlotViewModel(
                     this,
-                    ToleranceKind.N,
+                    ToleranceKind.R,
                     TolerancePosition.Origin,
                     x => x.NameTolOri,
                     x => x.Description2,
