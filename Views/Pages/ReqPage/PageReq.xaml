@@ -38,7 +38,7 @@
 
         <!-- ======================= Zone principale ======================= -->
         <Border Style="{StaticResource PageCardStyle}" Margin="12,0,0,0">
-            <Grid  x:Name="MainGridReq"   ShowGridLines="False" >
+            <Grid  x:Name="MainGridReq" ShowGridLines="False" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="70"/>
                     <RowDefinition Height="1"/>
@@ -131,9 +131,7 @@
 
                 <!-- Zone de saisie des valeurs -->
                 <Grid x:Name="GridItems" Grid.Row="2" ShowGridLines="False">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+
 
                     <!-- Zone principale : Liste (liste doit être dans Row=1) -->
                     <Grid >
@@ -171,6 +169,7 @@
                                  VirtualizingPanel.ScrollUnit="Pixel"
                                  ScrollViewer.CanContentScroll="True"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  Background="Transparent"
                                  BorderThickness="0"
                                  Focusable="False"
@@ -221,10 +220,10 @@
 
                     <!-- Header flottant : filtres d'affichage -->
                     <Grid x:Name="FloatingHeader"
-      Grid.Row="0"
-      HorizontalAlignment="Stretch"
-      VerticalAlignment="Top"
-      Panel.ZIndex="10">
+                          Grid.Row="0"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Top"
+                          Panel.ZIndex="10">
 
                         <!-- Animation verticale du header -->
                         <Grid.RenderTransform>
@@ -233,19 +232,19 @@
 
                         <!-- Conteneur des filtres -->
                         <Border HorizontalAlignment="Stretch"
-            Background="Transparent"
-            Panel.ZIndex="2"
-            MouseEnter="FloatingHeader_MouseEnter"
-            MouseLeave="FloatingHeader_MouseLeave">
+                                Background="Transparent"
+                                Panel.ZIndex="2"
+                                MouseEnter="FloatingHeader_MouseEnter"
+                                MouseLeave="FloatingHeader_MouseLeave">
 
                             <!--
             UniformGrid répartit les filtres équitablement.
             Le WrapPanel permet un retour à la ligne si nécessaire.
         -->
                             <WrapPanel x:Name="StackHeaderButtons"
-                   Orientation="Horizontal"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Top">
+                                       Orientation="Horizontal"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Top">
 
                                 <!-- Filtre : Part 1 -->
                                 <Border MinWidth="100"

@@ -172,6 +172,15 @@ namespace Toltech.App.ToltechCalculation.Helpers
                     _logger.LogWarning(msg, nameof(ComputeValidationService));
             }
 
+            // Pièce Fixe définie
+            if (await _databaseService.GetFixedPartAsync() is null)
+            {
+                var msg = ValidationRuleRegistry.NoFixPart.GetMessage();
+                errors.Add(msg);
+                if (showMessages)
+                    _logger.LogWarning(msg, nameof(ComputeValidationService));
+            }
+
             if (errors.Any())
             {
                 if (showMessages)
@@ -319,6 +328,10 @@ namespace Toltech.App.ToltechCalculation.Helpers
             MessageBox.Show(failMsg, "Échec de la validation", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
+        /// <summary>
+        /// Vérifie si le modèle global est isostatique en utilisant deux pièces aléatoires et la pièce fixe.
+        /// </summary>
+        /// <returns>True si le modèle est isostatique, sinon false.</returns>
         private async Task<bool> IsIsoModelAsync()
         {
             if (!ModelValidationHelper.CheckModelActif(true)) return false;
@@ -327,9 +340,9 @@ namespace Toltech.App.ToltechCalculation.Helpers
             if (partId1 == 0 || partId2 == 0) return false;
 
             var activePartIds = (await DatabaseService.ActiveInstance.GetAllPartsAsync())
-        .Where(p => p.IsActive)
-        .Select(p => p.Id)
-        .ToHashSet();
+                                .Where(p => p.IsActive)
+                                .Select(p => p.Id)
+                                .ToHashSet();
 
             var modelData = (await DatabaseService.ActiveInstance.GetAllModelDataAsync())
                 .Where(m =>
@@ -339,9 +352,16 @@ namespace Toltech.App.ToltechCalculation.Helpers
                 .ToList();
 
             var computeModelData = modelData.Select(m => m.ToCompute()).ToList();
-            var fixPart = await _databaseService.GetFixedPartAsync();
+            var fixPart = await _databaseService.GetFixedPartAsync(); // Permet de ne pas considerer l'eventuelle positionnement invalide de cette Part
 
-            return await _computeEngine.IsModelIsostaticAsync(computeModelData, partId1, partId2, fixPart.Id);
+            if(fixPart is not null)
+            {
+                return await _computeEngine.IsModelIsostaticAsync(computeModelData, partId1, partId2, fixPart.Id);
+            }
+            else
+            {
+                return await _computeEngine.IsModelIsostaticAsync(computeModelData, partId1, partId2);
+            }
         }
 
         private async Task<(int partId1, int partId2)> GetTwoRandomPartIdsAsync()

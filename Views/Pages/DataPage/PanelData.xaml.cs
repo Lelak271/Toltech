@@ -12,6 +12,7 @@ using Toltech.Cad.Model;
 using Toltech.Solver.Contracts;
 using static Toltech.App.Models.NodesDefinition;
 using static Toltech.App.Services.EventsManager;
+using System.Diagnostics;
 
 namespace Toltech.App.FrontEnd.Controls
 {
@@ -33,7 +34,15 @@ namespace Toltech.App.FrontEnd.Controls
         {
             InitializeComponent();
 
+
+
             Loaded += OnLoaded;
+        }
+
+        private void InitializeAvailableLinkageTypes()
+        {
+            if (AvailableLinkageTypes.Count > 0)
+                return;
 
             foreach (LinkageType type in Enum.GetValues<LinkageType>())
             {
@@ -44,6 +53,30 @@ namespace Toltech.App.FrontEnd.Controls
                 {
                     Value = type
                 });
+            }
+        }
+
+        public ObservableCollection<Part> AvailableParts { get; } = new();
+
+        private static void OnParentViewModelChanged(
+    DependencyObject d,
+    DependencyPropertyChangedEventArgs e)
+        {
+            if (d is PanelData control)
+                control.UpdateAvailableParts();
+        }
+
+        private void UpdateAvailableParts()
+        {
+            AvailableParts.Clear();
+
+            if (ParentViewModel?.Parts == null)
+                return;
+
+            foreach (var part in ParentViewModel.Parts)
+            {
+                if (Data == null || part.Id != Data.ExtremitePartId)
+                    AvailableParts.Add(part);
             }
         }
 
@@ -62,7 +95,7 @@ namespace Toltech.App.FrontEnd.Controls
                 nameof(ParentViewModel),
                 typeof(DatasViewModel),
                 typeof(PanelData),
-                new PropertyMetadata(null));
+                new PropertyMetadata(null, OnParentViewModelChanged));
 
         // Création d'une DependencyProperty pour faciliter le binding
         public static readonly DependencyProperty DataProperty =
@@ -84,6 +117,8 @@ namespace Toltech.App.FrontEnd.Controls
 
         private void OnLoaded(object sender, RoutedEventArgs e)
         {
+            InitializeAvailableLinkageTypes();
+
             // -= avant += : évite les doublons si Loaded est levé plusieurs fois.
             EventsManager.NodeChanged -= OnNodeChangedAsync;
             EventsManager.NodeChanged += OnNodeChangedAsync;
@@ -162,6 +197,23 @@ namespace Toltech.App.FrontEnd.Controls
             });
 
             return Task.CompletedTask;
+        }
+
+        #endregion
+
+        #region Functions
+
+        private async void ToggleSwitch_Changed(
+            object sender,
+            RoutedEventArgs e)
+        {
+            if (Data is not ModelData modelData)
+                return;
+
+            if (ParentViewModel is not DatasViewModel viewModel)
+                return;
+
+            await viewModel.SavePanelAsync(modelData, false);
         }
 
         #endregion

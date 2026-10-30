@@ -73,11 +73,23 @@ Objectif : dissocier les données géométriques et d'assemblage de la gestion d
 22/10/2026 
 Liste des tâches à réalisées
 
-Corriger les NumberBox liés au point de direction dans le panel REC.
-Mieux gérer les NumberBox : refuser les lettres, accepter les points et les virgules comme séparateur décimal.
-Empêcher les ComboBox d’afficher la même pièce : afficher un message d’erreur si la pièce est déjà sélectionnée.
-Ajouter la sauvegarde automatique quand on active ou désactive une donnée.
-Adapter le ruban principal : les images sont rognées à certains endroits.
-Ajouter un bouton light mode / dark mode en haut à droite de la fenêtre principale.
-Corriger l’affichage des données inversées dans le TreeView (priorité faible).
+		Corriger les NumberBox liés au point de direction dans le panel REQ.
+		Mieux gérer les NumberBox : refuser les lettres, accepter les points et les virgules comme séparateur décimal.
+		Empêcher les ComboBox d’afficher la même pièce : afficher un message d’erreur si la pièce est déjà sélectionnée.
+		Ajouter la sauvegarde automatique quand on active ou désactive une donnée.
+		Adapter le ruban principal : les images sont rognées à certains endroits.
+=> Ajouter un bouton light mode / dark mode en haut à droite de la fenêtre principale.
+Corriger l’affichage des données inversées dans le TreeView (priorité moyenne).
 Pour l’attribut, afficher uniquement le nœud sélectionné et non tous ses parents (priorité faible).
+
+---
+24/10/2026 
+Liste des tâches à réalisées
+=> Double clique treeview engendre un changement de page pour l'ux 
+		Revoir le temps lors du changement de tab qui semble un peu trop long : Modification de l'apparition des pages mais il reste une latence sur Data et Req induit par la structure des Panels. Pour le moment pas de chnagement pour palier à cela
+
+---
+25/10/2026
+Mettre les lang Loc sur la class ValidationRule 
+=> Améliorer l'analyse avant les résultats (Nouvelle fenetre moderne pour analyse poussé de l'isostatisme et optimistion
+des liaiosn ou directions des liaisons)

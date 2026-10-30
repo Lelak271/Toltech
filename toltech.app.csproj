@@ -8,8 +8,10 @@
 	<Nullable>enable</Nullable>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<UseWPF>true</UseWPF>
-	<ApplicationIcon>Asset\Logo_TT.ico</ApplicationIcon>
 	  
+	  <!-- Active Windows Forms pour détecter les écrans disponibles et restaurer correctement la position des fenêtres. -->
+	  
+	  <ApplicationIcon>Asset\Logo_TT.ico</ApplicationIcon>
 	  <!--
         Mock is used by default.
         The private Solver is enabled explicitly with:

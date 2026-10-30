@@ -19,9 +19,6 @@ namespace Toltech.App.FrontEnd.Controls
         public PanelReqs()
         {
             InitializeComponent();
-            //Debug.WriteLine("PANEL CREATED -> " + Guid.NewGuid());
-
-
         }
 
         public RequirementsViewModel ParentViewModel
@@ -53,6 +50,13 @@ namespace Toltech.App.FrontEnd.Controls
         }
 
         #endregion
+
+        public IEnumerable<Part> AvailableParts1 =>
+    ParentViewModel.Parts
+        .Where(p => p.Id != Requirement.PartReq2Id);
+        public IEnumerable<Part> AvailableParts2 =>
+    ParentViewModel.Parts
+        .Where(p => p.Id != Requirement.PartReq1Id);
 
         #region Sélection CAO
 

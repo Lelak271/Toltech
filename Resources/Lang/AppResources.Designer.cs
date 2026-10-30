@@ -1132,6 +1132,15 @@ namespace Toltech.App.Resources.Lang {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à More action.
+        /// </summary>
+        public static string OtherActions {
+            get {
+                return ResourceManager.GetString("OtherActions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Preview of parameters:.
         /// </summary>
         public static string ParamSentence {

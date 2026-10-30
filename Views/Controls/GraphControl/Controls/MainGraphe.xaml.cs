@@ -1,9 +1,11 @@
-﻿using System.ComponentModel;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Toltech.App.Services;
+using Toltech.App.ViewModels;
 using Toltech.App.Views.Controls.GrapheControl;
 using Toltech.App.Views.Controls.GrapheControl.GraphData;
 using Westermo.GraphX.Common.Enums;
@@ -13,276 +15,16 @@ using Westermo.GraphX.Logic.Algorithms.LayoutAlgorithms;
 
 namespace Toltech.App.FrontEnd.GraphePage.Controls
 {
-    public partial class MainGraphe : IDisposable
+    public partial class MainGraphe : Wpf.Ui.Controls.FluentWindow, IDisposable
     {
-        private DatabaseService _databaseService;
-        private int _edgeDistance;
-        private VertexControl _selectedVertex;
-        public MainGraphe()
-        {
-            InitializeComponent();
-            DataContext = this; // Tres important pour le BINDING
-            var ggLogic = new GXLogicCoreExample();
-            Area.LogicCore = ggLogic;
+        private readonly MainViewModel _mainVM;
+        public MainViewModel MainVM => _mainVM;
 
-            ZoomControl.SetViewFinderVisibility(zoomctrl, Visibility.Visible);
-            zoomctrl.ZoomToFill();
+        private readonly DomainService _domainService;
 
-            //var defaultOptions = GraphLayoutOptions.Default;
-            //GraphAreaExample_Setup(defaultOptions);
-            gg_but_randomgraph.Click += gg_but_randomgraph_Click;
-            gg_but_relayout.Click += gg_but_relayout_Click;
+        #region Types et constantes
 
-            _edgeDistance = 10;
-            cbEnablePE.Checked += CbMathShapeOnChecked;
-            cbEnablePE.Unchecked += CbMathShapeOnChecked;
-
-            #region Type d'algoritme
-            algo_choice.SelectionChanged += algo_choice_SelectionChanged;
-
-            algo_choice.ItemsSource = Enum.GetValues<LayoutAlgorithmTypeEnum>().Cast<LayoutAlgorithmTypeEnum>();
-            algo_choice.SelectedItem = LayoutAlgorithmTypeEnum.KK;
-            #endregion
-
-            #region Edge routing
-            gg_eralgo.SelectionChanged += gg_eralgo_SelectionChanged;
-            gg_eralgo.ItemsSource = Enum.GetValues<EdgeRoutingAlgorithmTypeEnum>()
-                                     .Cast<EdgeRoutingAlgorithmTypeEnum>();
-            gg_eralgo.SelectedItem = EdgeRoutingAlgorithmTypeEnum.SimpleER;
-            #endregion
-
-            #region Overlap
-            gg_oralgo.SelectionChanged += gg_oralgo_SelectionChanged;
-            gg_oralgo.ItemsSource = Enum.GetValues<OverlapRemovalAlgorithmTypeEnum>()
-               .Cast<OverlapRemovalAlgorithmTypeEnum>();
-            gg_oralgo.SelectedIndex = 0;
-            #endregion
-
-            #region Label // aux edges
-            alignEdgeLabels.Checked += alignEdgeLabels_Checked;
-            alignEdgeLabels.Unchecked += alignEdgeLabels_Checked;
-            #endregion
-
-            Loaded += MainWindow_Loaded;
-        }
-
-        private double _globalImageSize = 40; // Valeur par défaut
-
-        public double GlobalImageSize
-        {
-            get => _globalImageSize;
-            set
-            {
-                if (Math.Abs(_globalImageSize - value) > 0.1)
-                {
-                    _globalImageSize = value;
-                    OnPropertyChanged(nameof(GlobalImageSize));
-
-                    // Mettre à jour tous les vertexs
-                    UpdateAllVertexSizes(value);
-                }
-            }
-        }
-
-        private void UpdateAllVertexSizes(double newSize)
-        {
-            foreach (var vertexPair in Area.VertexList)
-            {
-                if (vertexPair.Value.Vertex is DataVertex dataVertex)
-                {
-                    dataVertex.ImageHeight = newSize;
-                }
-            }
-        }
-
-
-        private void InitializeDatabaseService()
-        {
-            _databaseService.Open(ModelManager.ModelActif);
-        }
-        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-
-            var defaultOptions = GraphLayoutOptions.Default;
-            await GraphAreaExample_Setup(defaultOptions);
-            OnPropertyChanged("EdgeDistance");
-
-            gg_but_randomgraph_Click(null, null);
-        }
-
-        private void gg_but_relayout_Click(object sender, RoutedEventArgs e)
-        {
-            Area.RelayoutGraph();
-            zoomctrl.ZoomToFill();
-        }
-
-        private void gg_but_randomgraph_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                Area.GenerateGraph(true);
-            }
-                        catch (Exception ex)
-            {
-                MessageBox.Show("Erreur lors de la génération du graphe : " + ex.Message, "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            Area.SetVerticesDrag(true);
-            Area.SetEdgesDashStyle(EdgeDashStyle.Dot);
-            Area.ShowAllEdgesArrows(false);
-            Area.ShowAllEdgesLabels(false);
-            Area.ShowAllVerticesLabels(true);
-
-            //Area.Set = true;
-            //Area.LogicCore.EdgeCurvingEnabled = true;
-
-            // Ajout du routage des arêtes requirement **après** la génération du graphe
-            foreach (var ec in Area.EdgesList.Values)
-            {
-                if (ec.Edge is DataEdge edge && edge.IsRequirement)
-                {
-                    ec.ShowArrows = true;
-                    ec.Foreground = Brushes.Red;
-
-                    // Récupération des positions des sommets source et cible (coordonnées graphiques)
-                    var sourcePos = ec.Source.GetPosition();
-                    var targetPos = ec.Target.GetPosition();
-                }
-            }
-
-            foreach (var ec in Area.EdgesList.Values)
-            {
-                var label = FindChildOfType<TextBlock>(ec);
-                if (label != null)
-                {
-                    label.FontSize = 3; // Ajustez selon vos besoins
-                }
-            }
-
-            zoomctrl.ZoomToFill();
-        }
-
-
-        private Random _rand = new Random();
-
-        // Déclaration du dictionnaire d'images
-        private Dictionary<int, BitmapImage> _imageDictionary = new Dictionary<int, BitmapImage>()
-                                        {
-                                            { 0, new BitmapImage(new Uri("pack://application:,,,/Asset/add_model.png")) },
-                                            { 1, new BitmapImage(new Uri("pack://application:,,,/Asset/add_model.png")) },
-                                            { 2, new BitmapImage(new Uri("pack://application:,,,/Asset/add_model.png")) }
-                                        };
-
-        private async Task<GraphExample> GraphExample_Setup()
-        {
-            InitializeDatabaseService();
-
-            // 1. Récupération des données
-            var modelDataList = await _databaseService.GetAllModelDataAsync();
-            var requirementsList = await _databaseService.GetAllRequirementsAsync();
-
-            // 2. Création des noeuds (vertices)
-            var vertices = new Dictionary<string, DataVertex>();
-            var edgesToCreate = new List<(DataVertex Source, DataVertex Target, string Text, bool IsRequirement)>();
-
-            var erreursLiaisons = new List<string>();
-
-            // Traiter les ModelData
-            foreach (var item in modelDataList)
-            {
-                if (string.IsNullOrEmpty(item.Origine) || string.IsNullOrEmpty(item.Extremite))
-                {
-                    erreursLiaisons.Add($"La liaison ID : {item.Id} est non valide.");
-                    continue;
-                }
-
-                EnsureVertexExists(item.Origine, vertices);
-                EnsureVertexExists(item.Extremite, vertices);
-
-                edgesToCreate.Add((
-                    vertices[item.Origine],
-                    vertices[item.Extremite],
-                    item.Model ?? $"{item.Origine} → {item.Extremite}",
-                    false
-                ));
-            }
-
-            // Traiter les Requirements
-            foreach (var req in requirementsList)
-            {
-                if (string.IsNullOrEmpty(req.Part1) || string.IsNullOrEmpty(req.Part2) )
-                {
-                    erreursLiaisons.Add($"L'exigence ID : {req.Id_req} est non valide.");
-                    continue;
-                }
-
-                EnsureVertexExists(req.Part1, vertices);
-                EnsureVertexExists(req.Part2, vertices);
-
-                edgesToCreate.Add((
-                    vertices[req.Part1],
-                    vertices[req.Part2],
-                    req.NameReq ?? $"{req.Part1} → {req.Part2}",
-                    true
-                ));
-            }
-
-            // Affichage unique des erreurs
-            if (erreursLiaisons.Count > 0)
-            {
-                var message = "Certaines liaisons sont nulles, vides ou référencent des pièces manquantes. Elles n’apparaîtront pas dans le graphe." + Environment.NewLine;
-
-                foreach (var erreur in erreursLiaisons)
-                {
-                    message += "  - " + erreur + Environment.NewLine;
-                }
-
-                MessageBox.Show(message, "Erreur de liaison", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-
-
-
-
-            // 3. Création du graphe avec les noeuds et arêtes
-            var dataGraph = new GraphExample();
-
-            // Ajouter tous les noeuds au graphe
-            foreach (var vertex in vertices.Values)
-            {
-                dataGraph.AddVertex(vertex);
-            }
-
-            // Ajouter toutes les arêtes au graphe
-            foreach (var edge in edgesToCreate)
-            {
-                dataGraph.AddEdge(new DataEdge(edge.Source, edge.Target)
-                {
-                    Text = edge.Text,
-                    IsRequirement = edge.IsRequirement
-                });
-            }
-
-            return dataGraph;
-        }
-
-        // Méthode helper pour créer un noeud s'il n'existe pas déjà
-        private void EnsureVertexExists(string vertexId, Dictionary<string, DataVertex> vertices)
-        {
-            if (!vertices.ContainsKey(vertexId))
-            {
-                var imageIndex = _rand.Next(0, 3);
-                vertices[vertexId] = new DataVertex(vertexId)
-                {
-                    ImageId = imageIndex,
-                    ImageSource = _imageDictionary[imageIndex]
-                };
-            }
-        }
-
-
-
-
+        /// <summary>Options du graphe. Source unique : l'état des contrôles de l'UI.</summary>
         public class GraphLayoutOptions
         {
             public LayoutAlgorithmTypeEnum LayoutAlgorithm { get; set; } = LayoutAlgorithmTypeEnum.KK;
@@ -292,216 +34,367 @@ namespace Toltech.App.FrontEnd.GraphePage.Controls
             public float HorizontalGap { get; set; } = 50;
             public float VerticalGap { get; set; } = 50;
             public bool UseAsyncCompute { get; set; } = false;
+            public bool EnableParallelEdges { get; set; } = true;
+            public int ParallelEdgeDistance { get; set; } = 10;
 
-            // Options par défaut exposées en tant que propriété statique
-            public static GraphLayoutOptions Default => new GraphLayoutOptions();
-
+            public static GraphLayoutOptions Default => new();
         }
 
+        /// <summary>Représentation neutre d'une liaison (ModelData ou Requirement).</summary>
+        private sealed record GraphLink(string Kind, object Id, int From, int To, string Text, bool IsRequirement);
 
-        private async Task GraphAreaExample_Setup(GraphLayoutOptions options)
+        private const double EdgeLabelFontSize = 3;
+
+        private static readonly Uri DefaultVertexImageUri =
+            new("pack://application:,,,/Asset/add_model.png");
+
+        private static readonly BitmapImage DefaultVertexImage =
+            CreateBitmapImage(DefaultVertexImageUri);
+
+        // Dictionnaire associant l'ID d'une pièce à son image.
+        private Dictionary<int, BitmapImage> VertexImages = new();
+
+        private static BitmapImage CreateBitmapImage(Uri uri)
         {
-            var graph = await GraphExample_Setup();
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.UriSource = uri;
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.EndInit();
+            image.Freeze();
 
-            var logicCore = new GXLogicCoreExample
+            return image;
+        }
+
+        #endregion
+
+        private readonly Random _rand = new();
+        private GXLogicCoreExample _logicCore;
+        private bool _isUpdatingUi;
+        private bool _hasLoaded;
+
+        private readonly DatabaseService _databaseService;
+
+        public MainGraphe(MainViewModel mainVM)
+        {
+            InitializeComponent();
+
+            _mainVM = mainVM;
+            _databaseService = _mainVM.DatabaseService;
+            _domainService = mainVM.DomainService;
+
+            var defaults = GraphLayoutOptions.Default;
+            FillCombo(LayoutCombo, defaults.LayoutAlgorithm);
+            FillCombo(OverlapCombo, defaults.OverlapRemovalAlgorithm);
+            FillCombo(EdgeRoutingCombo, defaults.EdgeRoutingAlgorithm);
+
+            ZoomControl.SetViewFinderVisibility(zoomctrl, Visibility.Visible);
+            Loaded += OnLoaded;
+        }
+
+        private static void FillCombo<T>(ComboBox box, T selected) where T : struct, Enum
+        {
+            box.ItemsSource = Enum.GetValues<T>();
+            box.SelectedItem = selected;
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (_hasLoaded) return; // évite de tout recharger à chaque retour sur la page
+            _hasLoaded = true;
+            await LoadGraphAsync();
+        }
+
+        #region Chargement du graphe
+
+        private async Task LoadGraphAsync()
+        {
+            ReloadButton.IsEnabled = false;
+            try
             {
-                Graph = graph,
-                DefaultLayoutAlgorithm = options.LayoutAlgorithm,
-                DefaultOverlapRemovalAlgorithm = options.OverlapRemovalAlgorithm,
-                DefaultEdgeRoutingAlgorithm = options.EdgeRoutingAlgorithm,
-                AsyncAlgorithmCompute = options.UseAsyncCompute
-            };
+                var modelData = await _databaseService.GetAllModelDataAsync();
+                var requirements = await _databaseService.GetAllRequirementsAsync();
 
-            // Paramètres spécifiques au layout
-            var layoutParams = logicCore.AlgorithmFactory.CreateLayoutParameters(options.LayoutAlgorithm);
+                var links = modelData
+                    .Select(m => new GraphLink("La liaison", m.Id, m.OriginePartId, m.ExtremitePartId.Value, m.Model, false))
+                    .Concat(requirements
+                    .Select(r => new GraphLink("L'exigence", r.Id_req, r.PartReq1Id.Value, r.PartReq2Id.Value, r.NameReq, true)));
 
-            // Exemple : configuration spécifique à l’algorithme KK
-            if (layoutParams is KKLayoutParameters kkParams)
+                var (graph, errors) = await BuildGraph(links);
+                if (errors.Count > 0)
+                {
+                    MessageBox.Show(
+                        "Certaines liaisons sont nulles, vides ou référencent des pièces manquantes. " +
+                        "Elles n'apparaîtront pas dans le graphe." + Environment.NewLine +
+                        string.Join(Environment.NewLine, errors.Select(err => "  - " + err)),
+                        "Erreur de liaison", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
+                _logicCore = new GXLogicCoreExample { Graph = graph };
+                ApplyOptions(_logicCore, ReadOptions());
+                Area.LogicCore = _logicCore;
+
+                Area.GenerateGraph(true);
+                ApplyGraphStyle();
+                zoomctrl.ZoomToFill();
+            }
+            catch (Exception ex)
             {
-                kkParams.MaxIterations = options.MaxIterations;
+                MessageBox.Show("Erreur lors de la génération du graphe : " + ex.Message,
+                    "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                ReloadButton.IsEnabled = true;
+            }
+        }
+
+        private async Task<(GraphExample Graph, List<string> Errors)> BuildGraph(
+            IEnumerable<GraphLink> links)
+        {
+            var graph = new GraphExample();
+            var vertices = new Dictionary<int, DataVertex>();
+            var errors = new List<string>();
+
+            VertexImages = await _domainService.GetPartImagesAsync();
+
+            DataVertex GetOrAdd(int id)
+            {
+                if (vertices.TryGetValue(id, out var vertex))
+                    return vertex;
+
+                vertex = new DataVertex(id.ToString())
+                {
+                    // L'identifiant de la pièce est également utilisé comme ImageId.
+                    ImageId = id,
+
+                    // Utilise l'image de la base de données ou l'image par défaut.
+                    ImageSource = VertexImages.TryGetValue(id, out var image)
+                                ? image
+                                : DefaultVertexImage,
+
+                    ImageHeight = ImageSizeSlider.Value
+                };
+
+                vertices[id] = vertex;
+                graph.AddVertex(vertex);
+
+                return vertex;
             }
 
-            logicCore.DefaultLayoutAlgorithmParams = layoutParams;
-
-            // Paramètres d’overlap
-            var overlapParams = logicCore.AlgorithmFactory.CreateOverlapRemovalParameters(options.OverlapRemovalAlgorithm);
-            overlapParams.HorizontalGap = options.HorizontalGap;
-            overlapParams.VerticalGap = options.VerticalGap;
-
-            logicCore.DefaultOverlapRemovalAlgorithmParams = overlapParams;
-
-
-            Area.LogicCore = logicCore;
-
-            Area.LogicCore.EnableParallelEdges = true;
-            Area.LogicCore.EdgeCurvingEnabled = true;
-
-        }
-
-
-        public void Dispose()
-        {
-            Area.Dispose();
-        }
-
-        public static T FindChildOfType<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj == null) return null;
-
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            foreach (var link in links)
             {
-                var child = VisualTreeHelper.GetChild(depObj, i);
+                // Vérifie que les identifiants des pièces sont valides.
+                if (link.From <= 0 || link.To <= 0)
+                {
+                    errors.Add($"{link.Kind} ID : {link.Id} est non valide.");
+                    continue;
+                }
 
-                if (child is T t)
-                    return t;
+                // Crée l'arête entre les deux sommets du graphe.
+                graph.AddEdge(new DataEdge(
+                    GetOrAdd(link.From),
+                    GetOrAdd(link.To))
+                {
+                    // Définit le libellé de l'arête.
+                    Text = link.Text ?? $"{link.From} → {link.To}",
 
-                var result = FindChildOfType<T>(child);
-                if (result != null)
-                    return result;
+                    // Indique s'il s'agit d'une exigence.
+                    IsRequirement = link.IsRequirement
+                });
+            }
+
+            return (graph, errors);
+        }
+
+        #endregion
+
+        #region Options (UI -> LogicCore)
+
+        private GraphLayoutOptions ReadOptions() => new()
+        {
+            LayoutAlgorithm = (LayoutAlgorithmTypeEnum)LayoutCombo.SelectedItem,
+            OverlapRemovalAlgorithm = (OverlapRemovalAlgorithmTypeEnum)OverlapCombo.SelectedItem,
+            EdgeRoutingAlgorithm = (EdgeRoutingAlgorithmTypeEnum)EdgeRoutingCombo.SelectedItem,
+            EnableParallelEdges = ParallelEdgesToggle.IsChecked == true,
+            ParallelEdgeDistance = (int)EdgeDistanceSlider.Value
+        };
+
+        private static void ApplyOptions(GXLogicCoreExample core, GraphLayoutOptions o)
+        {
+            var isSugiyama = o.LayoutAlgorithm == LayoutAlgorithmTypeEnum.EfficientSugiyama;
+
+            // Layout
+            core.DefaultLayoutAlgorithm = o.LayoutAlgorithm;
+            var layoutParams = core.AlgorithmFactory.CreateLayoutParameters(o.LayoutAlgorithm);
+            switch (layoutParams)
+            {
+                case KKLayoutParameters kk:
+                    kk.MaxIterations = o.MaxIterations;
+                    break;
+                case EfficientSugiyamaLayoutParameters sugiyama:
+                    sugiyama.EdgeRouting = SugiyamaEdgeRoutings.Orthogonal;
+                    sugiyama.LayerDistance = sugiyama.VertexDistance = 100;
+                    break;
+            }
+            core.DefaultLayoutAlgorithmParams = layoutParams;
+
+            // Overlap
+            core.DefaultOverlapRemovalAlgorithm = o.OverlapRemovalAlgorithm;
+            var overlapParams = core.AlgorithmFactory.CreateOverlapRemovalParameters(o.OverlapRemovalAlgorithm);
+            if (overlapParams != null)
+            {
+                overlapParams.HorizontalGap = o.HorizontalGap;
+                overlapParams.VerticalGap = o.VerticalGap;
+            }
+            core.DefaultOverlapRemovalAlgorithmParams = overlapParams;
+
+            // Edge routing
+            core.DefaultEdgeRoutingAlgorithm = o.EdgeRoutingAlgorithm;
+            if (o.EdgeRoutingAlgorithm == EdgeRoutingAlgorithmTypeEnum.Bundling)
+            {
+                core.DefaultEdgeRoutingAlgorithmParams = new BundleEdgeRoutingParameters
+                {
+                    Iterations = 200,
+                    SpringConstant = 5,
+                    Threshold = .1f
+                };
+            }
+
+            // Divers
+            core.EdgeCurvingEnabled = !isSugiyama;
+            core.EnableParallelEdges = o.EnableParallelEdges;
+            core.ParallelEdgeDistance = o.ParallelEdgeDistance;
+            core.AsyncAlgorithmCompute = o.UseAsyncCompute;
+        }
+
+        private void Relayout()
+        {
+            Area.RelayoutGraph();
+            zoomctrl.ZoomToFill();
+        }
+
+        #endregion
+
+        #region Style du graphe
+
+        private void ApplyGraphStyle()
+        {
+            Area.SetVerticesDrag(true);
+            Area.SetEdgesDashStyle(EdgeDashStyle.Dot);
+            Area.ShowAllEdgesArrows(false);
+            Area.ShowAllVerticesLabels(true);
+            ApplyEdgeLabelOptions();
+
+            foreach (var ec in Area.EdgesList.Values)
+            {
+                if (ec.Edge is DataEdge { IsRequirement: true })
+                {
+                    ec.ShowArrows = true;
+                    ec.Foreground = Brushes.Red;
+                }
+            }
+
+            // Les templates des labels ne sont appliqués qu'après le layout
+            Dispatcher.InvokeAsync(ShrinkEdgeLabels, DispatcherPriority.Loaded);
+        }
+
+        private void ApplyEdgeLabelOptions()
+        {
+            Area.ShowAllEdgesLabels(EdgeLabelsToggle.IsChecked == true);
+            Area.AlignAllEdgesLabels(AlignLabelsToggle.IsChecked == true);
+        }
+
+        private void ShrinkEdgeLabels()
+        {
+            foreach (var ec in Area.EdgesList.Values)
+            {
+                if (FindChildOfType<TextBlock>(ec) is { } label)
+                    label.FontSize = EdgeLabelFontSize;
+            }
+        }
+
+        private static T FindChildOfType<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null) return null;
+
+            for (var i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T match) return match;
+
+                var nested = FindChildOfType<T>(child);
+                if (nested != null) return nested;
             }
             return null;
         }
 
-
-
-        #region Label
-
-        private void EdgeLabelsVisibility_Checked(object sender, RoutedEventArgs e)
-        {
-            if (sender is CheckBox checkBox && Area != null)
-            {
-                // Active/désactive tous les labels des arêtes selon l'état de la CheckBox
-                Area.ShowAllEdgesLabels(checkBox.IsChecked ?? false);
-
-                // Force le rafraîchissement de l'affichage
-                Area.InvalidateVisual();
-            }
-        }
-
         #endregion
 
-        private async void test_Click(object sender, RoutedEventArgs e)
+        #region Handlers UI
+
+        private async void OnReloadClick(object sender, RoutedEventArgs e) => await LoadGraphAsync();
+
+        private void OnRelayoutClick(object sender, RoutedEventArgs e) => Relayout();
+
+        private void OnLayoutAlgorithmChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_logicCore is null || _isUpdatingUi) return;
 
-            var defaultOptions = GraphLayoutOptions.Default;
-            await GraphAreaExample_Setup(defaultOptions);
-            gg_but_randomgraph_Click(null, null);
-        }
-
-
-        #region Edge Distance
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            var handler = PropertyChanged;
-            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public int EdgeDistance
-        {
-            get => _edgeDistance;
-            set
+            // Sugiyama gère lui-même le routage orthogonal : on désactive l'edge routing
+            if ((LayoutAlgorithmTypeEnum)LayoutCombo.SelectedItem == LayoutAlgorithmTypeEnum.EfficientSugiyama)
             {
-                if (_edgeDistance != value)
-                {
-                    _edgeDistance = value;
-
-                    if (Area?.LogicCore != null)
-                    {
-                        Area.LogicCore.ParallelEdgeDistance = value;
-                        Area.UpdateAllEdges(true);
-                    }
-
-                    OnPropertyChanged("EdgeDistance");
-                }
+                _isUpdatingUi = true;
+                EdgeRoutingCombo.SelectedItem = EdgeRoutingAlgorithmTypeEnum.None;
+                _isUpdatingUi = false;
             }
+
+            ApplyAlgorithmOptions();
         }
 
-        
-        // Empeche les valeurs non numérique 
-        private void OnPreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        private void OnAlgorithmOptionChanged(object sender, SelectionChangedEventArgs e)
         {
-            e.Handled = !int.TryParse(e.Text, out _);
+            if (_logicCore is null || _isUpdatingUi) return;
+            ApplyAlgorithmOptions();
         }
 
-        private void CbMathShapeOnChecked(object sender, RoutedEventArgs routedEventArgs)
+        private void ApplyAlgorithmOptions()
         {
-            Area.LogicCore.EnableParallelEdges = (bool)cbEnablePE.IsChecked;
+            ApplyOptions(_logicCore, ReadOptions());
+            Relayout();
+        }
+
+        private void OnParallelEdgesChanged(object sender, RoutedEventArgs e)
+        {
+            if (_logicCore is null) return;
+
+            var options = ReadOptions();
+            _logicCore.EnableParallelEdges = options.EnableParallelEdges;
+            _logicCore.ParallelEdgeDistance = options.ParallelEdgeDistance;
             Area.UpdateAllEdges(true);
         }
 
-        #endregion
-
-
-        #region Type d'algo
-        private void algo_choice_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OnEdgeLabelOptionsChanged(object sender, RoutedEventArgs e)
         {
-            var late = (LayoutAlgorithmTypeEnum)algo_choice.SelectedItem;
-            Area.LogicCore.DefaultLayoutAlgorithm = late;
-            if (late == LayoutAlgorithmTypeEnum.EfficientSugiyama)
-            {
-                var prms =
-                    Area.LogicCore.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.EfficientSugiyama)
-                        as EfficientSugiyamaLayoutParameters;
-                prms.EdgeRouting = SugiyamaEdgeRoutings.Orthogonal;
-                prms.LayerDistance = prms.VertexDistance = 100;
-                Area.LogicCore.EdgeCurvingEnabled = false;
-                Area.LogicCore.DefaultLayoutAlgorithmParams = prms;
-                gg_eralgo.SelectedItem = EdgeRoutingAlgorithmTypeEnum.None;
-            }
-            else
-            {
-                Area.LogicCore.EdgeCurvingEnabled = true;
-            }
+            if (_logicCore is null) return;
 
-            if (late == LayoutAlgorithmTypeEnum.BoundedFR)
-                Area.LogicCore.DefaultLayoutAlgorithmParams
-                    = Area.LogicCore.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.BoundedFR);
-            if (late == LayoutAlgorithmTypeEnum.FR)
-                Area.LogicCore.DefaultLayoutAlgorithmParams
-                    = Area.LogicCore.AlgorithmFactory.CreateLayoutParameters(LayoutAlgorithmTypeEnum.FR);
-        }
-
-        #endregion
-
-        #region Edge routing
-        private void gg_eralgo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Area.LogicCore.DefaultEdgeRoutingAlgorithm = (EdgeRoutingAlgorithmTypeEnum)gg_eralgo.SelectedItem;
-            if ((EdgeRoutingAlgorithmTypeEnum)gg_eralgo.SelectedItem == EdgeRoutingAlgorithmTypeEnum.Bundling)
-            {
-                var prm = new BundleEdgeRoutingParameters();
-                Area.LogicCore.DefaultEdgeRoutingAlgorithmParams = prm;
-                prm.Iterations = 200;
-                prm.SpringConstant = 5;
-                prm.Threshold = .1f;
-                Area.LogicCore.EdgeCurvingEnabled = true;
-            }
-            else
-                Area.LogicCore.EdgeCurvingEnabled = false;
-        }
-        #endregion
-
-        #region OverLap
-        private void gg_oralgo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var core = Area.LogicCore;
-            core.DefaultOverlapRemovalAlgorithm = (OverlapRemovalAlgorithmTypeEnum)gg_oralgo.SelectedItem;
-            if (core.DefaultOverlapRemovalAlgorithm == OverlapRemovalAlgorithmTypeEnum.FSA ||
-                core.DefaultOverlapRemovalAlgorithm == OverlapRemovalAlgorithmTypeEnum.OneWayFSA)
-            {
-                core.DefaultOverlapRemovalAlgorithmParams.HorizontalGap = 30;
-                core.DefaultOverlapRemovalAlgorithmParams.VerticalGap = 30;
-            }
-        }
-        #endregion
-
-        private void alignEdgeLabels_Checked(object sender, RoutedEventArgs e)
-        {
-            Area.AlignAllEdgesLabels(alignEdgeLabels.IsChecked != null && alignEdgeLabels.IsChecked.Value);
+            ApplyEdgeLabelOptions();
             Area.InvalidateVisual();
         }
+
+        private void OnImageSizeChanged(object sender, RoutedEventArgs e)
+        {
+            if (Area is null) return;
+
+            foreach (var vertexControl in Area.VertexList.Values)
+            {
+                if (vertexControl.Vertex is DataVertex dataVertex)
+                    dataVertex.ImageHeight = ImageSizeSlider.Value;
+            }
+        }
+
+        #endregion
+
+        public void Dispose() => Area.Dispose();
     }
 }

@@ -72,10 +72,10 @@
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
             <Style.Triggers>
-                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                <DataTrigger Binding="{Binding IsActive}" Value="false">
                     <Setter Property="IsHitTestVisible" Value="True"/>
                     <!-- Aspect "désactivé", mais le contrôle reste interactif -->
-                    <Setter Property="Opacity" Value="0.5"/>
+                    <Setter Property="Opacity" Value="0.2"/>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -110,6 +110,20 @@
             <Setter Property="CornerRadius" Value="5"/>
         </Style>
 
+        <!-- ================================================================== -->
+        <!-- Visibilité par groupe de tolérance (1=N, 2=T1, 3=T2, 4=Rn, 5=Rt1,   -->
+        <!-- 6=Rt2). Remplace 18 liaisons Visibility identiques.                 -->
+        <!-- ================================================================== -->
+        <Style x:Key="TolGroupVisibleBase" TargetType="FrameworkElement">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding DataContext.Active,
+                                       RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
+                     Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
     </UserControl.Resources>
 
     <Grid Margin="0" ShowGridLines="False">
@@ -139,7 +153,6 @@
                     <ColumnDefinition Width="0"/>
                     <ColumnDefinition Width="*" MinWidth="500"/>
                     <ColumnDefinition Width="105"/>
-                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
@@ -184,17 +197,17 @@
                         <TextBlock Text="{lang:Loc Part1}" />
                         <ComboBox x:Name="Part1Text"
                                   VerticalAlignment="Top"
-                                  MinWidth="100"
                                   IsEditable="False"
                                   DisplayMemberPath="NamePart"
                                   SelectedValuePath="Id"
-                                  ItemsSource="{Binding ParentViewModel.Parts, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
+                                  ItemsSource="{Binding AvailableParts1, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
                                   SelectedValue="{Binding PartReq1Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Groupe 1 -->
                 <localTol:ToleranceEditor Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3"
+                           Style="{StaticResource TolGroupVisibleBase}" 
                            DataContext="{Binding Basic.Extremity}"
                            Active="{Binding DataContext.IsActive, ElementName=PanelDataName}"
                            PlaceholderName="{lang:Loc Placeholder_Tol1Name}"
@@ -202,6 +215,7 @@
                            PlaceholderTolerance="{lang:Loc Placeholder_Tol1}"/>
                 <!-- Groupe2 -->
                 <localTol:ToleranceEditor Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="3"
+                           Style="{StaticResource TolGroupVisibleBase}" 
                            DataContext="{Binding Basic.Origin}"
                            Active="{Binding DataContext.IsActive, ElementName=PanelDataName}"
                            PlaceholderName="{lang:Loc Placeholder_Tol2Name}"
@@ -215,16 +229,13 @@
                         <TextBlock Text="{lang:Loc Part2}" />
                         <ComboBox x:Name="Part2Text"
                                   VerticalAlignment="Top"
-                                  MinWidth="100"
                                   IsEditable="False"
                                   DisplayMemberPath="NamePart"
                                   SelectedValuePath="Id"
-                                  ItemsSource="{Binding ParentViewModel.Parts, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
+                                  ItemsSource="{Binding AvailableParts2, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
                                   SelectedValue="{Binding PartReq2Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
                     </StackPanel>
                 </Border>
-
-
 
 
                 <!-- ============ COORDONNÉES (point + direction) ============ -->
@@ -237,14 +248,14 @@
                                    HorizontalAlignment="Center"
                                    Margin="0,0,0,6"/>
 
-                        <Grid>
+                        <Grid Margin="0,0,8,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
                             <!-- Point -->
-                            <Grid Grid.Column="0" Margin="0,0,8,0">
+                            <Grid >
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
@@ -258,8 +269,10 @@
                                 <TextBlock Text="{lang:Loc Point}" Grid.ColumnSpan="3"
                                            />
 
-                                <ui:NumberBox x:Name="PointX" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
-                                              HorizontalContentAlignment="Center"
+                                <ui:NumberBox x:Name="PointX"
+                                              Grid.Row="1" 
+                                              Grid.Column="0" 
+                                              Margin="0,0,4,0"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointX}"
                                               Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">

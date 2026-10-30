@@ -55,6 +55,7 @@ namespace Toltech.App.ViewModels
         #endregion
 
         #region Properties
+
         #region Eyes 
         private bool GetEye(string key) => _uiSettings.IsPanelExpanded(key);
 
@@ -122,14 +123,24 @@ namespace Toltech.App.ViewModels
         public Part? FixedPart
         {
             get => _mainVM.PartVM?.FixedPart;
+
             set
             {
-                if (_mainVM.PartVM == null || _mainVM.PartVM.FixedPart == value) return;
+                if (_mainVM.PartVM == null)
+                    return;
+
+                // No change required.
+                if (_mainVM.PartVM.FixedPart == value)
+                    return;
+
+                // Update the source of truth.
                 _mainVM.PartVM.FixedPart = value;
+
                 UpdateIsFixedFlags(value);
+
                 OnPropertyChanged(nameof(FixedPart));
 
-                UpdateFixedPartAsync(FixedPart);
+                //UpdateFixedPartAsync(value);
             }
         }
 
@@ -258,7 +269,7 @@ namespace Toltech.App.ViewModels
                 );
             DeletePanelCommand = new TtCore.AsyncRelayCommand<ModelData>(DeletePanelAsync);
             ClearPanelCommand = new TtCore.RelayCommand<ModelData>(ClearPanel);
-            SavePanelCommand = new TtCore.AsyncRelayCommand<ModelData>(SavePanelAsync);
+            SavePanelCommand = new TtCore.AsyncRelayCommand<ModelData>(async (modelData) => await SavePanelAsync(modelData));
             #endregion
 
             TreeVM = treeVM;
@@ -534,7 +545,7 @@ namespace Toltech.App.ViewModels
                 .ToList();
 
             if (partId == SelectedPartId)
-                await ApplySortAndFilter(partId); 
+                await ApplySortAndFilter(partId);
         }
 
         // ─── Ajout d'un item dans une Part ────────────────────────────────────
@@ -574,24 +585,15 @@ namespace Toltech.App.ViewModels
             }
         }
 
-        // Surcharge unitaire pour les appels existants
-        private void InvalidateCache(int partId)
-            => InvalidateCache(new[] { partId });
         public void RestoreCache()
         {
             _cache.Clear();
             _lruOrder.Clear();
         }
 
-        // ─── Accesseurs utiles ────────────────────────────────────────────────
-        public IReadOnlyList<ModelData>? GetCachedItems(int partId)
-            => _cache.TryGetValue(partId, out var items) ? items : null;
 
         public bool HasUnsavedChanges(int partId)
             => _cache.TryGetValue(partId, out var items) && items.Any(d => d.IsDirty);
-
-        public bool HasUnsavedChangesAny()
-            => _cache.Values.Any(items => items.Any(d => d.IsDirty));
 
         // ─── Vue : synchronise Datas avec le cache de la Part affichée ────────
         private async Task ApplySortAndFilter(int partId)
@@ -766,7 +768,7 @@ namespace Toltech.App.ViewModels
         }
 
         // Save un seul item
-        private async Task SavePanelAsync(ModelData data)
+        public async Task SavePanelAsync(ModelData data, bool notification = true)
         {
             Debug.WriteLine("[DatasViewModel] - SavePanelAsync(ModelData data)");
             if (data.IsDirty != true)
@@ -779,7 +781,11 @@ namespace Toltech.App.ViewModels
             }
 
             await SaveModelDataInternalAsync(new List<ModelData> { data });
-            _ = _notificationService.ShowNotifAsync($"Données sauvegardées pour la ponctuelle {data.Model}.");
+
+            if (notification)
+            {
+                _ = _notificationService.ShowNotifAsync($"Données sauvegardées pour la ponctuelle {data.Model}.");
+            }
 
 
         }
@@ -811,7 +817,7 @@ namespace Toltech.App.ViewModels
         #endregion
 
         #region CRUD Helper
-        public async Task CreatePartAndDatas()
+        private async Task CreatePartAndDatas()
         {
             string nomPiece = "";
 
@@ -835,7 +841,7 @@ namespace Toltech.App.ViewModels
             }
 
             // Réaffiche la part créée
-            SelectedPartId = createResult.Value.Part.Id; 
+            SelectedPartId = createResult.Value.Part.Id;
 
 
             await EventsManager.RaisePartCrudAsync(new PartCrudEvent
@@ -852,7 +858,7 @@ namespace Toltech.App.ViewModels
 
         }
 
-        public async Task CreateData(int idPartActif)
+        private async Task CreateData(int idPartActif)
         {
             if (!ModelValidationHelper.CheckModelActif(true))
                 return;
@@ -888,7 +894,7 @@ namespace Toltech.App.ViewModels
         }
 
         // Supprimer pièce du modèle TODO
-        public async Task ShowWindowDeletePart()
+        private static async Task ShowWindowDeletePart()
         {
             if (!ModelValidationHelper.CheckModelActif(true))
                 return;
@@ -896,7 +902,7 @@ namespace Toltech.App.ViewModels
             Debug.WriteLine("[DatasViewModel] - FAKE FUNCTION ShowWindowDeletePart( TODO )");
             //deleteWindow.ShowDialog(); // Fenêtre modale
         }
-        public async Task DeletePartActive()
+        private async Task DeletePartActive()
         {
             if (!SelectedPartId.HasValue)
             {
@@ -1001,8 +1007,11 @@ namespace Toltech.App.ViewModels
             _dialog.Info(checkResult.Value.SuccessMessage, Loc("Title_ValidationSuccess"));
         }
 
-        private async Task UpdateFixedPartAsync(Part part)
+        public async Task UpdateFixedPartAsync(Part part)
         {
+            if (part is null)
+                return;
+
             var results = await _domainService.UpdateFixedPartAsync(part);
             if (results.IsFailure)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using Toltech.App.Services;
 using Toltech.App.ViewModels;
 
 namespace Toltech.App.FrontEnd.Controls
@@ -22,8 +23,13 @@ namespace Toltech.App.FrontEnd.Controls
 
             ViewModel = viewModel;
             DataContext = viewModel;
-        }
 
+            _=InitializeAsync();
+        }
+        public async Task InitializeAsync()
+        {
+            await ViewModel.LoadTolerancesAsync();
+        }
         private void Tolerances_MouseDoubleClick(
     object sender,
     MouseButtonEventArgs e)

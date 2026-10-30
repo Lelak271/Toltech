@@ -711,4 +711,7 @@
   <data name="Liaison_Requirement" xml:space="preserve">
     <value>Requisito</value>
   </data>
+  <data name="OtherActions" xml:space="preserve">
+    <value>Altre azioni</value>
+  </data>
 </root>

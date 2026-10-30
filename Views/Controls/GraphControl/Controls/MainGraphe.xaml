@@ -1,92 +1,479 @@
-﻿<Window x:Class="Toltech.App.FrontEnd.GraphePage.Controls.MainGraphe"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="https://westermo.com/graphx/"
-        xmlns:models="clr-namespace:Toltech.App.Views.Controls.GrapheControl"
-        Title="Simple graph example. Read code comments for more info." Height="600" Width="825">
+﻿<ui:FluentWindow x:Class="Toltech.App.FrontEnd.GraphePage.Controls.MainGraphe"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:controls="https://westermo.com/graphx/"
+                 xmlns:models="clr-namespace:Toltech.App.Views.Controls.GrapheControl"
+                 Title="Toltech — Graphe"
+                 Height="720"
+                 Width="1200"
+                 MinHeight="550"
+                 MinWidth="850"
+                 WindowStartupLocation="CenterOwner"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica"
+                 WindowState="Normal">
 
-    
+    <!-- ========================================================= -->
+    <!-- RESSOURCES                                                -->
+    <!-- ========================================================= -->
+
+    <ui:FluentWindow.Resources>
+
+        <ResourceDictionary>
+
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Toltech.App;component/Views/Controls/GraphControl/GraphStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Fond du panneau latéral -->
+            <SolidColorBrush x:Key="GraphPanelBackground"
+                             Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}" />
+
+            <!-- Titre des sections -->
+            <Style x:Key="GraphSectionTitle"
+                   TargetType="{x:Type TextBlock}">
+
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontWeight" Value="SemiBold" />
+
+                <Setter Property="Foreground"
+                        Value="{DynamicResource TextFillColorPrimaryBrush}" />
+
+                <Setter Property="Margin" Value="0,0,0,12" />
+
+            </Style>
+
+            <!-- Libellés des paramètres -->
+            <Style x:Key="GraphFieldLabel"
+                   TargetType="{x:Type TextBlock}">
+
+                <Setter Property="FontSize" Value="12" />
+
+                <Setter Property="Foreground"
+                        Value="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                <Setter Property="Margin" Value="0,12,0,5" />
+
+            </Style>
+
+            <!-- Séparation des sections -->
+            <Style x:Key="GraphSectionSeparator"
+                   TargetType="{x:Type Border}">
+
+                <Setter Property="Height" Value="1" />
+
+                <Setter Property="Background"
+                        Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+
+                <Setter Property="Margin" Value="0,20,0,20" />
+
+            </Style>
+
+            <!-- Boutons du panneau latéral -->
+            <Style x:Key="GraphActionButton"
+                   TargetType="{x:Type ui:Button}">
+
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="MinHeight" Value="38" />
+
+                <Setter Property="Padding" Value="12,8" />
+
+            </Style>
+
+            <!-- Contrôles de sélection -->
+            <Style x:Key="GraphComboBox"
+                   TargetType="{x:Type ComboBox}">
+
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="MinHeight" Value="34" />
+
+            </Style>
+
+        </ResourceDictionary>
+
+    </ui:FluentWindow.Resources>
+
+
+    <!-- ========================================================= -->
+    <!-- STRUCTURE PRINCIPALE                                      -->
+    <!-- ========================================================= -->
+
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
 
-        <Grid.Resources>
-            <ResourceDictionary>
-                <ResourceDictionary.MergedDictionaries>
-                    <ResourceDictionary Source="pack://application:,,,/Toltech.App;component/Views/Controls/GraphControl/GraphStyle.xaml"/>
-                </ResourceDictionary.MergedDictionaries>
-            </ResourceDictionary>
-        </Grid.Resources>
-        
-        <!-- Here we create our GraphArea layout container wrapped into the Zoombox for vast zooming capabilities.
-             This is the standard approach for GraphX.-->
-        <controls:ZoomControl x:Name="zoomctrl" Grid.Column="0">
-            <models:GraphAreaExample x:Name="Area" />
-        </controls:ZoomControl>
+        <Grid.RowDefinitions>
 
-        <Grid Grid.Column="1" Margin="3" Grid.RowSpan="2">
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                <Button Name="gg_but_randomgraph" Height="50" Margin="3" UseLayoutRounding="True" Click="gg_but_randomgraph_Click" ToolTip="Génère un graphe aléatoire">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 L10,5 0,10 Z" Fill="White" Stretch="Uniform" Margin="0,0,5,0"/>
-                        <TextBlock Text="Random Graph" VerticalAlignment="Center"/>
+            <!-- Barre de titre -->
+            <RowDefinition Height="Auto" />
+
+            <!-- Contenu principal -->
+            <RowDefinition Height="*" />
+
+        </Grid.RowDefinitions>
+
+
+        <!-- ===================================================== -->
+        <!-- BARRE DE TITRE                                        -->
+        <!-- ===================================================== -->
+
+        <ui:TitleBar x:Name="AppTitleBar"
+                     Grid.Row="0"
+                     Title="Toltech — Graphe" />
+
+
+        <!-- ===================================================== -->
+        <!-- CONTENU PRINCIPAL                                     -->
+        <!-- ===================================================== -->
+
+        <Grid Grid.Row="1">
+
+            <Grid.ColumnDefinitions>
+
+                <!-- Zone du graphe -->
+                <ColumnDefinition Width="*" />
+
+                <!-- Séparateur -->
+                <ColumnDefinition Width="1" />
+
+                <!-- Panneau de paramètres -->
+                <ColumnDefinition Width="290" />
+
+            </Grid.ColumnDefinitions>
+
+
+            <!-- ================================================= -->
+            <!-- ZONE DU GRAPHE                                    -->
+            <!-- ================================================= -->
+
+            <Grid Grid.Column="0"
+                  Background="{DynamicResource ApplicationBackgroundBrush}">
+
+                <Grid.RowDefinitions>
+
+                    <!-- En-tête de la zone de travail -->
+                    <RowDefinition Height="Auto" />
+
+                    <!-- Surface du graphe -->
+                    <RowDefinition Height="*" />
+
+                </Grid.RowDefinitions>
+
+
+                <!-- En-tête du graphe -->
+                <Border Grid.Row="0"
+                        Padding="20,14"
+                        Background="{DynamicResource ApplicationBackgroundBrush}"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1">
+
+                    <Grid>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+
+                        <StackPanel Grid.Column="0">
+
+                            <TextBlock Text="Graphe d'assemblage"
+                                       FontSize="18"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+                            <TextBlock Text="Visualisation des liaisons et des exigences"
+                                       Margin="0,4,0,0"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                        </StackPanel>
+
+
+                        <!-- Action de réorganisation -->
+                        <ui:Button Grid.Column="1"
+                                   Appearance="Secondary"
+                                   Content="Recalculer"
+                                   Icon="{ui:SymbolIcon ArrowSync24}"
+                                   VerticalAlignment="Center"
+                                   ToolTip="Recalculer la disposition des nœuds"
+                                   Click="OnRelayoutClick" />
+
+                    </Grid>
+
+                </Border>
+
+
+                <!-- Surface de travail -->
+                <Border Grid.Row="1"
+                        Margin="12"
+                        CornerRadius="8"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                        Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+                        ClipToBounds="True">
+
+                    <Grid>
+
+                        <!-- Contrôle GraphX -->
+                        <controls:ZoomControl x:Name="zoomctrl"
+                                              Background="Transparent">
+
+                            <models:GraphAreaExample x:Name="Area" />
+
+                        </controls:ZoomControl>
+
+
+                        <!-- Indication visuelle de la zone de travail -->
+                        <Border HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                Margin="12"
+                                Padding="10,6"
+                                CornerRadius="5"
+                                Background="{DynamicResource SolidBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{DynamicResource ControlStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                IsHitTestVisible="False">
+
+                            <StackPanel Orientation="Horizontal">
+
+                                <TextBlock Text="GraphX"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                                <TextBlock Text="  ·  Zoom et déplacement"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                            </StackPanel>
+
+                        </Border>
+
+                    </Grid>
+
+                </Border>
+
+            </Grid>
+
+
+            <!-- ================================================= -->
+            <!-- SÉPARATEUR                                       -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="1"
+                    Background="{DynamicResource ControlStrokeColorDefaultBrush}" />
+
+
+            <!-- ================================================= -->
+            <!-- PANNEAU LATÉRAL                                   -->
+            <!-- ================================================= -->
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+
+                    <StackPanel Margin="20,20,20,24">
+
+
+                        <!-- ===================================== -->
+                        <!-- EN-TÊTE DU PANNEAU                    -->
+                        <!-- ===================================== -->
+
+                        <TextBlock Text="Configuration"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+                        <TextBlock Text="Paramètres de visualisation"
+                                   Margin="0,4,0,0"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+
+                        <Border Style="{StaticResource GraphSectionSeparator}" />
+
+
+                        <!-- ===================================== -->
+                        <!-- ACTIONS                               -->
+                        <!-- ===================================== -->
+
+                        <TextBlock Text="Actions"
+                                   Style="{StaticResource GraphSectionTitle}" />
+
+
+                        <ui:Button x:Name="ReloadButton"
+                                   Style="{StaticResource GraphActionButton}"
+                                   Appearance="Primary"
+                                   Content="Recharger les données"
+                                   Icon="{ui:SymbolIcon ArrowClockwise24}"
+                                   ToolTip="Relire les données de la base et reconstruire le graphe"
+                                   Click="OnReloadClick" />
+
+                        <ui:Button Margin="0,8,0,0"
+                                   Style="{StaticResource GraphActionButton}"
+                                   Appearance="Secondary"
+                                   Content="Recalculer le layout"
+                                   Icon="{ui:SymbolIcon ArrowSync24}"
+                                   ToolTip="Recalculer la position des nœuds"
+                                   Click="OnRelayoutClick" />
+
+
+                        <Border Style="{StaticResource GraphSectionSeparator}" />
+
+
+                        <!-- ===================================== -->
+                        <!-- ALGORITHMES                           -->
+                        <!-- ===================================== -->
+
+                        <TextBlock Text="Disposition"
+                                   Style="{StaticResource GraphSectionTitle}" />
+
+
+                        <TextBlock Text="Algorithme de disposition"
+                                   Style="{StaticResource GraphFieldLabel}"
+                                   Margin="0,0,0,5" />
+
+                        <ComboBox x:Name="LayoutCombo"
+                                  Style="{StaticResource GraphComboBox}"
+                                  SelectionChanged="OnLayoutAlgorithmChanged" />
+
+
+                        <TextBlock Text="Suppression des chevauchements"
+                                   Style="{StaticResource GraphFieldLabel}" />
+
+                        <ComboBox x:Name="OverlapCombo"
+                                  Style="{StaticResource GraphComboBox}"
+                                  SelectionChanged="OnAlgorithmOptionChanged" />
+
+
+                        <TextBlock Text="Routage des arêtes"
+                                   Style="{StaticResource GraphFieldLabel}" />
+
+                        <ComboBox x:Name="EdgeRoutingCombo"
+                                  Style="{StaticResource GraphComboBox}"
+                                  SelectionChanged="OnAlgorithmOptionChanged" />
+
+
+                        <Border Style="{StaticResource GraphSectionSeparator}" />
+
+
+                        <!-- ===================================== -->
+                        <!-- AFFICHAGE                             -->
+                        <!-- ===================================== -->
+
+                        <TextBlock Text="Affichage"
+                                   Style="{StaticResource GraphSectionTitle}" />
+
+
+                        <ui:ToggleSwitch x:Name="EdgeLabelsToggle"
+                                         Content="Afficher les labels"
+                                         IsChecked="True"
+                                         Click="OnEdgeLabelOptionsChanged" />
+
+
+                        <ui:ToggleSwitch x:Name="AlignLabelsToggle"
+                                         Margin="0,12,0,0"
+                                         Content="Aligner les labels"
+                                         Click="OnEdgeLabelOptionsChanged" />
+
+
+                        <!-- Taille des images -->
+                        <Grid Margin="0,18,0,0">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Taille des images"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Value, ElementName=ImageSizeSlider, StringFormat={}{0:0} px}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+                        </Grid>
+
+
+                        <Slider x:Name="ImageSizeSlider"
+                                Margin="0,8,0,0"
+                                Minimum="20"
+                                Maximum="200"
+                                Value="40"
+                                TickFrequency="10"
+                                IsSnapToTickEnabled="True"
+                                ValueChanged="OnImageSizeChanged" />
+
+
+                        <Border Style="{StaticResource GraphSectionSeparator}" />
+
+
+                        <!-- ===================================== -->
+                        <!-- ARÊTES PARALLÈLES                     -->
+                        <!-- ===================================== -->
+
+                        <TextBlock Text="Arêtes parallèles"
+                                   Style="{StaticResource GraphSectionTitle}" />
+
+
+                        <ui:ToggleSwitch x:Name="ParallelEdgesToggle"
+                                         Content="Activer"
+                                         IsChecked="True"
+                                         ToolTip="Activer ou désactiver les arêtes parallèles"
+                                         Click="OnParallelEdgesChanged" />
+
+
+                        <!-- Distance entre les arêtes -->
+                        <Grid Margin="0,18,0,0">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0"
+                                       Text="Distance entre les arêtes"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Value, ElementName=EdgeDistanceSlider, StringFormat={}{0:0}}"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+
+                        </Grid>
+
+
+                        <Slider x:Name="EdgeDistanceSlider"
+                                Margin="0,8,0,0"
+                                Minimum="0"
+                                Maximum="50"
+                                Value="10"
+                                TickFrequency="1"
+                                IsSnapToTickEnabled="True"
+                                ValueChanged="OnParallelEdgesChanged" />
+
+
                     </StackPanel>
-                </Button>
-                <TextBlock Text="Type d'algo" DockPanel.Dock="Top" HorizontalAlignment="Center"  FontWeight="Bold"/>
-                <ComboBox IsReadOnly="True" Name="algo_choice" Margin="3" DockPanel.Dock="Top"/>
-                <TextBlock Text="Overlap removal" DockPanel.Dock="Top" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <ComboBox IsReadOnly="True" Name="gg_oralgo" Margin="3" DockPanel.Dock="Top"/>
-                <TextBlock Text="Edge routing" DockPanel.Dock="Top" HorizontalAlignment="Center" FontWeight="Bold"/>
-                <ComboBox IsReadOnly="True" Name="gg_eralgo" Margin="3" DockPanel.Dock="Top"/>
 
-                <Slider x:Name="ImageHeightSlider" 
-                        Minimum="20" 
-                        Maximum="200" 
-                        Value="{Binding GlobalImageSize, 
-                       Mode=TwoWay,
-                       UpdateSourceTrigger=PropertyChanged
-                       }"
-                        TickFrequency="10" 
-                        IsSnapToTickEnabled="True" 
-                        Width="200"/>
-                <CheckBox Margin="3" Content="Align edge labels" x:Name="alignEdgeLabels"/>
+                </ScrollViewer>
 
-                <Button Name="gg_but_relayout" Height="50" Margin="3" UseLayoutRounding="True" Click="gg_but_relayout_Click" ToolTip="Re-calculer le layout">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 L10,5 0,10 Z" Fill="White" Stretch="Uniform" Margin="0,0,5,0"/>
-                        <TextBlock Text="Relayout" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
+            </Border>
 
-                <Button Name="test" Height="50" Margin="3" UseLayoutRounding="True" Click="test_Click" ToolTip="Fonction de test">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 L10,5 0,10 Z" Fill="White" Stretch="Uniform" Margin="0,0,5,0"/>
-                        <TextBlock Text="Test" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-                <CheckBox IsChecked="True" Checked="EdgeLabelsVisibility_Checked" Unchecked="EdgeLabelsVisibility_Checked" Content="Afficher les labels" Margin="5"/>
-
-                <StackPanel Orientation="Vertical" Margin="0,10,0,0">
-                    <TextBlock VerticalAlignment="Center" Text="Distance between the edges:" Margin="0,0,5,0"/>
-                    <TextBox Width="110"
-                             Height="45"
-                             VerticalContentAlignment="Center"
-                             Text="{Binding EdgeDistance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                             PreviewTextInput="OnPreviewTextInput"
-                             />
-                    <CheckBox Height="25"
-                              x:Name="cbEnablePE"
-                              IsChecked="True"
-                              Content ="Enable parallel edges"
-                              ToolTip="Enable / disable parallel edges to see the difference"
-                              />
-                </StackPanel>
-
-                
-            </StackPanel>
         </Grid>
+
     </Grid>
-</Window>
+
+</ui:FluentWindow>

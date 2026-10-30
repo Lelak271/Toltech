@@ -14,7 +14,6 @@
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="None"
     WindowCornerPreference="Default"
-    WindowStartupLocation="CenterScreen"
     WindowState="Normal"
     ResizeMode="CanResize"
     FlowDirection="LeftToRight"
@@ -45,7 +44,7 @@
                                 <ContentPresenter Grid.Row="1"
                                                   ContentSource="Header"
                                                   HorizontalAlignment="Center"
-                                                  Margin="0,4,0,0"
+                                                  Margin="0,0,0,0"
                                                   TextElement.FontSize="11"
                                                   TextElement.Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                             </Grid>
@@ -68,11 +67,13 @@
         <!-- Bouton "ligne" (équivalent SizeDefinition=Middle / Small) -->
         <Style x:Key="RibbonSmallButtonStyle" TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
             <Setter Property="Margin" Value="2"/>
-            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="Padding" Value="3,3"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Width" Value="auto"/>
+            <Setter Property="Height" Value="32"/>
         </Style>
 
         <Style x:Key="RibbonIconStyle" TargetType="Image">
@@ -81,6 +82,122 @@
             <Setter Property="Margin" Value="0,0,0,4"/>
         </Style>
 
+        <Style x:Key="ThemeToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="56" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid>
+                            <!-- Piste -->
+                            <Border x:Name="Track"
+                            CornerRadius="14"
+                            Background="#FFD98A"
+                            BorderBrush="#E0B45C"
+                            BorderThickness="1">
+                                <Grid Margin="7,0">
+                                    <!-- Icônes décoratives (côté opposé au curseur) -->
+                                    <ui:SymbolIcon x:Name="TrackSun"
+                                           Symbol="WeatherSunny24"
+                                           FontSize="14"
+                                           Foreground="#8A5A00"
+                                           HorizontalAlignment="Left"
+                                           Opacity="0" />
+                                    <ui:SymbolIcon x:Name="TrackMoon"
+                                           Symbol="WeatherMoon24"
+                                           FontSize="14"
+                                           Foreground="#C9D4FF"
+                                           HorizontalAlignment="Right"
+                                           Opacity="0" />
+                                </Grid>
+                            </Border>
+
+                            <!-- Curseur -->
+                            <Border x:Name="Thumb"
+                            Width="22" Height="22"
+                            CornerRadius="11"
+                            Margin="3"
+                            HorizontalAlignment="Left"
+                            Background="White"
+                            RenderTransformOrigin="0.5,0.5">
+                                <Border.RenderTransform>
+                                    <TranslateTransform x:Name="ThumbTransform" X="0" />
+                                </Border.RenderTransform>
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="6" ShadowDepth="1" Opacity="0.3" />
+                                </Border.Effect>
+                                <Grid>
+                                    <ui:SymbolIcon x:Name="ThumbSun"
+                                           Symbol="WeatherSunny24"
+                                           FontSize="14"
+                                           Foreground="#F5A300"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                    <ui:SymbolIcon x:Name="ThumbMoon"
+                                           Symbol="WeatherMoon24"
+                                           FontSize="14"
+                                           Foreground="#3B4A8C"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Visibility="Collapsed" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Track" Property="Opacity" Value="0.92" />
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="#2B3A67" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="#46568F" />
+                                <Setter TargetName="ThumbSun" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="ThumbMoon" Property="Visibility" Value="Visible" />
+                                <Setter TargetName="Thumb" Property="Background" Value="#E8ECFF" />
+                                <Setter TargetName="TrackSun" Property="Opacity" Value="0.7" />
+                                <Setter TargetName="TrackSun" Property="Foreground" Value="#C9D4FF" />
+
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ThumbTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="28" Duration="0:0:0.22">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ThumbTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0" Duration="0:0:0.22">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut" />
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="TrackMoon" Property="Opacity" Value="0.7" />
+                                <Setter TargetName="TrackMoon" Property="Foreground" Value="#8A5A00" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
     </ui:FluentWindow.Resources>
 
     <Grid x:Name="GridApplication" Margin="0" ShowGridLines="False">
@@ -101,11 +218,29 @@
             <DynamicResource ResourceKey="ApplicationBackgroundBrush"/>
         </Grid.Background>
 
+        <ToggleButton x:Name="ThemeToggle" Panel.ZIndex="999" Grid.Row="0" Grid.RowSpan="2"
+                       Style="{StaticResource ThemeToggleStyle}"
+                       Margin="0,-100,30,0"
+                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                       ToolTip="Basculer entre mode clair et mode sombre"
+                       Click="ThemeChanged_Click" />
+        
         <!-- ======================= TITLE BAR ======================= -->
         <!-- Les boutons Minimize / Maximize / Close sont gérés nativement par WPF-UI -->
         <ui:TitleBar x:Name="AppTitleBar"
-                     Grid.Row="0"
-                     Title="{Binding ModelName, StringFormat='TOLTECH Application - {0}'}"/>
+             Grid.Row="0"
+             Title="{Binding ModelName, StringFormat='TOLTECH Application - {0}'}"
+             MaximizeClicked="Maximize_Click"
+             MinimizeClicked="Minimize_Click">
+            <!--<ui:TitleBar.TrailingContent>
+                <ToggleButton x:Name="ThemeTdoggle"
+                      Style="{StaticResource ThemeToggleStyle}"
+                      Margin="0,0,0,10"
+                      VerticalAlignment="Center"
+                      ToolTip="Basculer entre mode clair et mode sombre"
+                      Click="Minimize_Click" />
+            </ui:TitleBar.TrailingContent>-->
+        </ui:TitleBar>
 
         <!-- ======================= "RIBBON" (TabControl) ======================= -->
         <TabControl x:Name="AppRibbon"
@@ -127,62 +262,89 @@
                     </GroupBox>
 
                     <GroupBox Header="{lang:Loc GroupModels}" Style="{StaticResource RibbonGroupStyle}">
-                        <Grid>
+                        <Grid ShowGridLines="False" VerticalAlignment="Stretch" >
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
 
-                            <ui:Button Grid.Row="0" Grid.Column="0"
+                            <!-- Créer un modèle -->
+                            <ui:Button Grid.Row="0"
+                                       Grid.Column="0"
                                        Style="{StaticResource RibbonSmallButtonStyle}"
                                        Content="{lang:Loc CreateWord}"
                                        Command="{Binding CreateModelCommand}"
                                        ToolTip="{lang:Loc TipCreateModel}">
                                 <ui:Button.Icon>
-                                    <ui:ImageIcon Source="/Asset/add_model2.png" Width="16" Height="16"/>
+                                    <ui:ImageIcon Source="/Asset/add_model2.png"/>
                                 </ui:Button.Icon>
                             </ui:Button>
-                            <ui:Button Grid.Row="0" Grid.Column="1"
+
+                            <!-- Ouvrir un modèle -->
+                            <ui:Button Grid.Row="0"
+                                       Grid.Column="1"
                                        Style="{StaticResource RibbonSmallButtonStyle}"
                                        Content="{lang:Loc OpenWord}"
                                        Command="{Binding OpenModelFileCommand}"
                                        ToolTip="{lang:Loc TipOpenModel}">
                                 <ui:Button.Icon>
-                                    <ui:ImageIcon Source="/Asset/open_model2.png" Width="16" Height="16"/>
+                                    <ui:ImageIcon Source="/Asset/open_model2.png"/>
                                 </ui:Button.Icon>
                             </ui:Button>
-                            <ui:Button Grid.Row="1" Grid.Column="0"
-                                       Style="{StaticResource RibbonSmallButtonStyle}"
-                                       Content="{lang:Loc Link}"
-                                       Command="{Binding OpenRegisterWindowCommand}"
-                                       ToolTip="{DynamicResource TipLinkModel}">
-                                <ui:Button.Icon>
-                                    <ui:ImageIcon Source="/Asset/Associate_modele.png" Width="16" Height="16"/>
-                                </ui:Button.Icon>
-                            </ui:Button>
-                            <ui:Button Grid.Row="1" Grid.Column="1"
-                                       Style="{StaticResource RibbonSmallButtonStyle}"
-                                       Content="{lang:Loc DuplicateWord}"
-                                       Command="{Binding DuplicateActiveModelCommand}"
-                                       ToolTip="{DynamicResource TipDuplicateModel}">
-                                <ui:Button.Icon>
-                                    <ui:ImageIcon Source="/Asset/duplicate_model2.png" Width="16" Height="16"/>
-                                </ui:Button.Icon>
-                            </ui:Button>
-                            <ui:Button Grid.Row="2" Grid.Column="0"
+
+                            <!-- Supprimer le modèle actif -->
+                            <ui:Button Grid.Row="1"
+                                       Grid.Column="0"
                                        Style="{StaticResource RibbonSmallButtonStyle}"
                                        Content="{lang:Loc DeleteWord}"
                                        Command="{Binding DeleteActiveModelCommand}"
                                        ToolTip="{DynamicResource TipDeleteModel}">
                                 <ui:Button.Icon>
-                                    <ui:ImageIcon Source="/Asset/bin_model2.png" Width="16" Height="16"/>
+                                    <ui:ImageIcon Source="/Asset/bin_model2.png"/>
                                 </ui:Button.Icon>
                             </ui:Button>
+
+                            <!-- Menu déroulant regroupant Link et Duplicate -->
+                            <ui:DropDownButton Grid.Row="1"
+                                               Grid.Column="1"
+                                               Style="{StaticResource RibbonSmallButtonStyle}"
+                                               Content="{lang:Loc OtherActions}"
+                                               ToolTip="Associer ou dupliquer un modèle">
+
+                                <ui:DropDownButton.Icon>
+                                    <ui:SymbolIcon Symbol="PanelSeparateWindow20"/>
+                                </ui:DropDownButton.Icon>
+
+                                <ui:DropDownButton.Flyout>
+                                    <ContextMenu>
+                                        <!-- Associer un modèle -->
+                                        <MenuItem Header="{lang:Loc Link}"
+                                                 Command="{Binding OpenRegisterWindowCommand}">
+                                            <MenuItem.Icon>
+                                                <ui:ImageIcon Source="/Asset/Associate_modele.png" 
+                                                              Height="20"
+                                                              Width="20"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+
+                                        <!-- Dupliquer le modèle actif -->
+                                        <MenuItem Header="{lang:Loc DuplicateWord}"
+                                                    Command="{Binding DuplicateActiveModelCommand}">
+                                            <MenuItem.Icon>
+                                                <ui:ImageIcon Source="/Asset/duplicate_model2.png"
+                                                              Height="20"
+                                                               Width="20"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </ui:DropDownButton.Flyout>
+                            </ui:DropDownButton>
+                            
                         </Grid>
                     </GroupBox>
 
@@ -269,7 +431,7 @@
                             <ui:Button x:Name="AfficherMatriceButton"
                                        Style="{StaticResource RibbonLargeButtonStyle}"
                                        Margin="20,2,2,2"
-                                       Click="AfficherMatriceButton_Click">
+                                       Click="ValidateGraphDataButton_Click">
                                 <StackPanel>
                                     <Image Source="/Asset/TestGrapheButton.png" Style="{StaticResource RibbonIconStyle}"/>
                                     <TextBlock Text="{lang:Loc BtnMatrixPreview}" HorizontalAlignment="Center"/>
@@ -417,7 +579,7 @@
                         Width="Auto">
                 <TabItem  Header="🏠" Width="45" FontSize="15" Padding="0" HorizontalContentAlignment="Center"/>
                 <TabItem  Header="{lang:Loc TabModels}" Width="Auto" HorizontalContentAlignment="Center"/>
-                <TabItem  Header="{lang:Loc TabModeling}" Width="Auto" HorizontalContentAlignment="Center"/>
+                <TabItem  Header="{lang:Loc TabModeling}" Width="Auto" HorizontalContentAlignment="Center" Name="TabModeling" /> 
                 <TabItem  Header="{lang:Loc TabRequirements}" Width="Auto" HorizontalContentAlignment="Center"/>
                 <TabItem  Header="{lang:Loc TabResults}" Width="Auto" HorizontalContentAlignment="Center"/>
                 <TabItem  Header="{lang:Loc TabV3D}" Width="Auto" HorizontalContentAlignment="Center"/>
@@ -426,28 +588,8 @@
         </StackPanel>
 
         <!-- ======================= Contenu ======================= -->
-        <ContentControl Content="{Binding SelectedPage}" Grid.Row="3">
-            <ContentControl.Resources>
-                <DataTemplate DataType="{x:Type vm:HomePageViewModel}">
-                    <views:HomePage/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:ModelsViewModel}">
-                    <views:PageModels/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:DatasViewModel}">
-                    <views:PageData/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:RequirementsViewModel}">
-                    <views:PageReq/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:ResultsViewModel}">
-                    <views:PageResultats/>
-                </DataTemplate>
-                <DataTemplate DataType="{x:Type vm:V3DViewModel}">
-                    <views:VSTWindow/>
-                </DataTemplate>
-            </ContentControl.Resources>
-        </ContentControl>
+        <ContentControl Content="{Binding SelectedView}"
+                Grid.Row="3"/>
 
         <!-- ======================= Logger ======================= -->
         <Grid x:Name="LoggerGrid" Grid.Row="3" Height="33" VerticalAlignment="Bottom">

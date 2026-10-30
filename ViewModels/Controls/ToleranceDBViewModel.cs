@@ -42,7 +42,6 @@ namespace Toltech.App.ViewModels
             LinkedCommand = new RelayCommand(Select, () => IsSelectionMode && SelectedTolerance is not null);
             #endregion
 
-            _ = LoadTolerancesAsync();
         }
 
         // ----------------------------------------------------------------

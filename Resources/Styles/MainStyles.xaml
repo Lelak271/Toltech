@@ -178,6 +178,8 @@
        TargetType="{x:Type ui:NumberBox}"
        BasedOn="{StaticResource {x:Type ui:NumberBox}}">
 
+        <Setter Property="behaviors:TextBoxInputFilterBehavior.InputFilter" Value="Expression" />
+        
         <Setter Property="ContextMenu">
             <Setter.Value>
                 <ContextMenu Padding="4" HasDropShadow="True">

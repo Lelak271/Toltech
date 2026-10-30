@@ -261,6 +261,8 @@
                     <StackPanel>
                         <ui:ToggleSwitch HorizontalAlignment="Center"
                                          OnContent="" OffContent=""
+                                         Checked="ToggleSwitch_Changed"
+                                         Unchecked="ToggleSwitch_Changed"
                                          IsChecked="{Binding Active, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
@@ -392,9 +394,8 @@
                                   IsEditable="False"
                                   DisplayMemberPath="NamePart"
                                   SelectedValuePath="Id"
-                                  ItemsSource="{Binding ParentViewModel.Parts, RelativeSource={RelativeSource AncestorType=localControls:PanelData}}"
-                                  Text="{Binding OriginePartId, Converter={StaticResource IdToNameConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                  SelectedValue="{Binding OriginePartId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                  ItemsSource="{Binding AvailableParts, RelativeSource={RelativeSource AncestorType=localControls:PanelData}}"
+                                  SelectedValue="{Binding OriginePartId, Mode=TwoWay}"/>
                     </StackPanel>
                 </Border>
 
@@ -570,10 +571,13 @@
                                 <TextBlock Text="{lang:Loc Point}" Grid.ColumnSpan="3"
                                            />
 
-                                <ui:NumberBox x:Name="PointXText" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
-                                         Style="{StaticResource NumericBoxPointStyle}"
-                                         PlaceholderText="{lang:Loc Placeholder_PointX}" 
-                                         Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                <ui:NumberBox x:Name="PointXText" AcceptsExpression="True"
+                                              Grid.Row="1"
+                                              Grid.Column="0"
+                                              Margin="0,0,4,0"
+                                              Style="{StaticResource NumericBoxPointStyle}"
+                                              PlaceholderText="{lang:Loc Placeholder_PointX}" 
+                                              Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>

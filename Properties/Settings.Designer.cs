@@ -50,9 +50,9 @@ namespace Toltech.App.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int WindowWidth {
+        public double WindowWidth {
             get {
-                return ((int)(this["WindowWidth"]));
+                return ((double)(this["WindowWidth"]));
             }
             set {
                 this["WindowWidth"] = value;
@@ -62,9 +62,9 @@ namespace Toltech.App.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int WindowHeight {
+        public double WindowHeight {
             get {
-                return ((int)(this["WindowHeight"]));
+                return ((double)(this["WindowHeight"]));
             }
             set {
                 this["WindowHeight"] = value;
@@ -98,12 +98,12 @@ namespace Toltech.App.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool IsMaximized {
+        public bool WindowMaximized {
             get {
-                return ((bool)(this["IsMaximized"]));
+                return ((bool)(this["WindowMaximized"]));
             }
             set {
-                this["IsMaximized"] = value;
+                this["WindowMaximized"] = value;
             }
         }
         

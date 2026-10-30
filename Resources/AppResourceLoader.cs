@@ -50,6 +50,11 @@ namespace Toltech.App.Resources
         public SupportedDensityUnit DensityUnit { get; set; } = SupportedDensityUnit.KgPerCubicMeter;
         public AppTheme Theme { get; set; } = AppTheme.Light;
 
+        public AppSettings()
+        {
+            // Permet la prise en compte des valeur User lors de l'initialisation de l'application
+            LoadFromUserConfig();
+        }
 
         // --- Méthodes pour charger depuis les paramètres utilisateur ---
         public void LoadFromUserConfig()

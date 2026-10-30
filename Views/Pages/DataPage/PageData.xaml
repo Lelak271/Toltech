@@ -81,7 +81,8 @@
                                           ToolTip="Définition de la pièce fixe"
                                           ItemsSource="{Binding MainVM.Parts}"
                                           DisplayMemberPath="NamePart"
-                                          SelectedItem="{Binding FixedPart, Mode=TwoWay}"/>
+                                          SelectedItem="{Binding FixedPart, Mode=TwoWay}"
+                                          SelectionChanged="FixedPartComboBox_SelectionChanged"/>
                                 <Image Source="/Asset/IsFixedPartImg.png" Stretch="Uniform" Width="20" Margin="8,0,0,0"/>
                             </StackPanel>
                         </StackPanel>
@@ -268,6 +269,7 @@
                                                              ParentViewModel="{Binding DataContext, RelativeSource={RelativeSource AncestorType=local:PageData}}"
                                                              Margin="12,5"
                                                              Padding="10"/>
+                                    
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

@@ -1,144 +1,182 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using DocumentFormat.OpenXml.ExtendedProperties;
+using Wpf.Ui.Controls;
 
 namespace Toltech.App.Services.Notification
 {
+    public enum NotificationSeverity
+    {
+        Info,
+        Success,
+        Warning,
+        Error
+    }
+
     public partial class NotificationControl : UserControl
     {
-        private bool _isClosing = false;
-        private TaskCompletionSource<bool> _closeTcs;
+        private static readonly TimeSpan EnterDuration = TimeSpan.FromMilliseconds(300);
+        private static readonly TimeSpan ExitDuration = TimeSpan.FromMilliseconds(250);
+        private static readonly TimeSpan DefaultDisplayDuration = TimeSpan.FromSeconds(3);
 
+        // Complété par un clic (ou par Dismiss()) : ShowAsync se réveille immédiatement
+        private readonly TaskCompletionSource _dismissTcs =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public NotificationControl()
         {
             InitializeComponent();
-            // Pour s'assurer que ActualWidth est correctement défini avant d'animer
-            this.Loaded += NotificationControl_Loaded;
+
+            Opacity = 0; // invisible tant que ShowAsync n'a pas démarré
+            ClipHost.SizeChanged += (_, _) => UpdateClip();
         }
 
-        public NotificationControl(string message) : this()
+        public NotificationControl(string message, string? title = null) : this()
         {
             MessageText.Text = message;
+
+            if (!string.IsNullOrWhiteSpace(title))
+                TitleText.Text = title;
         }
 
-        private void NotificationControl_Loaded(object sender, RoutedEventArgs e)
+        // ------------------------------------------------------------------
+        //  API publique
+        // ------------------------------------------------------------------
+
+        /// <summary>Compatibilité avec l'ancien appel : ShowAsync(true) = erreur.</summary>
+        public Task ShowAsync(bool isError) =>
+            ShowAsync(isError ? NotificationSeverity.Error : NotificationSeverity.Info);
+
+        public async Task ShowAsync(NotificationSeverity severity = NotificationSeverity.Info,
+                                    TimeSpan? duration = null)
         {
-            // Optionnel : désabonnement pour éviter appels multiples
-            this.Loaded -= NotificationControl_Loaded;
-        }
+            var display = duration ?? DefaultDisplayDuration;
 
-        public async Task ShowAsync(bool isError = false)
-        {
-            int durationMs = 3000;
+            // À faire ici (et non dans le constructeur) : le contrôle est normalement déjà dans
+            // l'arbre visuel, donc TryFindResource voit aussi les ressources de la fenêtre.
+            ApplyTheme(severity);
 
-            if (isError)
-            {
-                SetBackgroundColors(
-                    "#D70022",
-                    "#FFFFFF",
-                    "#FFB3B3",
-                    "#FF7F7F",
-                    "#FFFFFF",
-                    "#FF4500"
-                );
-            }
+            // Entrée : fondu + léger glissement vers le haut
+            await Task.WhenAll(
+                AnimateAsync(this, OpacityProperty, 0, 1, EnterDuration),
+                AnimateAsync(CardTranslate, TranslateTransform.YProperty, 12, 0, EnterDuration,
+                             new CubicEase { EasingMode = EasingMode.EaseOut }));
 
-            // Fade-in
-            Opacity = 0;
-            var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
-            BeginAnimation(OpacityProperty, fadeIn);
+            // Remplissage progressif pendant la durée d'affichage
+            FillScale.BeginAnimation(ScaleTransform.ScaleXProperty,
+                new DoubleAnimation(0, 1, display)
+                {
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                });
 
-            await Task.Delay(300);
-
-            // Animation de progression
-            var fillAnimation = new DoubleAnimation
-            {
-                From = 0,
-                To = ActualWidth,
-                Duration = TimeSpan.FromMilliseconds(durationMs),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            LoadingProgress.BeginAnimation(WidthProperty, fillAnimation);
-
-            // Attente de la durée d’affichage
-            await Task.Delay(durationMs);
-
-            // Si déjà fermé par clic, ne rien faire
-            if (_isClosing)
-                return;
+            // Attend la fin du délai OU un clic, selon ce qui arrive en premier
+            await Task.WhenAny(Task.Delay(display), _dismissTcs.Task);
 
             await CloseAsync();
         }
 
+        /// <summary>Ferme la notification depuis l'extérieur.</summary>
+        public void Dismiss() => _dismissTcs.TrySetResult();
 
-        public void SetBackgroundColors(string headerColorHex,         // Couleur du header
-                                        string headerTextColorHex,     // Couleur du texte du header
-                                        string firstLoadingColorHex,   // Couleur de fond FirstLoadingProgress
-                                        string loadingColorHex,        // Couleur de la barre LoadingProgress
-                                        string messageTextColorHex,    // Couleur du texte du message
-                                        string progressBarColorHex     // Couleur de la ProgressBar
-                                    )
+        // ------------------------------------------------------------------
+        //  Thème
+        // ------------------------------------------------------------------
+
+        private readonly record struct Palette(string AccentKey, Brush AccentFallback, string Glyph);
+
+        private static Palette GetPalette(NotificationSeverity severity) => severity switch
         {
-            var brushHeader = (SolidColorBrush)new BrushConverter().ConvertFrom(headerColorHex);
-            var brushHeaderText = (SolidColorBrush)new BrushConverter().ConvertFrom(headerTextColorHex);
-            var brushFirstLoading = (SolidColorBrush)new BrushConverter().ConvertFrom(firstLoadingColorHex);
-            var brushLoading = (SolidColorBrush)new BrushConverter().ConvertFrom(loadingColorHex);
-            var brushMessageText = (SolidColorBrush)new BrushConverter().ConvertFrom(messageTextColorHex);
-            var brushProgressBar = (SolidColorBrush)new BrushConverter().ConvertFrom(progressBarColorHex);
+            NotificationSeverity.Success => new("SystemFillColorSuccessBrush", Frozen("#0F7B0F"), "\uE73E"),
+            NotificationSeverity.Warning => new("SystemFillColorCautionBrush", Frozen("#9D5D00"), "\uE7BA"),
+            NotificationSeverity.Error => new("SystemFillColorCriticalBrush", Frozen("#C42B1C"), "\uEA39"),
+            _ => new("SystemAccentColorPrimaryBrush", SystemColors.HighlightBrush, "\uE946")
+        };
 
-            // Header
-            HeaderNotif.Background = brushHeader;
-            if (HeaderNotif.Child is TextBlock headerText)
-                headerText.Foreground = brushHeaderText;
+        private void ApplyTheme(NotificationSeverity severity)
+        {
+            var palette = GetPalette(severity);
 
-            // Fond principal
-            FirstLoadingProgress.Background = brushFirstLoading;
+            // Surface
+            ApplyBrush(Card, Border.BackgroundProperty,
+                       "ControlSolidFillColorDefaultBrush", SystemColors.WindowBrush);
+            ApplyBrush(Card, Border.BorderBrushProperty,
+                       "ControlStrokeColorDefaultBrush", SystemColors.ControlDarkBrush);
 
-            // Barre de progression chargée
-            LoadingProgress.Background = brushLoading;
+            // Textes
+            ApplyBrush(MessageText, System.Windows.Controls.TextBlock.ForegroundProperty,
+                       "TextFillColorPrimaryBrush", SystemColors.ControlTextBrush);
+            ApplyBrush(TitleText, System.Windows.Controls.TextBlock.ForegroundProperty,
+                       "TextFillColorSecondaryBrush", SystemColors.GrayTextBrush);
+            ApplyBrush(CloseText, System.Windows.Controls.TextBlock.ForegroundProperty,
+                       "TextFillColorSecondaryBrush", SystemColors.GrayTextBrush);
 
-            // Message
-            MessageText.Foreground = brushMessageText;
+            // Accent (dépend de la sévérité)
+            ApplyBrush(IconText, System.Windows.Controls.TextBlock.ForegroundProperty, palette.AccentKey, palette.AccentFallback);
+            ApplyBrush(Fill, Border.BackgroundProperty, palette.AccentKey, palette.AccentFallback);
 
-            // ProgressBar
-            ProgressBar.Foreground = brushProgressBar;
+            IconText.Text = palette.Glyph;
         }
 
-        private async void OnNotificationClicked(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        /// <summary>
+        /// Si la clé existe (WPF-UI chargé), on crée une référence dynamique : le brush suit les
+        /// changements de thème en direct. Sinon, on applique le repli SystemColors.
+        /// </summary>
+        private void ApplyBrush(FrameworkElement target, DependencyProperty property, string key, Brush fallback)
         {
-            await CloseAsync();
+            if (TryFindResource(key) is not null)
+                target.SetResourceReference(property, key);
+            else
+                target.SetValue(property, fallback);
         }
+
+        private static SolidColorBrush Frozen(string hex)
+        {
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(hex));
+            brush.Freeze();
+            return brush;
+        }
+
+        // ------------------------------------------------------------------
+        //  Interactions / animations
+        // ------------------------------------------------------------------
+
+        private void OnNotificationClicked(object sender, System.Windows.Input.MouseButtonEventArgs e) =>
+            Dismiss();
 
         private async Task CloseAsync()
         {
-            if (_isClosing)
-                return;
+            // Fige le remplissage à sa valeur actuelle (sinon il retomberait à 0 pendant le fondu)
+            var current = FillScale.ScaleX;
+            FillScale.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            FillScale.ScaleX = current;
 
-            _isClosing = true;
-
-            // Stoppe les animations en cours
-            BeginAnimation(OpacityProperty, null);
-            LoadingProgress.BeginAnimation(WidthProperty, null);
-
-            var fadeOut = new DoubleAnimation(Opacity, 0, TimeSpan.FromMilliseconds(250));
-            _closeTcs = new TaskCompletionSource<bool>();
-
-            fadeOut.Completed += (s, e) =>
-            {
-                _closeTcs.TrySetResult(true);
-            };
-
-            BeginAnimation(OpacityProperty, fadeOut);
-            await _closeTcs.Task;
+            await Task.WhenAll(
+                AnimateAsync(this, OpacityProperty, null, 0, ExitDuration),
+                AnimateAsync(CardTranslate, TranslateTransform.YProperty, null, 8, ExitDuration,
+                             new CubicEase { EasingMode = EasingMode.EaseIn }));
         }
 
+        private static Task AnimateAsync(IAnimatable target, DependencyProperty property,
+                                         double? from, double to, TimeSpan duration,
+                                         IEasingFunction? easing = null)
+        {
+            var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
+            var animation = new DoubleAnimation { From = from, To = to, Duration = duration, EasingFunction = easing };
+            animation.Completed += (_, _) => tcs.TrySetResult();
 
+            target.BeginAnimation(property, animation);
+            return tcs.Task;
+        }
+
+        /// <summary>Clip arrondi : les coins du remplissage suivent ceux de la carte.</summary>
+        private void UpdateClip()
+        {
+            var radius = Math.Max(0, Card.CornerRadius.TopLeft - Card.BorderThickness.Left);
+
+            ClipHost.Clip = new RectangleGeometry(
+                new Rect(0, 0, ClipHost.ActualWidth, ClipHost.ActualHeight), radius, radius);
+        }
     }
 }

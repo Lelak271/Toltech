@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -73,9 +74,18 @@ namespace Toltech.App.ViewModels
             set
             {
                 if (_fixedPart == value) return;
-                _fixedPart = value;
+                if (_fixedPart == value)
+                {
+                    Debug.WriteLine("");
+                }
+                    _fixedPart = value;
                 OnPropertyChanged();
             }
+        }
+
+        public void NotifyFixedPartChanged()
+        {
+            OnPropertyChanged(nameof(FixedPart));
         }
 
         #endregion
@@ -198,17 +208,29 @@ namespace Toltech.App.ViewModels
             if (!ModelValidationHelper.CheckModelActif(false))
                 return;
 
-            Parts.Clear();
+            // Preserve the fixed part from the source of truth.
+            var fixedPartId = _mainVM.PartVM?.FixedPart?.Id;
 
+            // Retrieve updated parts from the database.
             var partsResult = await _domainService.GetAllPartsAsync();
-            if (partsResult.IsFailure) return;
+            if (partsResult.IsFailure)
+                return;
+
+            // Clear and reload the collection.
+            Parts.Clear();
 
             foreach (var part in partsResult.Value.OrderBy(p => p.NamePart))
             {
                 Parts.Add(part);
-                //System.Diagnostics.Debug.WriteLine( $"[PartVM] Ajout - Id={part.Id}, Nom='{part.NamePart}'");
             }
 
+            // Restore the fixed part using its database ID.
+            if (fixedPartId.HasValue)
+            {
+                var restoredPart = Parts.FirstOrDefault(p => p.Id == fixedPartId.Value);
+
+                _mainVM.PartVM!.FixedPart = restoredPart;
+            }
         }
         #endregion
 

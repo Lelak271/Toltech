@@ -19,7 +19,7 @@ namespace Toltech.App.FrontEnd.Controls
                 if (DataContext is PartDBViewModel vm && vm.LoadCommand.CanExecute(null))
                 {
                     // On exécute la commande synchronously ou async selon ton implémentation
-                    vm.LoadCommand.Execute(null);
+                    //vm.LoadCommand.Execute(null);
                 }
             }
             catch (Exception ex)

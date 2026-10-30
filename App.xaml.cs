@@ -7,6 +7,7 @@ using Toltech.App.Services.Dialog;
 using Toltech.App.Services.Logging;
 using Toltech.App.Services.Notification;
 using Toltech.App.ViewModels;
+using Toltech.App.Views;
 using Toltech.Cad.Abstractions;
 using Toltech.FreeCAD;
 using Toltech.Solver.Contracts;
@@ -21,7 +22,7 @@ namespace Toltech.App
         public static IDialogService DialogService { get; set; }
 
         public static UiSettingsService UiSettings { get; private set; }
-
+        public static AppSettings Settings { get; private set; }
         public static MainViewModel MainVM { get; set; }
 
         #region Test cad  TODO
@@ -53,8 +54,9 @@ namespace Toltech.App
             NotificationService = new NotificationService();
             DialogService = new DialogService();
 
-            UiSettings = new UiSettingsService();
+            Settings = new AppSettings();
 
+            UiSettings = new UiSettingsService();
 
             #region CAD INTEGRATION
 
@@ -86,7 +88,11 @@ namespace Toltech.App
             #endregion
         }
 
-
+        /// <summary>
+        /// Initializes the application, sets up logging, creates the main view model, performs asynchronous
+        /// initialization tasks, loads UI settings, applies resource settings, and configures shutdown behavior.
+        /// </summary>
+        /// <param name="e">Event data for the application startup event.</param>
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -99,6 +105,9 @@ namespace Toltech.App
 
                 IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.Create();
 
+                // Assure le chargement initial des ressources.
+                AppResourceLoader.ApplySettings();
+
                 // Création du ViewModel principal.
                 MainVM = new MainViewModel(engine);
 
@@ -107,11 +116,16 @@ namespace Toltech.App
                 await MainVM.InitializeAsync();
 
 
+                // Create the main window with its ViewModel.
+                var mainWindow = new MainWindow(MainVM);
+
+                // Display the main window.
+                mainWindow.Show();
+
                 // Chargement des paramètres d'interface utilisateur.
                 await UiSettings.LoadAsync();
 
-                // Assure le chargement initial des ressources.
-                AppResourceLoader.ApplySettings();
+
 
 
                 //if (!AccessControl.VerifyAccess())
@@ -139,9 +153,12 @@ namespace Toltech.App
             }
         }
 
-
-
-    }
+        protected override async void OnExit(ExitEventArgs e)
+        {
+            Logger.LogInfo("Application fermée");
+            base.OnExit(e);
+        }
+     }
 
 
 

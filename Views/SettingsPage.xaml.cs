@@ -16,7 +16,7 @@ namespace Toltech.App.Views
         {
             InitializeComponent();
 
-            _appSettings = new AppSettings();
+            _appSettings = App.Settings;
             _appSettings.LoadFromUserConfig();
 
             InitializeControlsFromSettings();

@@ -1,17 +1,21 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
-using Toltech.App.FrontEnd.Controls;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.ToltechCalculation.Resux;
 using Toltech.App.Utilities;
+using Toltech.App.Views;
 using Toltech.App.Views.Controls.TreeView;
+using Toltech.App.Services.Logging;
 using Toltech.Solver.Contracts;
+using Toltech.App.Resources;
+using Toltech.App.Resources.ColorTheme;
 
 namespace Toltech.App.ViewModels
 {
@@ -36,6 +40,11 @@ namespace Toltech.App.ViewModels
     public partial class MainViewModel : INotifyPropertyChanged
     {
         #region Fields & Services
+
+        public static ILoggerService _logger;
+        public ILoggerService Logger => _logger;
+
+        private AppSettings _appSettings;
 
         private ResuxSerializer _resuxSerializer;
 
@@ -67,53 +76,90 @@ namespace Toltech.App.ViewModels
 
         #region Pages Instances & Navigation
 
-
-        /// <summary>
-        /// Page séléctionné des TabItems
-        /// Séléction via ViewModel
-        /// </summary>
-        public object SelectedPage
-        {
-            get
-            {
-                switch (SelectedTabIndex)
-                {
-                    case 0:
-                        return HomeVM;
-                    case 1:
-                        return ModelsVM;
-                    case 2:
-                        return DataVM;
-                    case 3:
-                        return RequirementVM;
-                    case 4:
-                        return ResultsVM;
-                    case 5:
-                        return V3DVM;
-                    case 6:
-                        return ResultsVM;
-
-                    default:
-                        return ResultsVM;
-                }
-            }
-        }
-
-
         private int _selectedTabIndex;
         public int SelectedTabIndex
         {
             get => _selectedTabIndex;
             set
             {
-                if (SetField(ref _selectedTabIndex, value))
-                {
-                    OnPropertyChanged(nameof(SelectedPage));
+                if (_selectedTabIndex == value)
+                    return;
 
-                    // Déclenche le chargement de la page associée
-                    //_ = TryLoadAsync(SelectedPage);
-                }
+                _selectedTabIndex = value;
+
+                OnPropertyChanged(nameof(SelectedTabIndex));
+
+                SelectedView = GetOrCreatePage(value);
             }
+        }
+
+        private readonly Dictionary<object, FrameworkElement> _pageCache = new();
+
+
+        private FrameworkElement? _selectedView;
+
+        public FrameworkElement? SelectedView
+        {
+            get => _selectedView;
+            private set
+            {
+                if (ReferenceEquals(_selectedView, value))
+                    return;
+
+                _selectedView = value;
+                OnPropertyChanged(nameof(SelectedView));
+            }
+        }
+        private FrameworkElement GetOrCreatePage(int index)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            if (_pageCache.TryGetValue(index, out var existingPage))
+            {
+                return existingPage;
+            }
+
+            FrameworkElement page = index switch
+            {
+                0 => new HomePage
+                {
+                    DataContext = HomeVM
+                },
+
+                1 => new PageModels
+                {
+                    DataContext = ModelsVM
+                },
+
+                2 => new PageData
+                {
+                    DataContext = DataVM
+                },
+
+                3 => new PageReq
+                {
+                    DataContext = RequirementVM
+                },
+
+                4 => new PageResultats
+                {
+                    DataContext = ResultsVM
+                },
+
+                5 => new VSTWindow
+                {
+                    DataContext = V3DVM
+                },
+
+                _ => new PageResultats
+                {
+                    DataContext = ResultsVM
+                }
+            };
+
+            _pageCache[index] = page;
+
+            return page;
         }
 
         #endregion
@@ -137,13 +183,15 @@ namespace Toltech.App.ViewModels
             ComputeEngine = computeEngine; // Instance Unique
             ComputeValidationService = new ComputeValidationService(ComputeEngine, DatabaseService); // Instance QUASI Unique => Page Resultats
 
+            _logger = App.Logger;
+            _appSettings = App.Settings;
             //MetaModelSyncService.MetaChanged += OnMetaChanged;
 
             DomainService = new DomainService(
                 DatabaseService,
                 MetaModelDatabaseService,
                 ComputeValidationService,
-                App.Logger
+                _logger
                 ); // Instance Unique
 
             TreeNodeService = new TreeNodeService(DatabaseService, DomainService);
@@ -161,6 +209,7 @@ namespace Toltech.App.ViewModels
 
             StatusBarVM = new LogViewerViewModel(App.Logger);
 
+            SelectedView = GetOrCreatePage(0);
         }
 
         private void LoadVM()
@@ -384,6 +433,22 @@ namespace Toltech.App.ViewModels
 
         #endregion
 
+
+        public void ThemeChanged()
+        {
+            // Retrieve the current application theme.
+            AppTheme currentAppTheme = _appSettings.Theme;
+
+            // Switch between Light and Dark themes.
+            _appSettings.Theme = currentAppTheme == AppTheme.Light
+                ? AppTheme.Dark
+                : AppTheme.Light;
+
+            _appSettings.SaveToUserConfig();
+
+            // Log the theme change.
+            Debug.WriteLine($"Application theme changed to: {_appSettings.Theme}");
+        }
 
     }
 

@@ -35,6 +35,9 @@ namespace Toltech.App.Properties
 
         public UiSettings Current { get; private set; } = new();
 
+        /// <summary>
+        /// Initializes a new instance of the UiSettingsService class.
+        /// </summary>
         public UiSettingsService()
         {
         }

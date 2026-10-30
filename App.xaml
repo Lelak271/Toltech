@@ -5,7 +5,6 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:Toltech.App" 
-             StartupUri="Views/Pages/MainWindow.xaml"
              ShutdownMode="OnExplicitShutdown"
              >
     <Application.Resources>

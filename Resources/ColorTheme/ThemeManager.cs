@@ -15,8 +15,6 @@ namespace Toltech.App.Resources.ColorTheme
 
     public static class ThemeManager
     {
-        private const string FluentAssemblyUri = "pack://application:,,,/Fluent;component/Themes/";
-
         private static AppTheme _currentTheme = AppTheme.Light;
         public static AppTheme CurrentTheme => _currentTheme;
         public static AppTheme ThemeFallBack => AppTheme.Light;

@@ -5,8 +5,8 @@ using Toltech.App.Services.Notification;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.Utilities;
 using Toltech.App.Utilities.Result;
-//using Toltech.App.ViewModels;
 using static Toltech.App.Services.EventsManager;
+using System.Windows.Media.Imaging;
 
 namespace Toltech.App.Services
 {
@@ -452,7 +452,7 @@ namespace Toltech.App.Services
             try
             {
                 if (part == null)
-                    return Result<List<Part>>.Failure("Part is null", ErrorCode.Unknown);
+                    return Result<List<Part>>.Failure("Part is null. Impossible d'enregistrer la pièce fixe.", ErrorCode.Unknown);
 
                 var result = await _databaseService.SetFixedPartAsync(part);
 
@@ -1423,6 +1423,37 @@ namespace Toltech.App.Services
             };
         }
 
+        /// <summary>
+        /// Construit un dictionnaire associant l'identifiant de chaque pièce à son image.
+        /// Les pièces sans image sont ignorées.
+        /// </summary>
+        /// <returns>Dictionnaire associant l'ID de la pièce à son image.</returns>
+        public async Task<Dictionary<int, BitmapImage>> GetPartImagesAsync()
+        {
+            var parts = await _databaseService.GetAllPartsAsync();
+
+            var images = new Dictionary<int, BitmapImage>();
+
+            foreach (var part in parts)
+            {
+                // Ignore les pièces sans image.
+                if (part.ImagePart == null || part.ImagePart.Length == 0)
+                    continue;
+
+                using var stream = new MemoryStream(part.ImagePart);
+
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = stream;
+                image.EndInit();
+                image.Freeze();
+
+                images[part.Id] = image;
+            }
+
+            return images;
+        }
 
         #endregion
 

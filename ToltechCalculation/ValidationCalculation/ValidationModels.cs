@@ -96,6 +96,13 @@ namespace Toltech.App.ToltechCalculation.Validation
                 "La validation n'a pas pu être effectuée.\nAucune donnée exploitable n'a été retournée."
         };
 
+        public static readonly ValidationRule NoFixPart = new()
+        {
+            Category        = ValidationCategory.EmptyPartReference,
+            MessageTemplate = _ =>
+                "La validation du graphe est incomplete car aucune pièce fixe n'a été definie."
+        };
+
         public static readonly ValidationRule ValidationSuccess = new()
         {
             Category        = ValidationCategory.GraphCoherence,

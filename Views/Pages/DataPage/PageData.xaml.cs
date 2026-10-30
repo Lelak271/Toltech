@@ -3,8 +3,10 @@ using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Toltech.App.FrontEnd.Controls;
+using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.ViewModels;
+using static Toltech.App.FrontEnd.Controls.Dashboard.BarChartControl;
 
 namespace Toltech.App.Views
 {
@@ -60,6 +62,23 @@ namespace Toltech.App.Views
 
         #region Fonction UI
 
+        private async void FixedPartComboBox_SelectionChanged(
+                            object sender,
+                            SelectionChangedEventArgs e)
+        {
+            // Ignorer les changements provoqués par le rafraîchissement des éléments.
+            if (e.AddedItems.Count == 0)
+                return;
+
+            if (DataContext is not DatasViewModel dataVM)
+                return;
+
+            if (e.AddedItems[0] is not Part selectedPart)
+                return;
+
+            await dataVM.UpdateFixedPartAsync(selectedPart);
+        }
+
         #region Fonctions liées aux Buttons du HeaderPage3
 
         // Appel de la fonction Save Data
@@ -85,8 +104,6 @@ namespace Toltech.App.Views
         }
 
         #endregion
-
-
 
         #region Gestion Button Show Hide
 

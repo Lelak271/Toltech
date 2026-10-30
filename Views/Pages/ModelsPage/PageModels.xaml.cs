@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using Toltech.App.FrontEnd.Controls;
 using Toltech.App.Services;
 
@@ -17,6 +18,9 @@ namespace Toltech.App.Views
         public PageModels()
         {
             InitializeComponent();
+        }
+        private async void Page_UnLoaded(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
