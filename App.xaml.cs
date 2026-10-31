@@ -106,7 +106,7 @@ namespace Toltech.App
                 IComputeEngine engine = ToltechCalculation.ComputeEngineFactory.Create();
 
                 // Assure le chargement initial des ressources.
-                AppResourceLoader.ApplySettings();
+                AppResourceLoader.ApplySettings(Settings);
 
                 // Création du ViewModel principal.
                 MainVM = new MainViewModel(engine);

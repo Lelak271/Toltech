@@ -39,6 +39,7 @@ namespace Toltech.App.ViewModels
             SaveCommand = new AsyncRelayCommand(SaveAsync);
             DeleteCommand = new AsyncRelayCommand(DeleteAsync);
             InsertImageCommand = new AsyncRelayCommand(InsertImageAsync, () => SelectedParts != null);
+            EraseImageCommand = new AsyncRelayCommand(EraseImageAsync, () => SelectedParts != null);
             #endregion
 
             #region Events
@@ -96,7 +97,7 @@ namespace Toltech.App.ViewModels
         public ICommand CreateCommand { get; }
         public ICommand SaveCommand { get; }
         public ICommand DeleteCommand { get; }
-        public ICommand TestCommand { get; }
+        public ICommand EraseImageCommand { get; }
         public ICommand InsertImageCommand { get; }
 
         #endregion
@@ -397,6 +398,23 @@ namespace Toltech.App.ViewModels
 
             // Mettre à jour la propriété ImagePart de la ligne sélectionnée
             selectedPart.ImagePart = imageBytes;
+
+            // Sauvegarde en base
+            await _domainService.UpdatePartsAsync(selectedPart);
+
+            // Notifier l'UI si nécessaire
+            OnPropertyChanged(nameof(SelectedParts));
+        }
+
+        private async Task EraseImageAsync()
+        {
+            // On prend la première ligne sélectionnée uniquement
+            var selectedPart = SelectedParts.FirstOrDefault();
+            if (selectedPart == null)
+                return;
+
+            // Mettre à jour la propriété ImagePart de la ligne sélectionnée
+            selectedPart.ImagePart = null;
 
             // Sauvegarde en base
             await _domainService.UpdatePartsAsync(selectedPart);

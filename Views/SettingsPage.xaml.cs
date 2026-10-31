@@ -124,7 +124,7 @@ namespace Toltech.App.Views
         {
             _appSettings.Language = GetSelectedEnumFromComboBox<SupportedLanguage>(LanguageComboBox);
             _appSettings.LengthUnit = GetSelectedRadioButtonTagByGroupName<SupportedLengthUnit>(UnitStack, "Units") ?? _appSettings.LengthUnit;
-            _appSettings.AngleUnit = GetSelectedRadioButtonTagByGroupName<SupportedAnglehUnit>(AngleStack, "angle") ?? _appSettings.AngleUnit;
+            _appSettings.AngleUnit = GetSelectedRadioButtonTagByGroupName<SupportedAngleUnit>(AngleStack, "angle") ?? _appSettings.AngleUnit;
             _appSettings.DensityUnit = GetSelectedEnumFromComboBox<SupportedDensityUnit>(DensityUnitComboBox);
             _appSettings.Theme = GetSelectedEnumFromListBox<AppTheme>(ThemeList);
 

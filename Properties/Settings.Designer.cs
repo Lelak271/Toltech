@@ -121,12 +121,12 @@ namespace Toltech.App.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Millimeter")]
-        public string DefaultUnit {
+        public string LenghtUnit {
             get {
-                return ((string)(this["DefaultUnit"]));
+                return ((string)(this["LenghtUnit"]));
             }
             set {
-                this["DefaultUnit"] = value;
+                this["LenghtUnit"] = value;
             }
         }
         

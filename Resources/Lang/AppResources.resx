@@ -714,4 +714,16 @@
   <data name="OtherActions" xml:space="preserve">
     <value>More action</value>
   </data>
+  <data name="DatabasePartTitle" xml:space="preserve">
+    <value>Database - Parts</value>
+  </data>
+  <data name="InsertPicture" xml:space="preserve">
+    <value>Insert picture</value>
+  </data>
+  <data name="ActiveModelParts" xml:space="preserve">
+    <value>Active model parts </value>
+  </data>
+  <data name="Part_in_the_database" xml:space="preserve">
+    <value>part(s) in the database </value>
+  </data>
 </root>

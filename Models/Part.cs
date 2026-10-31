@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using DocumentFormat.OpenXml.EMMA;
-using DocumentFormat.OpenXml.Wordprocessing;
+﻿using System.Runtime.CompilerServices;
 using SQLite;
 using Toltech.App.ViewModels;
 
@@ -19,7 +11,7 @@ namespace Toltech.App.Models
         private int _id;
         private string _namePart;
         private double _masseVol;
-        private byte[] _imagePart; 
+        private byte[] _imagePart;
         private string _comment;
         private bool _isFixed;
         private bool _isActive;

@@ -426,7 +426,7 @@ namespace Toltech.App.ViewModels
         //public ICommand CreatePartCommand => PartVM.CreateCommand;
         public ICommand SaveCommand => PartVM.SaveCommand;
         //public ICommand DeletePartCommand => PartVM.DeleteCommand;
-        public ICommand TestCommand => PartVM.TestCommand;
+        public ICommand EraseImageCommand => PartVM.EraseImageCommand;
         public ICommand InsertImageCommand => PartVM.InsertImageCommand;
 
         #endregion

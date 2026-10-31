@@ -70,6 +70,15 @@ namespace Toltech.App.Resources.Lang {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Active model parts .
+        /// </summary>
+        public static string ActiveModelParts {
+            get {
+                return ResourceManager.GetString("ActiveModelParts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Analyse.
         /// </summary>
         public static string AnalyseWord {
@@ -309,6 +318,15 @@ namespace Toltech.App.Resources.Lang {
         public static string CreateWord {
             get {
                 return ResourceManager.GetString("CreateWord", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Database - Parts.
+        /// </summary>
+        public static string DatabasePartTitle {
+            get {
+                return ResourceManager.GetString("DatabasePartTitle", resourceCulture);
             }
         }
         
@@ -835,6 +853,15 @@ namespace Toltech.App.Resources.Lang {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Insert picture.
+        /// </summary>
+        public static string InsertPicture {
+            get {
+                return ResourceManager.GetString("InsertPicture", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Italian.
         /// </summary>
         public static string ItalianLabel {
@@ -1155,6 +1182,15 @@ namespace Toltech.App.Resources.Lang {
         public static string Part_Fixed {
             get {
                 return ResourceManager.GetString("Part_Fixed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à part(s) in the database .
+        /// </summary>
+        public static string Part_in_the_database {
+            get {
+                return ResourceManager.GetString("Part_in_the_database", resourceCulture);
             }
         }
         

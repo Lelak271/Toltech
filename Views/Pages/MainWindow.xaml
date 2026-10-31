@@ -232,14 +232,6 @@
              Title="{Binding ModelName, StringFormat='TOLTECH Application - {0}'}"
              MaximizeClicked="Maximize_Click"
              MinimizeClicked="Minimize_Click">
-            <!--<ui:TitleBar.TrailingContent>
-                <ToggleButton x:Name="ThemeTdoggle"
-                      Style="{StaticResource ThemeToggleStyle}"
-                      Margin="0,0,0,10"
-                      VerticalAlignment="Center"
-                      ToolTip="Basculer entre mode clair et mode sombre"
-                      Click="Minimize_Click" />
-            </ui:TitleBar.TrailingContent>-->
         </ui:TitleBar>
 
         <!-- ======================= "RIBBON" (TabControl) ======================= -->

@@ -26,7 +26,7 @@
     <Setting Name="RecentFiles" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="DefaultUnit" Type="System.String" Scope="User">
+    <Setting Name="LenghtUnit" Type="System.String" Scope="User">
       <Value Profile="(Default)">Millimeter</Value>
     </Setting>
     <Setting Name="DensityUnit" Type="System.String" Scope="User">

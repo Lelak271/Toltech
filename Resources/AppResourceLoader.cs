@@ -1,164 +1,35 @@
 ﻿using System.Windows;
-using Toltech.App.Properties;
 using Toltech.App.Resources.ColorTheme;
 using Toltech.App.Resources.Lang;
 
 namespace Toltech.App.Resources
 {
-
-    #region Other ressources
-
     /// <summary>
-    /// Unités de longueur
-    /// </summary>
-    public enum SupportedLengthUnit
-    {
-        Millimeter,  // mm
-        Inch         // in
-    }
-    /// <summary>
-    /// Unités d'angle
-    /// </summary>
-    public enum SupportedAnglehUnit
-    {
-        Degre,  // mm
-        Radian         // in
-    }
-
-    /// <summary>
-    /// Unités de masse volumique
-    /// </summary>
-    public enum SupportedDensityUnit
-    {
-        KgPerCubicMeter, // kg/m³
-        GramPerCm3,      // g/cm³
-        PoundPerCubicFoot, // lb/ft³
-        PoundPerCubicInch  // lb/in³
-    }
-
-    #endregion
-
-
-    /// <summary>
-    /// Propriétés modifiables par l'utilisateur 
-    /// </summary>
-    public class AppSettings
-    {
-        public SupportedLanguage Language { get; set; } = SupportedLanguage.fr;
-        public SupportedLengthUnit LengthUnit { get; set; } = SupportedLengthUnit.Millimeter;
-        public SupportedAnglehUnit AngleUnit { get; set; } = SupportedAnglehUnit.Degre;
-        public SupportedDensityUnit DensityUnit { get; set; } = SupportedDensityUnit.KgPerCubicMeter;
-        public AppTheme Theme { get; set; } = AppTheme.Light;
-
-        public AppSettings()
-        {
-            // Permet la prise en compte des valeur User lors de l'initialisation de l'application
-            LoadFromUserConfig();
-        }
-
-        // --- Méthodes pour charger depuis les paramètres utilisateur ---
-        public void LoadFromUserConfig()
-        {
-            // Langue
-            if (Enum.TryParse(Settings.Default.Language, out SupportedLanguage lang))
-                Language = lang;
-
-            // Unité de longueur
-            if (Enum.TryParse(Settings.Default.DefaultUnit, out SupportedLengthUnit lengthUnit))
-                LengthUnit = lengthUnit;
-
-            // Unité de masse volumique
-            if (Enum.TryParse(Settings.Default.DensityUnit, out SupportedDensityUnit densityUnit))
-                DensityUnit = densityUnit;
-
-            // Thème
-            if (Enum.TryParse(Settings.Default.Theme, out AppTheme theme))
-                Theme = theme;
-
-        }
-
-        // --- Méthodes pour sauvegarder dans les paramètres utilisateur ---
-        public void SaveToUserConfig()
-        {
-            Settings.Default.Language = Language.ToString();
-            Settings.Default.DefaultUnit = LengthUnit.ToString();
-            Settings.Default.AngleUnit = AngleUnit.ToString();
-            Settings.Default.DensityUnit = DensityUnit.ToString();
-            Settings.Default.Theme = Theme.ToString();
-
-            Settings.Default.Save();
-
-            // Appliquer les ressources mises à jour (langue, thème…)
-            AppResourceLoader.ApplySettings();
-        }
-    }
-
-    /// <summary>
-    /// Chargement centraliser des ressources
+    /// Projette un <see cref="AppSettings"/> vers <c>Application.Resources</c>
+    /// pour les <c>DynamicResource</c> du XAML. Ne parse rien et ne définit aucun défaut.
     /// </summary>
     public static class AppResourceLoader
     {
-
-        /// <summary>
-        /// Charge les paramètres utilisateur dans les ressources dynamiques de l'application avec fallback.
-        /// </summary>
-        private static void LoadSettingsToResources()
+        public static void ApplySettings(AppSettings s)
         {
-            // --- Unités de longueur ---
-            if (Enum.TryParse(Properties.Settings.Default.DefaultUnit, out SupportedLengthUnit lengthUnit))
-            {
-                Application.Current.Resources["DefaultUnit"] = lengthUnit.ToString();
-            }
-            else
-            {
-                Application.Current.Resources["DefaultUnit"] = SupportedLengthUnit.Millimeter.ToString(); // valeur par défaut
-            }
+            var res = Application.Current.Resources;
 
-            // --- Unités de angle ---
-            if (Enum.TryParse(Properties.Settings.Default.AngleUnit, out SupportedAnglehUnit angleUnit))
-            {
-                Application.Current.Resources["DefaultAngle"] = angleUnit.ToString();
-            }
-            else
-            {
-                Application.Current.Resources["DefaultAngle"] = SupportedAnglehUnit.Degre.ToString(); // valeur par défaut
-            }
+            // Noms d'enum (pour les converters / sélections).
+            res["DefaultUnit"] = s.LengthUnit.ToString();
+            res["DefaultAngle"] = s.AngleUnit.ToString();
+            res["DensityUnit"] = s.DensityUnit.ToString();
+            res["Language"] = s.Language.ToString();
+            res["Theme"] = s.Theme.ToString();
 
-            // --- Unités de masse volumique ---
-            if (Enum.TryParse(Properties.Settings.Default.DensityUnit, out SupportedDensityUnit densityUnit))
-            {
-                Application.Current.Resources["DensityUnit"] = densityUnit.ToString();
-            }
-            else
-            {
-                Application.Current.Resources["DensityUnit"] = SupportedDensityUnit.KgPerCubicMeter.ToString(); // valeur par défaut
-            }
-
-            // --- Langue ---
-            Application.Current.Resources["Language"] =
-                string.IsNullOrWhiteSpace(Properties.Settings.Default.Language)
-                ? LanguageManager.LanguageFallBack.ToString()
-                : Properties.Settings.Default.Language.ToString();
-
-            // --- Thème ---
-            Application.Current.Resources["Theme"] =
-                string.IsNullOrWhiteSpace(Properties.Settings.Default.Theme)
-                ? ThemeManager.ThemeFallBack.ToString()
-                : Properties.Settings.Default.Theme.ToString();
-        }
-
-        /// <summary>
-        /// Application des settings actuels 
-        /// </summary>
-        public static async Task ApplySettings()
-        {
-            LoadSettingsToResources();
+            // Symboles affichables (en-têtes de colonnes, labels...).
+            // Chaque affectation REMPLACE la ressource, ce qui déclenche
+            // la mise à jour des DynamicResource.
+            res["LengthUnitSymbol"] = s.LengthUnit.Symbol();
+            res["AngleUnitSymbol"] = s.AngleUnit.Symbol();
+            res["DensityUnitSymbol"] = s.DensityUnit.Symbol();
 
             LanguageManager.ApplyFromSettings();
             ThemeManager.ApplyFromSettings();
         }
-
-
-
     }
 }
