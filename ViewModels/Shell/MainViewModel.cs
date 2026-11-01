@@ -6,16 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
 using Toltech.App.Models;
+using Toltech.App.Resources;
 using Toltech.App.Services;
+using Toltech.App.Services.Logging;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.ToltechCalculation.Resux;
 using Toltech.App.Utilities;
 using Toltech.App.Views;
 using Toltech.App.Views.Controls.TreeView;
-using Toltech.App.Services.Logging;
 using Toltech.Solver.Contracts;
-using Toltech.App.Resources;
-using Toltech.App.Resources.ColorTheme;
 
 namespace Toltech.App.ViewModels
 {
@@ -436,18 +435,10 @@ namespace Toltech.App.ViewModels
 
         public void ThemeChanged()
         {
-            // Retrieve the current application theme.
-            AppTheme currentAppTheme = _appSettings.Theme;
-
-            // Switch between Light and Dark themes.
-            _appSettings.Theme = currentAppTheme == AppTheme.Light
-                ? AppTheme.Dark
-                : AppTheme.Light;
-
             _appSettings.SaveToUserConfig();
 
             // Log the theme change.
-            Debug.WriteLine($"Application theme changed to: {_appSettings.Theme}");
+            _logger.LogInfo($"Application theme changed to: {_appSettings.Theme}");
         }
 
     }

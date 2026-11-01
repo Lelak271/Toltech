@@ -104,4 +104,36 @@ namespace Toltech.App.Resources.Lang
         }
    
     }
+
+    public static class LanguageExtensions
+    {
+
+        /// <summary>Nom affichable, traduit dans la langue courante de l'interface.</summary>
+        public static string DisplayName(this SupportedLanguage l)
+        {
+            string key = l switch
+            {
+                SupportedLanguage.fr => "FrenchLabel",
+                SupportedLanguage.en => "EnglishLabel",
+                SupportedLanguage.it => "ItalianLabel",
+                _ => string.Empty
+            };
+
+            if (key.Length == 0)
+                return l.ToString();
+
+            // Même source que {lang:Loc} : le ResourceManager, avec la culture courante.
+            return AppResources.ResourceManager.GetString(key, LocalizationManager.Instance.CurrentCulture)
+                   ?? l.ToString();
+        }
+    }
+
+    public static class LanguageOptions
+    {
+        /// <summary>Construit la liste des choix à partir de l'enum et de sa fonction Symbol.</summary>
+        public static IReadOnlyList<UnitOption<T>> Of<T>(Func<T, string> symbol) where T : struct, Enum =>
+            Enum.GetValues<T>()
+                .Select(u => new UnitOption<T>(u, symbol(u)))
+                .ToList();
+    }
 }

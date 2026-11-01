@@ -1,277 +1,285 @@
-﻿<Window x:Class="Toltech.App.Views.SettingsPage"
+﻿<ui:FluentWindow x:Class="Toltech.App.Views.SettingsPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
         xmlns:conv="clr-namespace:Toltech.App.Converters"
+        xmlns:res="clr-namespace:Toltech.App.Resources"
+        xmlns:theme="clr-namespace:Toltech.App.Resources.ColorTheme"
         mc:Ignorable="d"
         Title="{lang:Loc ApplicationParameter}"
-        Height="580" 
-        Width="700"
-        ResizeMode="NoResize"
+        Height="680"
+        Width="620"
+        ResizeMode="CanMinimize"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource SecondaryBackgroundBrush}">
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica">
 
-    <Window.Resources>
-
+    <ui:FluentWindow.Resources>
         <conv:CultureToFlagConverter x:Key="CultureToFlag"/>
-        
-        <Style TargetType="RadioButton"  >
-            <Setter Property="Margin" Value="0 4 16 4"/>
-        </Style>
-    </Window.Resources>
+        <conv:EnumToBooleanConverter x:Key="EnumToBool"/>
 
-    <Grid Margin="16">
+        <Style TargetType="RadioButton" BasedOn="{StaticResource {x:Type RadioButton}}">
+            <Setter Property="Margin" Value="0,4,16,4"/>
+        </Style>
+
+        <!-- Carte de section -->
+        <Style x:Key="SectionCard" TargetType="Border">
+            <Setter Property="Padding" Value="20,16"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+        </Style>
+
+        <!-- Titre de section -->
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Style>
+    </ui:FluentWindow.Resources>
+
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- En-tête -->
-        <StackPanel x:Name="Header" Grid.Row="0">
-            <TabControl Name="TabNavigation" Width="auto" >
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="Onglet 1"  Width="auto"/>
-                <TabItem Style="{DynamicResource TabItemStyle}" Header="Onglet 2" Width="auto"    HorizontalContentAlignment="Center"  />
-            </TabControl>
-        </StackPanel>
+        <!-- Barre de titre -->
+        <ui:TitleBar Grid.Row="0"
+                     Title="{lang:Loc ApplicationParameter}"
+                     ShowMaximize="False"/>
 
         <!-- Contenu principal -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="0 5 0 0" Width="400">
-                <!-- Section Langue -->
-                <TextBlock Text="{lang:Loc LanguageLabel}" FontWeight="ExtraBold" FontSize="15"/>
-                <StackPanel Orientation="Horizontal" Margin="0 15 "  HorizontalAlignment="Center">
-                    <ComboBox x:Name="LanguageComboBox" 
-                              SelectionChanged="LanguageComboBox_SelectionChanged"
-                              Width="100">
-                        
-                        <ComboBoxItem Content="{lang:Loc FrenchLabel}" Tag="fr"/>
-                        <ComboBoxItem Content="{lang:Loc EnglishLabel}" Tag="en"/>
-                        <ComboBoxItem Content="{lang:Loc ItalianLabel}" Tag="it"/>
-                    </ComboBox>
+            <StackPanel Margin="24,8,24,8"
+                        Selector.SelectionChanged="OnSettingChanged"
+                        RadioButton.Checked="OnSettingChanged">
 
-                    <Image x:Name="Flag"
-                           Width="32"
-                           Height="32"
-                           Margin="15,0"
-                           Source="{Binding Source={x:Static lang:LocalizationManager.Instance}, 
-                        Converter={StaticResource CultureToFlag}}">
-                        <Image.ToolTip>
-                            <ToolTip>
-                                <StackPanel>
-                                <TextBlock Text="{lang:Loc ToolTipFlag}"
-                                           TextWrapping="Wrap"
-                                           MaxWidth="300" />
-                                    <Image Source="/Asset/Flags/map_fr.png"
-                                           Height="32">
-
-                                        <Image.Style>
-                                            <Style TargetType="Image">
-                                                <!-- Masqué par défaut -->
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-
-                                                <Style.Triggers>
-                                                    <DataTrigger 
-                                                        Binding="{Binding Source={x:Static lang:LocalizationManager.Instance}, 
-                                                                          Path=CurrentCulture.TwoLetterISOLanguageName}"
-                                                        Value="fr">
-
-                                                        <Setter Property="Visibility" Value="Visible"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Image.Style>
-
-                                    </Image>
-                                </StackPanel>
-                            </ToolTip>
-                        </Image.ToolTip>
-                    </Image>
-                </StackPanel>
-                
-                <!-- Section Unités -->
-                <TextBlock Text="{lang:Loc DefaultUnit}" FontWeight="ExtraBold" FontSize="15"/>
-                <Grid  HorizontalAlignment="Stretch" Margin="0 0 0 0">
-                    <StackPanel Orientation="Vertical" Margin="0 15 "  HorizontalAlignment="Center">
-                        <StackPanel x:Name="UnitStack" Orientation="Horizontal" >
-                            <RadioButton x:Name="rbMillimeters" 
-                                         Grid.Column="0" 
-                                         Content="{lang:Loc Millimeters}" 
-                                         GroupName="Units" 
-                                         Tag="Millimeter" 
-                                         IsChecked="True"/>
-                            <RadioButton x:Name="rbInches" 
-                                         Grid.Column="1"
-                                         Content="{lang:Loc Inche}" 
-                                         GroupName="Units" 
-                                         Tag="Inch"/>
+                <!-- ===================== Langue ===================== -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <ui:SymbolIcon Symbol="Translate24" FontSize="20" Margin="0,0,10,0"
+                                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="{lang:Loc LanguageLabel}" Style="{StaticResource SectionTitle}"/>
                         </StackPanel>
-                        
-                        <Separator Margin="0 5"/>
 
-                        <StackPanel Orientation="Horizontal" x:Name="AngleStack" >
-                            <RadioButton x:Name="rbdegree" 
-                                         Grid.Column="3" 
-                                         Content="{lang:Loc Degree}"
-                                         GroupName="angle" 
-                                         Tag="Degre"/>
-                            <RadioButton x:Name="rbradian" 
-                                         Grid.Column="4" 
-                                         Content="{lang:Loc RadianRad}"
-                                         GroupName="angle" 
-                                         Tag="Radian"/>
-                       </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <ComboBox x:Name="LanguageComboBox"
+                                      Width="170"
+                                      VerticalAlignment="Center"
+                                      SelectedValue="{Binding Language, Mode=TwoWay}"
+                                      SelectionChanged="LanguageComboBox_SelectionChanged"
+                                      DisplayMemberPath="Symbol"
+                                      SelectedValuePath="Value"/>
 
-                        <Separator Margin="0 5"/>
-
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                            <ComboBox x:Name="DensityUnitComboBox" Width="120">
-                                <!-- Unités SI / européennes -->
-                                <ComboBoxItem Content="kg/m³" 
-                                              Tag="KgPerCubicMeter"
-                                              IsSelected="True"/>
-                                <ComboBoxItem Content="g/cm³"
-                                              Tag="GramPerCm3"/>
-
-                                <!-- Séparateur visuel -->
-                                <Separator/>
-
-                                <!-- Unités anglaises / impériales -->
-                                <ComboBoxItem Content="lb/ft³" 
-                                              Tag="PoundPerCubicFoot"/>
-                                <ComboBoxItem Content="lb/in³"
-                                              Tag="PoundPerCubicInch"/>
-                            </ComboBox>
+                            <Image x:Name="Flag"
+                                   Width="32" Height="32"
+                                   Margin="16,0,0,0"
+                                   Source="{Binding Source={x:Static lang:LocalizationManager.Instance},
+                                                    Converter={StaticResource CultureToFlag}}">
+                                <Image.ToolTip>
+                                    <ToolTip>
+                                        <StackPanel>
+                                            <TextBlock Text="{lang:Loc ToolTipFlag}"
+                                                       TextWrapping="Wrap"
+                                                       MaxWidth="300"/>
+                                            <Image Source="/Asset/Flags/map_fr.png" Height="32">
+                                                <Image.Style>
+                                                    <Style TargetType="Image">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Source={x:Static lang:LocalizationManager.Instance},
+                                                                                           Path=CurrentCulture.TwoLetterISOLanguageName}"
+                                                                         Value="fr">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                        </StackPanel>
+                                    </ToolTip>
+                                </Image.ToolTip>
+                            </Image>
                         </StackPanel>
                     </StackPanel>
-    </Grid>
+                </Border>
 
-                <!-- Section Thème -->
-                <TextBlock Text="{lang:Loc ApplicationTheme}" 
-                           FontWeight="ExtraBold" 
-                           FontSize="15"/>
-                <ListBox x:Name="ThemeList"
-                         SelectionMode="Single"
-                         BorderThickness="0"
-                         Background="Transparent"
-                         HorizontalContentAlignment="Stretch"
-                         Margin="0 5 0 0"
-                         >
-
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" />
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Margin" Value="15 0"/>
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <Border x:Name="TileBorder"
-                                CornerRadius="6"
-                                BorderThickness="2"
-                                BorderBrush="Transparent"
-                                Padding="8">
-
-                                            <ContentPresenter/>
-
-                                        </Border>
-
-                                        <ControlTemplate.Triggers>
-
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="TileBorder"
-                                        Property="BorderBrush"
-                                        Value="#0078D4"/>
-                                            </Trigger>
-
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter TargetName="TileBorder"
-                                        Property="Opacity"
-                                        Value="0.9"/>
-                                            </Trigger>
-
-                                        </ControlTemplate.Triggers>
-
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-
-                    <!-- Items -->
-
-                    <ListBoxItem Tag="Light" >
-                        <StackPanel>
-                            <Border Width="40" Height="40" Background="{DynamicResource IconPrimaryBrush}">
-                                <Border.OpacityMask>
-                                    <ImageBrush ImageSource="/Asset/LightMode.png" 
-                                               Stretch="Uniform" />
-                                </Border.OpacityMask>
-                            </Border>
-                            <TextBlock Text="Clair"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,6,0,0"/>
+                <!-- ===================== Unités ===================== -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                            <ui:SymbolIcon Symbol="Ruler24" FontSize="20" Margin="0,0,10,0"
+                                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="{lang:Loc DefaultUnit}" Style="{StaticResource SectionTitle}"/>
                         </StackPanel>
-                    </ListBoxItem>
 
-                    <ListBoxItem Tag="Dark" IsSelected="True">
-                        <StackPanel>
-                            <Border Width="40" Height="40" Background="{DynamicResource IconPrimaryBrush}">
-                                <Border.OpacityMask>
-                                    <ImageBrush ImageSource="/Asset/DarkMode.png" 
-                                               Stretch="Uniform" />
-                                </Border.OpacityMask>
-                            </Border>
-                            <TextBlock Text="Sombre"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,6,0,0"/>
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <RadioButton GroupName="Units"
+                                             Content="{lang:Loc Millimeters}"
+                                             IsChecked="{Binding LengthUnit, Mode=TwoWay,
+                                                         Converter={StaticResource EnumToBool},
+                                                         ConverterParameter={x:Static res:SupportedLengthUnit.Millimeter}}"/>
+                                <RadioButton GroupName="Units"
+                                             Content="{lang:Loc Inche}"
+                                             IsChecked="{Binding LengthUnit, Mode=TwoWay,
+                                                         Converter={StaticResource EnumToBool},
+                                                         ConverterParameter={x:Static res:SupportedLengthUnit.Inch}}"/>
+                            </StackPanel>
+
+                            <Separator Margin="0,8"/>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <RadioButton GroupName="Angle"
+                                             Content="{lang:Loc Degree}"
+                                             IsChecked="{Binding AngleUnit, Mode=TwoWay,
+                                                         Converter={StaticResource EnumToBool},
+                                                         ConverterParameter={x:Static res:SupportedAngleUnit.Degre}}"/>
+                                <RadioButton GroupName="Angle"
+                                             Content="{lang:Loc RadianRad}"
+                                             IsChecked="{Binding AngleUnit, Mode=TwoWay,
+                                                         Converter={StaticResource EnumToBool},
+                                                         ConverterParameter={x:Static res:SupportedAngleUnit.Radian}}"/>
+                            </StackPanel>
+
+                            <Separator Margin="0,8,0,12"/>
+
+                            <ComboBox x:Name="DensityUnitComboBox"
+                                      Width="140"
+                                      HorizontalAlignment="Center"
+                                      DisplayMemberPath="Symbol"
+                                      SelectedValuePath="Value"
+                                      SelectedValue="{Binding DensityUnit, Mode=TwoWay}"/>
                         </StackPanel>
-                    </ListBoxItem>
+                    </StackPanel>
+                </Border>
 
-                    <ListBoxItem Tag="System">
-                        <StackPanel>
-                            <Border Width="40" Height="40" Background="{DynamicResource IconPrimaryBrush}">
-                                <Border.OpacityMask>
-                                    <ImageBrush ImageSource="/Asset/SystemMode.png" 
-                                    Stretch="Uniform" />
-                                </Border.OpacityMask>
-                            </Border>
-                            <TextBlock Text="Système"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,6,0,0"/>
+                <!-- ===================== Thème ===================== -->
+                <Border Style="{StaticResource SectionCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <ui:SymbolIcon Symbol="PaintBrush24" FontSize="20" Margin="0,0,10,0"
+                                           Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="{lang:Loc ApplicationTheme}" Style="{StaticResource SectionTitle}"/>
                         </StackPanel>
-                    </ListBoxItem>
 
-                </ListBox>
+                        <ListBox x:Name="ThemeList"
+                                 SelectionMode="Single"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 HorizontalContentAlignment="Stretch"
+                                 SelectedValuePath="Tag"
+                                 SelectedValue="{Binding Theme, Mode=TwoWay}">
 
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Margin" Value="8,0"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <Border x:Name="TileBorder"
+                                                        Width="96"
+                                                        CornerRadius="8"
+                                                        BorderThickness="2"
+                                                        BorderBrush="Transparent"
+                                                        Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                                                        Padding="8,12">
+                                                    <ContentPresenter HorizontalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="TileBorder" Property="Background"
+                                                                Value="{DynamicResource ControlFillColorTertiaryBrush}"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsSelected" Value="True">
+                                                        <Setter TargetName="TileBorder" Property="BorderBrush"
+                                                                Value="{DynamicResource AccentFillColorDefaultBrush}"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            
+                            <ListBoxItem Tag="{x:Static theme:AppTheme.Light}">
+                                <StackPanel>
+                                    <ui:SymbolIcon Symbol="WeatherSunny24"
+                           FontSize="32"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Clair" HorizontalAlignment="Center" Margin="0,8,0,0"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem Tag="{x:Static theme:AppTheme.Dark}">
+                                <StackPanel>
+                                    <ui:SymbolIcon Symbol="WeatherMoon24"
+                           FontSize="32"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Sombre" HorizontalAlignment="Center" Margin="0,8,0,0"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem Tag="{x:Static theme:AppTheme.System}">
+                                <StackPanel>
+                                    <ui:SymbolIcon Symbol="Desktop24"
+                           FontSize="32"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Système" HorizontalAlignment="Center" Margin="0,8,0,0"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                </StackPanel>
+                            </ListBoxItem>
+                        </ListBox>
+
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 
         <!-- Boutons de bas de page -->
         <StackPanel x:Name="Footer"
-                    Grid.Row="2" 
+                    Grid.Row="2"
                     Orientation="Horizontal"
-                    HorizontalAlignment="Right" 
-                    Margin="0">
-            <Button x:Name="Cancel" 
-                     Content="{lang:Loc Cancel}" 
-                    Margin="0 0 8 0"
-                    Click="CancelButton_Click"/>
+                    HorizontalAlignment="Right"
+                    Margin="24,8,24,20">
+            <ui:Button x:Name="Cancel"
+                       Content="{lang:Loc Cancel}"
+                       Icon="{ui:SymbolIcon Dismiss24}"
+                       Appearance="Secondary"
+                       MinWidth="110"
+                       Margin="0,0,8,0"
+                       Click="CancelButton_Click"/>
 
-            <Button x:Name="SaveButton" 
-                    Content="{lang:Loc Save}" 
-                    Background="{DynamicResource PrimaryHueMidBrush}"
-                    Click="SaveButton_Click"/>
+            <ui:Button x:Name="SaveButton"
+                       IsEnabled="False"
+                       Content="{lang:Loc Save}"
+                       Icon="{ui:SymbolIcon Save24}"
+                       Appearance="Primary"
+                       MinWidth="110"
+                       Click="SaveButton_Click"/>
         </StackPanel>
     </Grid>
-</Window>
+</ui:FluentWindow>

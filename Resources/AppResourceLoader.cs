@@ -13,12 +13,12 @@ namespace Toltech.App.Resources
         public static void ApplySettings(AppSettings s)
         {
             var res = Application.Current.Resources;
+            
+            LanguageManager.ApplyFromSettings();
+            ThemeManager.ApplyFromSettings();
 
             // Noms d'enum (pour les converters / sélections).
-            res["DefaultUnit"] = s.LengthUnit.ToString();
-            res["DefaultAngle"] = s.AngleUnit.ToString();
-            res["DensityUnit"] = s.DensityUnit.ToString();
-            res["Language"] = s.Language.ToString();
+            res["LanguageDisplay"] = s.Language.DisplayName();
             res["Theme"] = s.Theme.ToString();
 
             // Symboles affichables (en-têtes de colonnes, labels...).
@@ -28,8 +28,6 @@ namespace Toltech.App.Resources
             res["AngleUnitSymbol"] = s.AngleUnit.Symbol();
             res["DensityUnitSymbol"] = s.DensityUnit.Symbol();
 
-            LanguageManager.ApplyFromSettings();
-            ThemeManager.ApplyFromSettings();
         }
     }
 }

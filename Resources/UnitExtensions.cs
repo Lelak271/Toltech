@@ -73,6 +73,7 @@
             _ => throw new ArgumentOutOfRangeException(nameof(u))
         };
 
+       
         /// <summary>Valeur de 1 unité exprimée en kg/m³.</summary>
         public static double ToBaseFactor(this SupportedDensityUnit u) => u switch
         {
@@ -83,6 +84,19 @@
             _ => throw new ArgumentOutOfRangeException(nameof(u))
         };
     }
+
+    /// <summary>Élément de liste : valeur de l'enum + symbole affiché.</summary>
+    public sealed record UnitOption<T>(T Value, string Symbol) where T : struct, Enum;
+
+    public static class UnitOptions
+    {
+        /// <summary>Construit la liste des choix à partir de l'enum et de sa fonction Symbol.</summary>
+        public static IReadOnlyList<UnitOption<T>> Of<T>(Func<T, string> symbol) where T : struct, Enum =>
+            Enum.GetValues<T>()
+                .Select(u => new UnitOption<T>(u, symbol(u)))
+                .ToList();
+    }
+
 
     #endregion
 

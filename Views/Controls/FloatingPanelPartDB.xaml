@@ -15,7 +15,8 @@
 
     <ui:FluentWindow.Resources>
         <conv:ByteArrayToImageConverter x:Key="ByteArrayToImageConverter"/>
-
+        <conv:DensityUnitConverter x:Key="DensityUnitConverter"/>
+        
         <!-- Texte centré verticalement dans les cellules -->
         <Style x:Key="CellTextStyle" TargetType="TextBlock">
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -147,6 +148,31 @@
                           behaviors:DataGridSelectedItemsBehavior.SelectedItems="{Binding SelectedParts}">
 
                     <DataGrid.Columns>
+                        <!-- Indicateur de modification non enregistrée -->
+                        <DataGridTemplateColumn Width="28" IsReadOnly="True" CanUserResize="False">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="10" Height="10"
+                     Fill="#F5B800"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     IsHitTestVisible="False"
+                     ToolTip="Modifications non enregistrées">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        
                         <DataGridTextColumn Header="{lang:Loc Name}"
                                             Binding="{Binding NamePart}"
                                             Width="*"
@@ -154,7 +180,10 @@
                                             EditingElementStyle="{StaticResource CellEditStyle}"/>
 
                         <DataGridTextColumn Header="{lang:Loc MasseVol}"
-                    Binding="{Binding MasseVol}"
+                     Binding="{Binding MasseVol,
+                              Converter={StaticResource DensityUnitConverter},
+                              ConverterCulture=fr-FR,
+                              StringFormat={}{0:G6}}"
                     Width="130"
                     ElementStyle="{StaticResource CellTextStyle}"
                     EditingElementStyle="{StaticResource CellEditStyle}">

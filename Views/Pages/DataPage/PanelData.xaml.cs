@@ -12,7 +12,8 @@ using Toltech.Cad.Model;
 using Toltech.Solver.Contracts;
 using static Toltech.App.Models.NodesDefinition;
 using static Toltech.App.Services.EventsManager;
-using System.Diagnostics;
+using Toltech.App.Resources;
+using System.Windows.Data;
 
 namespace Toltech.App.FrontEnd.Controls
 {
@@ -33,8 +34,6 @@ namespace Toltech.App.FrontEnd.Controls
         public PanelData()
         {
             InitializeComponent();
-
-
 
             Loaded += OnLoaded;
         }
@@ -59,8 +58,8 @@ namespace Toltech.App.FrontEnd.Controls
         public ObservableCollection<Part> AvailableParts { get; } = new();
 
         private static void OnParentViewModelChanged(
-    DependencyObject d,
-    DependencyPropertyChangedEventArgs e)
+                                DependencyObject d,
+                                DependencyPropertyChangedEventArgs e)
         {
             if (d is PanelData control)
                 control.UpdateAvailableParts();
@@ -126,6 +125,9 @@ namespace Toltech.App.FrontEnd.Controls
             EventsManager.PartCrud -= OnPartCrudAsync;
             EventsManager.PartCrud += OnPartCrudAsync;
 
+            AppSettings.UnitsChanged -= OnUnitsChanged;
+            AppSettings.UnitsChanged += OnUnitsChanged;
+
             if (_cadSelectionController is null)
             {
                 var cadSelectionService = ((App)Application.Current).CadSelectionService;
@@ -137,10 +139,12 @@ namespace Toltech.App.FrontEnd.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            // Un événement maintenu par un service global garde une référence
-            // vers ce UserControl : on se désabonne au déchargement.
+            // Un événement maintenu par un service global (ou statique) garde une
+            // référence vers ce UserControl : on se désabonne au déchargement,
+            // dans le même ordre que l'abonnement.
             EventsManager.NodeChanged -= OnNodeChangedAsync;
             EventsManager.PartCrud -= OnPartCrudAsync;
+            AppSettings.UnitsChanged -= OnUnitsChanged;
 
             if (_cadSelectionController is not null)
             {
@@ -214,6 +218,17 @@ namespace Toltech.App.FrontEnd.Controls
                 return;
 
             await viewModel.SavePanelAsync(modelData, false);
+        }
+
+        private void OnUnitsChanged(object? sender, UnitsChangedEventArgs e)
+        {
+            if (!e.LengthChanged) return;
+
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var box in new[] { PointXText, PointYText, PointZText, DirectionXText, DirectionYText, DirectionZText })
+                    BindingOperations.GetBindingExpression(box, Wpf.Ui.Controls.NumberBox.ValueProperty)?.UpdateTarget();
+            });
         }
 
         #endregion

@@ -3,9 +3,6 @@ using System.Windows;
 using System.Windows.Controls.Primitives;
 using Toltech.App.FrontEnd.Controls;
 using Toltech.App.FrontEnd.GraphePage.Controls;
-using Toltech.App.Resources;
-using Toltech.App.Resources.ColorTheme;
-using Toltech.App.Services;
 using Toltech.App.ToltechCalculation.Helpers;
 using Toltech.App.Utilities;
 using Toltech.App.ViewModels;
@@ -31,7 +28,7 @@ namespace Toltech.App.Views
 
 
             RestoreWindowPosition();
-            ThemeToggle.IsChecked = App.Settings.Theme == AppTheme.Dark;
+            //ThemeToggle.IsChecked = App.Settings.Theme == AppTheme.Dark;
         }
 
         #endregion

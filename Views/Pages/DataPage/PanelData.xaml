@@ -33,7 +33,9 @@
         <conv:SelectedGroupToBoolConverter x:Key="SelectedGroupToBoolConverter"/>
         <conv:SelectedGroupToVisibilityConverter x:Key="SelectedGroupToVisibilityConverter"/>
         <conv:LinkageTypeLocalizationConverter x:Key="LinkageTypeLocalizationConverter"/>
-
+        <conv:LengthUnitConverter  x:Key="LengthUnitConverter"/>
+        <conv:AngleUnitConverter   x:Key="AngleUnitConverter"/>
+        
         <!-- ===== Carte principale : accent quand actif, atténuée quand inactif ===== -->
         <Style x:Key="ActiveAwareContainer" TargetType="Border">
             <Setter Property="CornerRadius" Value="8"/>
@@ -577,7 +579,9 @@
                                               Margin="0,0,4,0"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointX}" 
-                                              Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordX, Mode=TwoWay,
+                                                      UpdateSourceTrigger=PropertyChanged,
+                                                      Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
@@ -586,7 +590,9 @@
                                 <ui:NumberBox x:Name="PointYText" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                          Style="{DynamicResource NumericBoxPointStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_PointY}"
-                                         Value="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordY, Mode=TwoWay, 
+                                                        UpdateSourceTrigger=PropertyChanged,
+                                                        Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
@@ -595,7 +601,9 @@
                                 <ui:NumberBox x:Name="PointZText" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                          Style="{DynamicResource NumericBoxPointStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_PointZ}"
-                                         Value="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordZ, Mode=TwoWay, 
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
                                             Executed="PickPointMenuItem_Executed"/>
@@ -621,7 +629,9 @@
                                 <ui:NumberBox x:Name="DirectionXText" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirX}"
-                                         Value="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordU, Mode=TwoWay,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
@@ -630,7 +640,9 @@
                                 <ui:NumberBox x:Name="DirectionYText" Grid.Row="1" Grid.Column="1" Margin="4,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirY}"
-                                         Value="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordV, Mode=TwoWay,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
@@ -639,7 +651,9 @@
                                 <ui:NumberBox x:Name="DirectionZText" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
                                          Style="{DynamicResource NumericBoxDirectionStyle}"
                                          PlaceholderText="{lang:Loc Placeholder_DirZ}"
-                                         Value="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                         Value="{Binding CoordW, Mode=TwoWay,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
                                         <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>

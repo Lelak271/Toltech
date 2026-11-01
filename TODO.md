@@ -78,7 +78,7 @@ Liste des tâches à réalisées
 		Empêcher les ComboBox d’afficher la même pièce : afficher un message d’erreur si la pièce est déjà sélectionnée.
 		Ajouter la sauvegarde automatique quand on active ou désactive une donnée.
 		Adapter le ruban principal : les images sont rognées à certains endroits.
-=> Ajouter un bouton light mode / dark mode en haut à droite de la fenêtre principale.
+		Ajouter un bouton light mode / dark mode en haut à droite de la fenêtre principale.
 Corriger l’affichage des données inversées dans le TreeView (priorité moyenne).
 Pour l’attribut, afficher uniquement le nœud sélectionné et non tous ses parents (priorité faible).
 

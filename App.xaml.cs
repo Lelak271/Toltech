@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using Microsoft.Win32;
 using Toltech.App.Properties;
 using Toltech.App.Resources;
 using Toltech.App.Services.CAD;
@@ -11,6 +12,7 @@ using Toltech.App.Views;
 using Toltech.Cad.Abstractions;
 using Toltech.FreeCAD;
 using Toltech.Solver.Contracts;
+using Toltech.App.Resources.ColorTheme;
 
 namespace Toltech.App
 {
@@ -126,7 +128,7 @@ namespace Toltech.App
                 await UiSettings.LoadAsync();
 
 
-
+                EventWindow(); //
 
                 //if (!AccessControl.VerifyAccess())
                 //{
@@ -153,6 +155,22 @@ namespace Toltech.App
             }
         }
 
+        private void EventWindow()
+        {
+            // Dans OnStartup, après la création de Settings
+            SystemEvents.UserPreferenceChanged += (_, e) =>
+            {
+                if (e.Category != UserPreferenceCategory.General || Settings.Theme != AppTheme.System)
+                    return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    ThemeManager.ApplyFromSettings();   // réapplique le thème système à l'interface
+                    Settings.RefreshEffectiveTheme();   // met le toggle à jour
+                });
+            };
+
+        }
         protected override async void OnExit(ExitEventArgs e)
         {
             Logger.LogInfo("Application fermée");

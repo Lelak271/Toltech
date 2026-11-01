@@ -196,12 +196,17 @@
                     <StackPanel>
                         <TextBlock Text="{lang:Loc Part1}" />
                         <ComboBox x:Name="Part1Text"
-                                  VerticalAlignment="Top"
-                                  IsEditable="False"
-                                  DisplayMemberPath="NamePart"
-                                  SelectedValuePath="Id"
-                                  ItemsSource="{Binding AvailableParts1, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
-                                  SelectedValue="{Binding PartReq1Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+          DisplayMemberPath="NamePart"
+          SelectedValuePath="Id"
+          ItemsSource="{Binding AvailableParts1, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
+          SelectedValue="{Binding PartReq1Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+          SelectionChanged="Part_SelectionChanged">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
                     </StackPanel>
                 </Border>
 
@@ -228,12 +233,17 @@
                     <StackPanel>
                         <TextBlock Text="{lang:Loc Part2}" />
                         <ComboBox x:Name="Part2Text"
-                                  VerticalAlignment="Top"
-                                  IsEditable="False"
                                   DisplayMemberPath="NamePart"
                                   SelectedValuePath="Id"
                                   ItemsSource="{Binding AvailableParts2, RelativeSource={RelativeSource AncestorType=localControls:PanelReqs}}"
-                                  SelectedValue="{Binding PartReq2Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"/>
+                                  SelectedValue="{Binding PartReq2Id, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                  SelectionChanged="Part_SelectionChanged">
+                            <ComboBox.ItemContainerStyle>
+                                <Style TargetType="ComboBoxItem" BasedOn="{StaticResource {x:Type ComboBoxItem}}">
+                                    <Setter Property="IsEnabled" Value="{Binding IsEnabled}"/>
+                                </Style>
+                            </ComboBox.ItemContainerStyle>
+                        </ComboBox>
                     </StackPanel>
                 </Border>
 

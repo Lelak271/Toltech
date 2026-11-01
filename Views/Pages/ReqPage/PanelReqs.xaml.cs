@@ -1,15 +1,17 @@
-﻿using System.Windows;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Toltech.App.Models;
+using Toltech.App.Services.CAD;
 using Toltech.App.ViewModels;
 using Toltech.Cad.Model;
-using Toltech.App.Services.CAD;
-using System.Windows.Input;
 
 namespace Toltech.App.FrontEnd.Controls
 {
-    public partial class PanelReqs : UserControl
+    public sealed partial class PanelReqs : UserControl
     {
         private string currentContextTarget = string.Empty; // "Part1" ou "Part2"
 
@@ -32,7 +34,7 @@ namespace Toltech.App.FrontEnd.Controls
                 nameof(ParentViewModel),
                 typeof(RequirementsViewModel),
                 typeof(PanelReqs),
-                new PropertyMetadata(null));
+               new PropertyMetadata(null, OnParentViewModelChanged));
 
 
         // Création d'une DependencyProperty pour faciliter le binding
@@ -51,12 +53,55 @@ namespace Toltech.App.FrontEnd.Controls
 
         #endregion
 
-        public IEnumerable<Part> AvailableParts1 =>
-    ParentViewModel.Parts
-        .Where(p => p.Id != Requirement.PartReq2Id);
-        public IEnumerable<Part> AvailableParts2 =>
-    ParentViewModel.Parts
-        .Where(p => p.Id != Requirement.PartReq1Id);
+        #region ComboBox Gestion
+        private static void OnParentViewModelChanged(
+                        DependencyObject d,
+                        DependencyPropertyChangedEventArgs e)
+        {
+            if (d is PanelReqs control)
+                control.UpdateAvailableParts();
+        }
+
+        private bool _listsBuilt;
+
+        private void UpdateAvailableParts()
+        {
+            if (ParentViewModel?.Parts == null)
+                return;
+
+            // Reconstruit les listes seulement si l'ensemble des pièces a changé.
+            if (!_listsBuilt || AvailableParts1.Count != ParentViewModel.Parts.Count)
+            {
+                AvailableParts1.Clear();
+                AvailableParts2.Clear();
+
+                foreach (var part in ParentViewModel.Parts)
+                {
+                    AvailableParts1.Add(new PartChoice(part));
+                    AvailableParts2.Add(new PartChoice(part));
+                }
+                _listsBuilt = true;
+            }
+
+            // Les sélections sont lues sur les combobox : fiable quel que soit l'UpdateSourceTrigger.
+            var selected1 = Part1Text.SelectedValue as int? ?? Requirement?.PartReq1Id;
+            var selected2 = Part2Text.SelectedValue as int? ?? Requirement?.PartReq2Id;
+
+            foreach (var c in AvailableParts1) c.IsEnabled = selected2 == null || c.Id != selected2;
+            foreach (var c in AvailableParts2) c.IsEnabled = selected1 == null || c.Id != selected1;
+        }
+
+
+        private void Part_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (IsLoaded)
+                UpdateAvailableParts();
+        }
+
+        public ObservableCollection<PartChoice> AvailableParts1 { get; } = new();
+        public ObservableCollection<PartChoice> AvailableParts2 { get; } = new();
+
+        #endregion
 
         #region Sélection CAO
 
@@ -126,4 +171,32 @@ namespace Toltech.App.FrontEnd.Controls
         #endregion
 
     }
+
+    /// <summary>
+    /// Represents a selectable part with properties for identification, name, and enabled state. Notifies listeners
+    /// when property values change.
+    /// </summary>
+    public sealed class PartChoice : INotifyPropertyChanged
+    {
+        public PartChoice(Part part) => Part = part;
+
+        public Part Part { get; }
+        public int Id => Part.Id;
+        public string NamePart => Part.NamePart;
+
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value) return;
+                _isEnabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+    }
+
 }

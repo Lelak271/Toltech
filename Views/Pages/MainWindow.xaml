@@ -3,11 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:local="clr-namespace:Toltech.App"
     xmlns:views="clr-namespace:Toltech.App.Views"
     xmlns:controls="clr-namespace:Toltech.App.FrontEnd.Controls"
     xmlns:vm="clr-namespace:Toltech.App.ViewModels"
     xmlns:conv="clr-namespace:Toltech.App.Converters"
     xmlns:lang="clr-namespace:Toltech.App.Resources.Lang"
+    xmlns:theme="clr-namespace:Toltech.App.Resources.ColorTheme"
     x:Name="MainWindowApp"
     Width="1200"
     Height="600"
@@ -23,7 +25,6 @@
 
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <conv:BoolToGridLengthConverter x:Key="BoolToGridLengthConverter"/>
-        <conv:DensityUnitToSymbolConverter x:Key="DensityUnitToSymbolConverter"/>
 
         <!-- ===== Remplacement des RibbonGroupBox : GroupBox avec titre en bas ===== -->
         <Style x:Key="RibbonGroupStyle" TargetType="GroupBox">
@@ -116,12 +117,12 @@
 
                             <!-- Curseur -->
                             <Border x:Name="Thumb"
-                            Width="22" Height="22"
-                            CornerRadius="11"
-                            Margin="3"
-                            HorizontalAlignment="Left"
-                            Background="White"
-                            RenderTransformOrigin="0.5,0.5">
+                                        Width="22" Height="22"
+                                        CornerRadius="11"
+                                        Margin="3"
+                                        HorizontalAlignment="Left"
+                                        Background="White"
+                                        RenderTransformOrigin="0.5,0.5">
                                 <Border.RenderTransform>
                                     <TranslateTransform x:Name="ThumbTransform" X="0" />
                                 </Border.RenderTransform>
@@ -218,10 +219,17 @@
             <DynamicResource ResourceKey="ApplicationBackgroundBrush"/>
         </Grid.Background>
 
-        <ToggleButton x:Name="ThemeToggle" Panel.ZIndex="999" Grid.Row="0" Grid.RowSpan="2"
-                       Style="{StaticResource ThemeToggleStyle}"
+        <ToggleButton x:Name="ThemeToggle"
+                      Panel.ZIndex="999" 
+                      Grid.Row="0"
+                      Grid.RowSpan="2"
+                      Style="{StaticResource ThemeToggleStyle}"
+                      IsChecked="{Binding Source={x:Static local:App.Settings},
+                                  Path=IsDark,
+                                  Mode=TwoWay}"
                        Margin="0,-100,30,0"
-                       VerticalAlignment="Center" HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Right"
                        ToolTip="Basculer entre mode clair et mode sombre"
                        Click="ThemeChanged_Click" />
         
@@ -545,16 +553,16 @@
                                 <StackPanel Orientation="Horizontal" Margin="5,0">
                                     <TextBlock Text="{lang:Loc LanguageLabel}"/>
                                     <TextBlock Text=" : "/>
-                                    <TextBlock Text="{DynamicResource Language}"/>
+                                    <TextBlock Text="{DynamicResource LanguageDisplay}"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="5,0">
                                     <TextBlock Text="{lang:Loc UnitLabel}"/>
                                     <TextBlock Text=" : "/>
-                                    <TextBlock Text="{DynamicResource DefaultUnit}"/>
+                                    <TextBlock Text="{DynamicResource LengthUnitSymbol}"/>
                                     <TextBlock Text=" / "/>
-                                    <TextBlock Text="{DynamicResource DefaultAngle}"/>
+                                    <TextBlock Text="{DynamicResource AngleUnitSymbol}"/>
                                     <TextBlock Text=" / "/>
-                                    <TextBlock Text="{DynamicResource DensityUnit}"/>
+                                    <TextBlock Text="{DynamicResource DensityUnitSymbol}"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>

@@ -214,14 +214,21 @@ namespace Toltech.App.ViewModels
 
             // Retrieve updated parts from the database.
             var partsResult = await _domainService.GetAllPartsAsync();
+
             if (partsResult.IsFailure)
                 return;
 
             // Clear and reload the collection.
             Parts.Clear();
 
-            foreach (var part in partsResult.Value.OrderBy(p => p.NamePart))
+            foreach (var dbPart in partsResult.Value.OrderBy(p => p.NamePart))
             {
+                // Create a new Part instance.
+                var part = new Part();
+
+                // Load database values and initialize IsDirty.
+                part.LoadFromDb(dbPart);
+
                 Parts.Add(part);
             }
 
@@ -424,16 +431,6 @@ namespace Toltech.App.ViewModels
         }
 
         #endregion
-
-        private async Task DefinedFixedPart()
-        {
-            var fixedPart = await _domainService.GetFixedPartAsync();
-            if (fixedPart.IsFailure || fixedPart.Value == null) return;
-
-            var partInCollection = _mainVM.Parts.FirstOrDefault(p => p.Id == fixedPart.Value.Id);
-            if (partInCollection != null)
-                FixedPart = partInCollection;
-        }
 
     }
 }

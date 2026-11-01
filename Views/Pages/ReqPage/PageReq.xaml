@@ -24,7 +24,6 @@
                                       TrueImage="pack://application:,,,/Asset/Graphe.png"
                                       FalseImage="pack://application:,,,/Asset/eyehide.png"/>
 
-        
     </UserControl.Resources>
 
     <DockPanel LastChildFill="True" >

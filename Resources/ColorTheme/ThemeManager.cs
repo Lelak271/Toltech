@@ -51,7 +51,7 @@ namespace Toltech.App.Resources.ColorTheme
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ApplyWPF_UITheme(theme);
-                ApplyColorTheme(theme);
+                //ApplyColorTheme(theme);
             });
         }
 
@@ -75,31 +75,7 @@ namespace Toltech.App.Resources.ColorTheme
                     break;
             }
         }
-
-        private static void ApplyColorTheme(AppTheme theme)
-        {
-            var merged = Application.Current.Resources.MergedDictionaries;
-
-            string fileName = GetThemeFileName(theme);
-            string uri = $"pack://application:,,,/Toltech.App;component/Resources/ColorTheme/{fileName}";
-
-            // Suppression des anciens thèmes couleur
-            for (int i = merged.Count - 1; i >= 0; i--)
-            {
-                var source = merged[i].Source?.OriginalString;
-                if (source != null &&
-                    AllThemeFiles.Contains(System.IO.Path.GetFileName(source)))
-                {
-                    merged.RemoveAt(i);
-                }
-            }
-
-            merged.Add(new ResourceDictionary
-            {
-                Source = new Uri(uri, UriKind.Absolute)
-            });
-        }
-
+       
         #endregion
 
         #region Mapping fichiers
