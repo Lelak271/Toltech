@@ -19,6 +19,9 @@
 
         <conv:IdToNameConverter x:Key="IdToNameConverter"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:LengthUnitConverter  x:Key="LengthUnitConverter"/>
+        <conv:AngleUnitConverter   x:Key="AngleUnitConverter"/>
+        <conv:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter"/>
 
         <!-- Style de la case à cocher -->
         <Style TargetType="{x:Type CheckBox}"
@@ -153,15 +156,36 @@
 
             <!-- Valeur de tolérance -->
 
-            <ui:NumberBox Grid.Row="1"
-                     Grid.Column="1" Grid.ColumnSpan="2"
-                     Margin="20,6,20,0"
-                          SpinButtonPlacementMode="Hidden"
-                     Value="{Binding Value,
-                                    Mode=TwoWay,
-                                    UpdateSourceTrigger=PropertyChanged}"
-                     PlaceholderText="{Binding PlaceholderTolerance,
-                         RelativeSource={RelativeSource AncestorType={x:Type local:ToleranceEditor}}}"/>
+            <Grid Grid.Row="1"
+      Grid.Column="1"
+      Grid.ColumnSpan="2"
+      Margin="20,0,20,0"> 
+
+                <!-- Champ de saisie -->
+                <ui:NumberBox x:Name="ToleranceValueText"
+                            SpinButtonPlacementMode="Hidden" 
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                    VerticalContentAlignment="Center"
+                    Margin="0 5 0 0  "
+                            Padding="22,0,0,0"
+                            Value="{Binding Value,
+                                            Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged,
+                                            Converter={StaticResource LengthUnitConverter}}"
+                            PlaceholderText="{Binding PlaceholderTolerance,
+                                                      RelativeSource={RelativeSource AncestorType={x:Type local:ToleranceEditor}}}"/>
+
+                <!-- Symbole ± affiché lorsque le champ contient une valeur -->
+                <TextBlock Visibility="Visible"
+                            Text="±"
+                            Foreground="Gray"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Left"
+                            Margin="8,5,0,0"
+                            IsHitTestVisible="False"
+                    />
+            </Grid>
 
         </Grid>
 

@@ -29,6 +29,9 @@
 
     #region Symboles et facteurs
 
+    /// <summary>
+    /// Provides extension methods for supported units to retrieve their symbols and conversion factors to base units.
+    /// </summary>
     public static class UnitExtensions
     {
         // ---------- Longueur ----------

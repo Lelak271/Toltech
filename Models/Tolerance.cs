@@ -105,5 +105,35 @@ namespace Toltech.App.Models
 
         #endregion
 
+        #region Load / Sync
+        public void LoadFromDb(Tolerance db)
+        {
+            if (db == null)
+                return;
+
+            BeginLoad();
+
+            Id = db.Id;
+            Description = db.Description;
+            Name = db.Name;
+            Tol = db.Tol;
+
+            EndLoad();
+        }
+
+        private void BeginLoad()
+        {
+            _isLoading = true;
+        }
+
+        private void EndLoad()
+        {
+            _isLoading = false;
+            IsDirty = false;
+            IsOutOfSync = false;
+        }
+
+        #endregion
+
     }
 }

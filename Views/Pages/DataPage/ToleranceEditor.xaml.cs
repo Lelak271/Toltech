@@ -4,6 +4,8 @@ using Toltech.App.Front;
 using Toltech.App.Services;
 using Toltech.App.ViewModels;
 using static Toltech.App.Services.EventsManager;
+using Toltech.App.Resources;
+using System.Windows.Data;
 
 namespace Toltech.App.Views.Pages.DataPage
 {
@@ -25,6 +27,9 @@ namespace Toltech.App.Views.Pages.DataPage
         {
             _mainVM = App.MainVM; // TODO Pas super jolie
             _domainService = _mainVM.DomainService;
+
+            AppSettings.UnitsChanged -= OnUnitsChanged;
+            AppSettings.UnitsChanged += OnUnitsChanged;
 
             InitializeComponent();
         }
@@ -148,6 +153,18 @@ namespace Toltech.App.Views.Pages.DataPage
 
 
 
+        }
+
+
+        private void OnUnitsChanged(object? sender, UnitsChangedEventArgs e)
+        {
+            if (!e.LengthChanged) return;
+
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var box in new[] { ToleranceValueText})
+                    BindingOperations.GetBindingExpression(box, Wpf.Ui.Controls.NumberBox.ValueProperty)?.UpdateTarget();
+            });
         }
 
     }

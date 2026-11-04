@@ -13,7 +13,7 @@ using static Toltech.App.Services.EventsManager;
 
 namespace Toltech.App.ViewModels
 {
-    public class PartDBViewModel : BaseViewModel
+    public class PartsViewModel : BaseViewModel
     {
         private readonly MainViewModel _mainVM;
         public MainViewModel MainVM => _mainVM;
@@ -22,7 +22,7 @@ namespace Toltech.App.ViewModels
 
         private DomainService _domainService;
         private static bool _subscribed = false;
-        public PartDBViewModel(MainViewModel mainVM)
+        public PartsViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
             _domainService = mainVM.DomainService;
@@ -52,7 +52,7 @@ namespace Toltech.App.ViewModels
             //EventsManager.PartAddedOrDelete += WrapperLoadAsync;
             #endregion
 
-            _ = LoadAsync();
+            //_ = LoadAsync();
         }
 
         #region Collections
@@ -258,7 +258,7 @@ namespace Toltech.App.ViewModels
         #region CRUD
         private async Task CreateAsync()
         {
-            string namePart = "Nouvelle pièce";
+            string namePart = Loc("NewPart");
             var newPart = new Part
             {
                 NamePart = namePart,

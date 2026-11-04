@@ -726,4 +726,13 @@
   <data name="Part_in_the_database" xml:space="preserve">
     <value>part(s) in the database </value>
   </data>
+  <data name="NewPart" xml:space="preserve">
+    <value>New Part</value>
+  </data>
+  <data name="NewTolerance" xml:space="preserve">
+    <value>New tolerance</value>
+  </data>
+  <data name="SelectPointInCAD" xml:space="preserve">
+    <value>Select a point in CAD</value>
+  </data>
 </root>

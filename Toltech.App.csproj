@@ -92,7 +92,6 @@
 	<None Remove="Asset\Capg.png" />
 	<None Remove="Asset\clean.png" />
 	<None Remove="Asset\Contact.png" />
-	<None Remove="Asset\DarkMode.png" />
 	<None Remove="Asset\duplicate_model.png" />
 	<None Remove="Asset\duplicate_model2.png" />
 	<None Remove="Asset\EmptyData.jpg" />
@@ -111,7 +110,6 @@
 	<None Remove="Asset\ImageEmptyModels.png" />
 	<None Remove="Asset\ImageEmptyReqs.png" />
 	<None Remove="Asset\IsFixedPartImg.png" />
-	<None Remove="Asset\LightMode.png" />
 	<None Remove="Asset\LineMeasure.png" />
 	<None Remove="Asset\Linkages\Appui_Plan.png" />
 	<None Remove="Asset\Linkages\encastrement.png" />
@@ -145,7 +143,6 @@
 	<None Remove="Asset\save.png" />
 	<None Remove="Asset\SimpleFolder.png" />
 	<None Remove="Asset\syncDB.png" />
-	<None Remove="Asset\SystemMode.png" />
 	<None Remove="Asset\Template_CdC_Excel_Toltech.xlsx" />
 	<None Remove="Asset\TestGrapheButton.png" />
 	<None Remove="Asset\TheBatman.jpg" />
@@ -197,9 +194,6 @@
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>
 	<Resource Include="Asset\Contact.png" />
-	<Resource Include="Asset\DarkMode.png">
-	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	</Resource>
 	<Resource Include="Asset\duplicate_model2.png">
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>
@@ -255,9 +249,6 @@
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>
 	<Resource Include="Asset\IsFixedPartImg.png">
-	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	</Resource>
-	<Resource Include="Asset\LightMode.png">
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>
 	<Resource Include="Asset\LineMeasure.png">
@@ -383,9 +374,6 @@
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>
 	<Resource Include="Asset\syncDB.png" />
-	<Resource Include="Asset\SystemMode.png">
-	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	</Resource>
 	<Resource Include="Asset\TestGrapheButton.png">
 	  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	</Resource>

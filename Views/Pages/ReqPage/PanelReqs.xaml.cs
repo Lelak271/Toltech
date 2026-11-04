@@ -1,14 +1,15 @@
 ﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
+using System.ComponentModel;
+using System.Windows.Input;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using Toltech.App.Models;
+using Toltech.App.Resources;
 using Toltech.App.Services.CAD;
 using Toltech.App.ViewModels;
 using Toltech.Cad.Model;
-
+using System.Windows.Data;
 namespace Toltech.App.FrontEnd.Controls
 {
     public sealed partial class PanelReqs : UserControl
@@ -21,6 +22,9 @@ namespace Toltech.App.FrontEnd.Controls
         public PanelReqs()
         {
             InitializeComponent();
+
+            AppSettings.UnitsChanged -= OnUnitsChanged;
+            AppSettings.UnitsChanged += OnUnitsChanged;
         }
 
         public RequirementsViewModel ParentViewModel
@@ -169,6 +173,17 @@ namespace Toltech.App.FrontEnd.Controls
         }
 
         #endregion
+
+        private void OnUnitsChanged(object? sender, UnitsChangedEventArgs e)
+        {
+            if (!e.LengthChanged) return;
+
+            Dispatcher.Invoke(() =>
+            {
+                foreach (var box in new[] { PointX, PointY, PointZ, DirU, DirV, DirW })
+                    BindingOperations.GetBindingExpression(box, Wpf.Ui.Controls.NumberBox.ValueProperty)?.UpdateTarget();
+            });
+        }
 
     }
 

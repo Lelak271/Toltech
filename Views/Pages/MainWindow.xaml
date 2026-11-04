@@ -493,7 +493,7 @@
                         <StackPanel Orientation="Horizontal">
                             <ui:Button x:Name="OpenDataBaseButton"
                                        Style="{StaticResource RibbonLargeButtonStyle}"
-                                       Click="OpenFloatingPanelDB_Click">
+                                       Click="OpenFloatingTolerancePanel_Click">
                                 <StackPanel>
                                     <Image Source="/Asset/Logo_DB_tol.png" Style="{StaticResource RibbonIconStyle}"/>
                                     <TextBlock Text="{lang:Loc BtnTol}" HorizontalAlignment="Center"/>
@@ -502,7 +502,7 @@
                             <ui:Button x:Name="OpenDataBasePartButton"
                                        Style="{StaticResource RibbonLargeButtonStyle}"
                                        Margin="20,2,2,2"
-                                       Click="OpenFloatingPartDB_Click">
+                                       Click="OpenFloatingPartPanel_Click">
                                 <StackPanel>
                                     <Image Source="/Asset/Logo_DB_EXI.png" Style="{StaticResource RibbonIconStyle}"/>
                                     <TextBlock Text="{lang:Loc BtnPart}" HorizontalAlignment="Center"/>
@@ -511,7 +511,7 @@
                             <ui:Button x:Name="OpenDataBaseModelButton"
                                        Style="{StaticResource RibbonLargeButtonStyle}"
                                        Margin="20,2,2,2"
-                                       Click="OpenFloatingPanelDB_Click">
+                                       Click="OpenFloatingTolerancePanel_Click">
                                 <StackPanel>
                                     <Image Source="/Asset/Logo_DB_MODEL.png" Style="{StaticResource RibbonIconStyle}"/>
                                     <TextBlock Text="{lang:Loc BtnMod}" HorizontalAlignment="Center"/>

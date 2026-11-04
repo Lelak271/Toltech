@@ -1478,11 +1478,38 @@ namespace Toltech.App.Services
             return _databaseService.InsertToleranceAsync(tolerance);
         }
 
-        // Met à jour une tolérance existante.
-        public Task UpdateToleranceAsync(Tolerance tolerance)
+        public async Task<Result> UpdateTolerancesAsync(IEnumerable<Tolerance> tolerances)
         {
-            return _databaseService.UpdateToleranceAsync(tolerance);
+            var list = tolerances?.Where(t => t != null).ToList() ?? new List<Tolerance>();
+            if (list.Count == 0)
+                return Result.Success();
+
+            try
+            {
+                // --- Validation métier (à adapter : unicité du nom, Tol >= 0, etc.) ---
+                // Exemple si les noms de tolérances doivent être uniques :
+                // var renamed = await ResolveUniqueNamesAsync(list, _databaseService.NumberOfNameToleranceAsync);
+
+                // --- Séparation insert / update ---
+                var toUpdate = list.Where(t => t.Id != 0).ToList();
+
+                // --- Transaction unique ---
+                await _databaseService.UpdateRangeAsync(toUpdate);
+
+                // Reset uniquement après succès global
+                foreach (var tolerance in list)
+                    tolerance.ClearDirty();
+
+                return Result.Success();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Failed to save tolerances ", "", ex);
+                return Result.Failure("Erreur lors de la sauvegarde.", ErrorCode.Unknown);
+            }
         }
+        public async Task<Result> UpdateToleranceAsync(Tolerance tolerance) =>
+                        await UpdateTolerancesAsync(new[] { tolerance });
 
         // Supprime une tolérance.
         public Task DeleteToleranceAsync(Tolerance tolerance)

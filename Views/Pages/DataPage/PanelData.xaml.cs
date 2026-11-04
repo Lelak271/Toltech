@@ -283,9 +283,16 @@ namespace Toltech.App.FrontEnd.Controls
             if (selection.Point is not CadPoint point)
                 return;
 
-            PointXText.Text = point.X.ToString(CultureInfo.InvariantCulture);
-            PointYText.Text = point.Y.ToString(CultureInfo.InvariantCulture);
-            PointZText.Text = point.Z.ToString(CultureInfo.InvariantCulture);
+            Dispatcher.Invoke(() =>
+            {
+                if (Data is not ModelData target)
+                    return;
+
+                target.CoordX = point.X;
+                target.CoordY = point.Y;
+                target.CoordZ = point.Z;
+            });
+
         }
 
         private void HandleDirectionSelection(CadSelection selection)
@@ -293,9 +300,16 @@ namespace Toltech.App.FrontEnd.Controls
             if (selection.Direction is not CadDirection direction)
                 return;
 
-            DirectionXText.Text = direction.U.ToString(CultureInfo.InvariantCulture);
-            DirectionYText.Text = direction.V.ToString(CultureInfo.InvariantCulture);
-            DirectionZText.Text = direction.W.ToString(CultureInfo.InvariantCulture);
+            Dispatcher.Invoke(() =>
+            {
+                if (Data is not ModelData data)
+                    return;
+
+                data.CoordU = direction.U;
+                data.CoordV = direction.V;
+                data.CoordW = direction.W;
+            });
+
         }
 
         #endregion

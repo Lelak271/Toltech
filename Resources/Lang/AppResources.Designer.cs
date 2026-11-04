@@ -1087,6 +1087,24 @@ namespace Toltech.App.Resources.Lang {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à New Part.
+        /// </summary>
+        public static string NewPart {
+            get {
+                return ResourceManager.GetString("NewPart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à New tolerance.
+        /// </summary>
+        public static string NewTolerance {
+            get {
+                return ResourceManager.GetString("NewTolerance", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à No data to display.
         /// </summary>
         public static string NoModelData1 {
@@ -1524,6 +1542,15 @@ namespace Toltech.App.Resources.Lang {
         public static string SelectFolderPathDefault {
             get {
                 return ResourceManager.GetString("SelectFolderPathDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select a point in CAD.
+        /// </summary>
+        public static string SelectPointInCAD {
+            get {
+                return ResourceManager.GetString("SelectPointInCAD", resourceCulture);
             }
         }
         

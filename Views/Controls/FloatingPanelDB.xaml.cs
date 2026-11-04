@@ -7,34 +7,26 @@ namespace Toltech.App.FrontEnd.Controls
 {
     /// <summary>
     /// Fenêtre des tolérances de la base de données.
-    /// Deux modes selon <see cref="ToleranceDBViewModel.IsSelectionMode"/> :
+    /// Deux modes selon <see cref="TolerancesViewModel.IsSelectionMode"/> :
     /// - false : visualisation / édition (boutons CRUD),
     /// - true  : sélection d'une seule valeur (menu contextuel "Link DB").
     /// </summary>
-    public partial class FloatingPanelDB : Window
+    public partial class TolerancePanelWindow : Wpf.Ui.Controls.FluentWindow
     {
-        protected ToleranceDBViewModel ViewModel { get; }
+        protected TolerancesViewModel ViewModel { get; }
 
-        public FloatingPanelDB(ToleranceDBViewModel viewModel)
+        public TolerancePanelWindow(TolerancesViewModel viewModel)
         {
-            ArgumentNullException.ThrowIfNull(viewModel);
+            DataContext = viewModel;
 
             InitializeComponent();
 
             ViewModel = viewModel;
-            DataContext = viewModel;
+        }
 
-            _=InitializeAsync();
-        }
-        public async Task InitializeAsync()
+        private void Tolerances_MouseDoubleClick(object sender,MouseButtonEventArgs e)
         {
-            await ViewModel.LoadTolerancesAsync();
-        }
-        private void Tolerances_MouseDoubleClick(
-    object sender,
-    MouseButtonEventArgs e)
-        {
-            if (DataContext is not ToleranceDBViewModel vm)
+            if (DataContext is not TolerancesViewModel vm)
                 return;
 
             if (vm.LinkedCommand.CanExecute(null))

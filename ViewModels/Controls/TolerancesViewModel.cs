@@ -1,14 +1,13 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
+using System.Diagnostics;
 using System.Windows.Input;
 using Toltech.App.Models;
 using Toltech.App.Services;
 using Toltech.App.Services.Notification;
 using static Toltech.App.Services.EventsManager;
-
 namespace Toltech.App.ViewModels
 {
-    public class ToleranceDBViewModel : BaseViewModel
+    public class TolerancesViewModel : BaseViewModel
     {
         private readonly MainViewModel _mainVM;
         public MainViewModel MainVM => _mainVM;
@@ -26,15 +25,16 @@ namespace Toltech.App.ViewModels
             set => SetProperty(ref _selectedTolerances, value);
         }
 
-        public ToleranceDBViewModel(MainViewModel mainVM)
+        public TolerancesViewModel(MainViewModel mainVM)
         {
             _mainVM = mainVM;
             _domainService = mainVM.DomainService;
+            _notificationService = App.NotificationService;
 
             Tolerances = new ObservableCollection<Tolerance>();
 
             #region ICommand
-            LoadCommand = new AsyncRelayCommand(LoadTolerancesAsync);
+            LoadCommand = new AsyncRelayCommand(LoadAsync);
             SaveCommand = new AsyncRelayCommand(SaveTolerancesAsync);
             CreateCommand = new AsyncRelayCommand(CreateToleranceAsync);
             DeleteCommand = new AsyncRelayCommand(DeleteSelectedTolerancesAsync);
@@ -42,11 +42,16 @@ namespace Toltech.App.ViewModels
             LinkedCommand = new RelayCommand(Select, () => IsSelectionMode && SelectedTolerance is not null);
             #endregion
 
+            #region Events
+
+            // Gestion centrale du Chargement des Parts du modèle actif
+            EventsManager.ModelOpened += OnOpenModel;
+            #endregion
         }
 
-        // ----------------------------------------------------------------
-        // Collections
-        // ----------------------------------------------------------------
+        /// <summary>
+        /// Gets the collection of tolerances.
+        /// </summary>
         public ObservableCollection<Tolerance> Tolerances { get; }
 
         // ----------------------------------------------------------------
@@ -76,11 +81,11 @@ namespace Toltech.App.ViewModels
         // Méthodes Async
         // ----------------------------------------------------------------
 
-        public async Task LoadTolerancesAsync()
+        public async Task LoadAsync()
         {
             if (string.IsNullOrEmpty(ModelManager.ModelActif))
             {
-                MessageBox.Show("Aucun modèle actif sélectionné.", "Erreur", MessageBoxButton.OK, MessageBoxImage.Warning);
+                _dialog.Info("Aucun modèle actif sélectionné.");
                 return;
             }
 
@@ -90,48 +95,71 @@ namespace Toltech.App.ViewModels
                 var tolerances = await _domainService.GetTolerancesAsync();
                 if (tolerances == null || !tolerances.Any()) return;
 
-                foreach (var tol in tolerances)
+                foreach (var dbTol in tolerances)
+                {
+                    // Create a new Tolerance instance.
+                    var tol = new Tolerance();
+
+                    // Load database values and initialize IsDirty.
+                    tol.LoadFromDb(dbTol);
+
                     Tolerances.Add(tol);
+
+                }
             });
+        }
+
+        private async Task OnOpenModel(ModelOpenedEvent e)
+        {
+            try
+            {
+                await LoadAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[PartVM] Erreur lors du rechargement : {ex}");
+            }
         }
 
         public async Task SaveTolerancesAsync()
         {
+            var toSave = Tolerances.Where(p => p.IsDirty).ToList();
+            if (toSave.Count == 0)
+                return;
+
             bool saved = await ExecuteBusyAsync("Sauvegarde des tolérances...", async () =>
             {
-                foreach (var tol in Tolerances)
-                {
-                    if (tol.Id == 0)
-                        await _domainService.InsertToleranceAsync(tol);
-                    else
-                        await _domainService.UpdateToleranceAsync(tol);
-                }
+                await _domainService.UpdateTolerancesAsync(toSave);
             });
 
             if (saved)
-                MessageBox.Show("Tolérances sauvegardées avec succès.", "Succès", MessageBoxButton.OK, MessageBoxImage.Information);
+                _ = _notificationService.ShowNotifAsync("Tolérances sauvegardées avec succès.");
         }
 
         public async Task CreateToleranceAsync()
         {
             bool created = await ExecuteBusyAsync("Création d'une tolérance...", async () =>
             {
-                var newTol = new Tolerance();
+                string nameTol = Loc("NewTolerance");
+                var newTol = new Tolerance
+                { 
+                 Name= nameTol,
+                };
                 await _domainService.InsertToleranceAsync(newTol);
+                Tolerances.Add(newTol);
+                _ = _notificationService.ShowNotifAsync($"Tolérances ajoutée {newTol.Name}.");
+
             });
 
-            // Rechargement attendu pour récupérer l'Id attribué par la base.
-            if (created)
-                await LoadTolerancesAsync();
         }
 
         public async Task DeleteToleranceAsync(Tolerance tol)
         {
             if (tol == null) return;
 
-            var result = MessageBox.Show($"Confirmez-vous la suppression de {tol.Name} ?",
-                                         "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-            if (result != MessageBoxResult.Yes) return;
+            var result = _dialog.Confirm($"Confirmez-vous la suppression de {tol.Name} ?",
+                                         "Confirmation");
+            if (result != true) return;
 
             await ExecuteBusyAsync("Suppression...", async () =>
             {
@@ -140,18 +168,20 @@ namespace Toltech.App.ViewModels
             });
         }
 
+        /// <summary>
+        /// Deletes the selected tolerances after user confirmation.
+        /// </summary>
+        /// <remarks>If no tolerances are selected, the operation is skipped.</remarks>
+        /// <returns>A task that represents the asynchronous delete operation.</returns>
         public async Task DeleteSelectedTolerancesAsync()
         {
             if (SelectedTolerances == null || SelectedTolerances.Count == 0)
                 return;
 
-            var result = MessageBox.Show(
-                $"Confirmez-vous la suppression de {SelectedTolerances.Count} tolérance(s) ?",
-                "Confirmation",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning);
+            var result = _dialog.Confirm(
+                $"Confirmez-vous la suppression de {SelectedTolerances.Count} tolérance(s) ?");
 
-            if (result != MessageBoxResult.Yes)
+            if (result != true)
                 return;
 
             await ExecuteBusyAsync("Suppression des tolérances...", async () =>
@@ -190,7 +220,7 @@ namespace Toltech.App.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Erreur : {ex.Message}", "Erreur", MessageBoxButton.OK, MessageBoxImage.Error);
+                _dialog.Error($"Erreur : {ex.Message}");
                 return false;
             }
             finally

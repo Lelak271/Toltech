@@ -10,23 +10,18 @@ namespace Toltech.App.Resources
     /// </summary>
     public static class AppResourceLoader
     {
-        public static void ApplySettings(AppSettings s)
+        public static void ApplySettings(AppSettings appSetting)
         {
-            var res = Application.Current.Resources;
+            var ressource = Application.Current.Resources;
             
             LanguageManager.ApplyFromSettings();
             ThemeManager.ApplyFromSettings();
 
-            // Noms d'enum (pour les converters / sélections).
-            res["LanguageDisplay"] = s.Language.DisplayName();
-            res["Theme"] = s.Theme.ToString();
-
-            // Symboles affichables (en-têtes de colonnes, labels...).
-            // Chaque affectation REMPLACE la ressource, ce qui déclenche
-            // la mise à jour des DynamicResource.
-            res["LengthUnitSymbol"] = s.LengthUnit.Symbol();
-            res["AngleUnitSymbol"] = s.AngleUnit.Symbol();
-            res["DensityUnitSymbol"] = s.DensityUnit.Symbol();
+            ressource["LanguageDisplay"] = appSetting.Language.DisplayName();
+            ressource["Theme"] = appSetting.Theme.ToString();
+            ressource["LengthUnitSymbol"] = appSetting.LengthUnit.Symbol();
+            ressource["AngleUnitSymbol"] = appSetting.AngleUnit.Symbol();
+            ressource["DensityUnitSymbol"] = appSetting.DensityUnit.Symbol();
 
         }
     }

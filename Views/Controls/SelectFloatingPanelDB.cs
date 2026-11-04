@@ -6,10 +6,10 @@ namespace Toltech.App.Front
 {
     /// <summary>
     /// Fenêtre de sélection d'une tolérance de la base de données.
-    /// Surcouche de <see cref="FloatingPanelDB"/> en mode sélection : aucun XAML propre,
+    /// Surcouche de <see cref="TolerancePanelWindow"/> en mode sélection : aucun XAML propre,
     /// l'API utilisée par les appelants (constructeur, Owner, ToleranceSelected, ShowDialog) est conservée.
     /// </summary>
-    public sealed class SelectFloatingPanelDB : FloatingPanelDB
+    public sealed class SelectFloatingPanelDB : TolerancePanelWindow
     {
         public MainViewModel MainVM { get; }
 
@@ -27,11 +27,11 @@ namespace Toltech.App.Front
             Closed += (_, _) => ViewModel.ToleranceSelected -= OnViewModelToleranceSelected;
         }
 
-        private static ToleranceDBViewModel CreateViewModel(MainViewModel mainVM)
+        private static TolerancesViewModel CreateViewModel(MainViewModel mainVM)
         {
             ArgumentNullException.ThrowIfNull(mainVM);
 
-            return new ToleranceDBViewModel(mainVM)
+            return new TolerancesViewModel(mainVM)
             {
                 IsSelectionMode = true
             };

@@ -89,7 +89,9 @@
                          LostFocus="TextBox_LostFocus"
                          KeyDown="TextBox_KeyDown"
                          behaviors:TextBoxEnterBehavior.MoveFocusOnEnter="False"
-                         behaviors:TextBoxEnterBehavior.AllowEnterKey="True"/>
+                         behaviors:TextBoxEnterBehavior.AllowEnterKey="True"
+                         />
+         
 
                 <!-- Affichage du nom -->
                 <TextBlock x:Name="PART_TextBlock"

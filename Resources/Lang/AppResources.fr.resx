@@ -726,4 +726,13 @@
   <data name="Part_in_the_database" xml:space="preserve">
     <value>pièce(s) dans la base de données</value>
   </data>
+  <data name="NewPart" xml:space="preserve">
+    <value>Nouvelle pièce</value>
+  </data>
+  <data name="NewTolerance" xml:space="preserve">
+    <value>Nouvelle tolérance</value>
+  </data>
+  <data name="SelectPointInCAD" xml:space="preserve">
+    <value>Sélectionner un point dans la CAO</value>
+  </data>
 </root>

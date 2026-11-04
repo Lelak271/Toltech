@@ -90,9 +90,9 @@
 
         <Style x:Key="NumericBoxPointStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadPointStyle}">
             <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
+            <Setter Property="ClearButtonEnabled" Value="True"/>
+            <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter Property="IsHitTestVisible" Value="True"/>
@@ -104,9 +104,9 @@
 
         <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgeStyle}">
             <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
+            <Setter Property="ClearButtonEnabled" Value="True"/>
+            <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter Property="IsReadOnly" Value="False"/>
@@ -583,7 +583,7 @@
                                                       UpdateSourceTrigger=PropertyChanged,
                                                       Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -594,7 +594,7 @@
                                                         UpdateSourceTrigger=PropertyChanged,
                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                                         Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -605,7 +605,7 @@
                                                          UpdateSourceTrigger=PropertyChanged,
                                                          Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                             Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -633,7 +633,7 @@
                                                          UpdateSourceTrigger=PropertyChanged,
                                                          Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -644,7 +644,7 @@
                                                          UpdateSourceTrigger=PropertyChanged,
                                                          Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -655,7 +655,7 @@
                                                          UpdateSourceTrigger=PropertyChanged,
                                                          Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>

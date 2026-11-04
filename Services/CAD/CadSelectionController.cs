@@ -1,6 +1,5 @@
 ﻿using System.Net.Http;
 using System.Windows;
-
 using Toltech.App.Views.Controls.CAD;
 using Toltech.Cad.Abstractions;
 using Toltech.Cad.Model;

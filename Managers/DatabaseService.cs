@@ -185,6 +185,9 @@ namespace Toltech.App.Services
                 await _asyncDb.DeleteAsync(entity);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public async Task UpdateRangeAsync<T>(IEnumerable<T> entities)
         {
             ArgumentNullException.ThrowIfNull(entities);

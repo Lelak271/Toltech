@@ -43,17 +43,22 @@ namespace Toltech.App.Resources
         /// </summary>
         public static event EventHandler<UnitsChangedEventArgs>? UnitsChanged;
 
+        // General settings
         public SupportedLanguage Language { get; set; } = SupportedLanguage.fr;
-        public SupportedLengthUnit LengthUnit { get; set; } = SupportedLengthUnit.Millimeter;
-        public SupportedAngleUnit AngleUnit { get; set; } = SupportedAngleUnit.Degre;
-        public SupportedDensityUnit DensityUnit { get; set; } = SupportedDensityUnit.KgPerCubicMeter;
-
         private AppTheme _theme = AppTheme.System;
         public AppTheme Theme
         {
             get => _theme;
             set { if (_theme == value) return; _theme = value; Notify(); Notify(nameof(IsDark)); }
         }
+
+        // Units
+        public SupportedLengthUnit LengthUnit { get; set; } = SupportedLengthUnit.Millimeter;
+        public SupportedAngleUnit AngleUnit { get; set; } = SupportedAngleUnit.Degre;
+        public SupportedDensityUnit DensityUnit { get; set; } = SupportedDensityUnit.KgPerCubicMeter;
+
+        // Display
+        public int DisplayPrecision { get; set; } = 3;
 
         /// <summary>
         /// Lecture : thème effectivement affiché (System inclus).
@@ -69,7 +74,6 @@ namespace Toltech.App.Resources
                     AppTheme.Light => false,
                     _ => SystemThemeHelper.IsDark()
                 };
-                Debug.WriteLine($"[AppSettings] IsDark get : Theme={Theme}, result={value}");
                 return value;
             }
             set => Theme = value ? AppTheme.Dark : AppTheme.Light;
@@ -115,8 +119,6 @@ namespace Toltech.App.Resources
         public void SaveToUserConfig()
         {
             // 1. Relit l'état actuellement persisté AVANT d'écrire :
-            //    c'est la référence pour détecter ce qui change, même si
-            //    plusieurs instances d'AppSettings coexistent.
             var previous = new AppSettings();
 
             // 2. Écriture dans Settings (en mémoire).
@@ -125,17 +127,12 @@ namespace Toltech.App.Resources
             Settings.Default.AngleUnit = AngleUnit.ToString();
             Settings.Default.DensityUnit = DensityUnit.ToString();
             Settings.Default.Theme = Theme.ToString();
-
-            // 3. Persistance sur disque. Si Save() lève une exception, rien
-            //    n'est appliqué ni notifié plus bas.
             Settings.Default.Save();
 
             // 4. Projection vers les ressources XAML (symboles inclus) :
-            //    les DynamicResource se rafraîchissent.
             AppResourceLoader.ApplySettings(this);
 
             // 5. Notification : uniquement si une unité a réellement changé,
-            //    et seulement après la persistance et l'application des ressources.
             var args = new UnitsChangedEventArgs
             {
                 OldLength = previous.LengthUnit,
@@ -156,10 +153,13 @@ namespace Toltech.App.Resources
         public void CopyFrom(AppSettings other)
         {
             Language = other.Language;
+            Theme = other.Theme;
+
             LengthUnit = other.LengthUnit;
             AngleUnit = other.AngleUnit;
             DensityUnit = other.DensityUnit;
-            Theme = other.Theme;
+
+            DisplayPrecision = other.DisplayPrecision;
         }
     }
 }

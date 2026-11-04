@@ -50,12 +50,12 @@ namespace Toltech.App.ViewModels
         public HomePageViewModel HomeVM { get; private set; }
         public DatasViewModel DataVM { get; private set; }
         public RequirementsViewModel RequirementVM { get; private set; }
-        public PartDBViewModel PartVM { get; private set; }
+        public PartsViewModel PartVM { get; private set; }
         public ModelsViewModel ModelsVM { get; private set; }
         public ResultsViewModel ResultsVM { get; private set; }
         public V3DViewModel V3DVM { get; private set; }
 
-        public ToleranceDBViewModel ToleranceVM { get; private set; }
+        public TolerancesViewModel ToleranceVM { get; private set; }
 
         public TreeViewAreaV3ViewModel TreeViewViewModel { get; private set; }
         public LogViewerViewModel StatusBarVM { get; private set; }
@@ -215,14 +215,14 @@ namespace Toltech.App.ViewModels
         {
             TreeViewViewModel = new TreeViewAreaV3ViewModel(this, TreeNodeService, NodeSyncService);
             RequirementVM = new RequirementsViewModel(this, DomainService, TreeViewViewModel);
-            PartVM = new PartDBViewModel(this);
+            PartVM = new PartsViewModel(this);
             DataVM = new DatasViewModel(this, TreeViewViewModel);
             HomeVM = new HomePageViewModel();
             ModelsVM = new ModelsViewModel(this);
             ResultsVM = new ResultsViewModel(this, RequirementVM);
             V3DVM = new V3DViewModel(this);
 
-            ToleranceVM = new ToleranceDBViewModel(this);
+            ToleranceVM = new TolerancesViewModel(this);
 
         }
 
@@ -437,7 +437,6 @@ namespace Toltech.App.ViewModels
         {
             _appSettings.SaveToUserConfig();
 
-            // Log the theme change.
             _logger.LogInfo($"Application theme changed to: {_appSettings.Theme}");
         }
 

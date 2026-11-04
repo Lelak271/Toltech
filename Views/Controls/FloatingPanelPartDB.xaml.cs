@@ -4,11 +4,11 @@ using Toltech.App.ViewModels;
 
 namespace Toltech.App.FrontEnd.Controls
 {
-    public partial class FloatingPanelPartDB : Wpf.Ui.Controls.FluentWindow
+    public partial class PartPanelWindow : Wpf.Ui.Controls.FluentWindow
     {
-        public FloatingPanelPartDB(MainViewModel mainVM)
+        public PartPanelWindow(PartsViewModel toleranceVM)
         {
-            DataContext = mainVM.PartVM;
+            DataContext = toleranceVM;
 
             InitializeComponent();
         }
@@ -29,10 +29,8 @@ namespace Toltech.App.FrontEnd.Controls
         {
             try
             {
-                if (DataContext is PartDBViewModel vm && vm.LoadCommand.CanExecute(null))
+                if (DataContext is PartsViewModel vm && vm.LoadCommand.CanExecute(null))
                 {
-                    // On exécute la commande synchronously ou async selon ton implémentation
-                    //vm.LoadCommand.Execute(null);
                 }
             }
             catch (Exception ex)

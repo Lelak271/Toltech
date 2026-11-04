@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using Toltech.Cad.Abstractions;
-using Toltech.Cad.Model;
 namespace Toltech.App.Views.Controls.CAD
 {
     /// <summary>
     /// Logique d'interaction pour CadSelectionPopup.xaml
     /// </summary>
-    public partial class CadPointSelectionWindow : Window, INotifyPropertyChanged
+    public partial class CadPointSelectionWindow : Wpf.Ui.Controls.FluentWindow, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -62,7 +61,7 @@ namespace Toltech.App.Views.Controls.CAD
             InitializeComponent();
             DataContext = this;
             _cadSelectionService = cadSelectionService;
-            _cadSelectionService.HintReceived +=    OnHintReceived;
+            _cadSelectionService.HintReceived += OnHintReceived;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)

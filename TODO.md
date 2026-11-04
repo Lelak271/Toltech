@@ -93,3 +93,13 @@ Liste des tâches à réalisées
 Mettre les lang Loc sur la class ValidationRule 
 => Améliorer l'analyse avant les résultats (Nouvelle fenetre moderne pour analyse poussé de l'isostatisme et optimistion
 des liaiosn ou directions des liaisons)
+
+--- 
+04/11/2026 
+Mettre en place le meme patern pour la selection CAD sur le panel requirement
+Mettre drapeau en haut à droite ( voir si dll pourrait etre pertinent)
+Scroll à remettre en place pour les eyes button 
+Revoir la logique complete du treeview + epingler le tree 
+mettre en place le dernier modele en cours et la retenir la page finale avant fermeture
+Ajouter image sur db tolérance pour uniformiser les DB
+Traduction panel tolerance 

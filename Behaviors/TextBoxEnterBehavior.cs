@@ -4,6 +4,7 @@ using System.Windows.Input;
 
 namespace Toltech.App.Behaviors
 {
+    #region OLD
     /// <summary>
     /// Comportement attaché pour les TextBox qui gère la touche Enter.
     /// Lorsqu'Enter est pressé :
@@ -64,6 +65,51 @@ namespace Toltech.App.Behaviors
             }
         }
 
+    }
+    
+    #endregion
+
+    public static class TextBoxEnterBehavior2
+    {
+        public static readonly DependencyProperty EnableProperty =
+            DependencyProperty.RegisterAttached(
+                "Enable",
+                typeof(bool),
+                typeof(TextBoxEnterBehavior2),
+                new PropertyMetadata(false, OnEnableChanged));
+
+        public static bool GetEnable(DependencyObject obj) =>
+            (bool)obj.GetValue(EnableProperty);
+
+        public static void SetEnable(DependencyObject obj, bool value) =>
+            obj.SetValue(EnableProperty, value);
+
+        private static void OnEnableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is not TextBox textBox)
+                return;
+
+            if ((bool)e.NewValue)
+                textBox.PreviewKeyDown += TextBox_PreviewKeyDown;
+            else
+                textBox.PreviewKeyDown -= TextBox_PreviewKeyDown;
+        }
+
+        private static void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (sender is not TextBox textBox)
+                return;
+
+            // Laisser Enter fonctionner si le TextBox accepte les retours à la ligne.
+            if (textBox.AcceptsReturn || e.Key != Key.Enter)
+                return;
+
+            // Empêcher le retour à la ligne et le bip sonore.
+            e.Handled = true;
+
+            // Déplacer le focus vers le contrôle suivant.
+            textBox.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
     }
 
 }

@@ -157,7 +157,6 @@ namespace Toltech.App
 
         private void EventWindow()
         {
-            // Dans OnStartup, après la création de Settings
             SystemEvents.UserPreferenceChanged += (_, e) =>
             {
                 if (e.Category != UserPreferenceCategory.General || Settings.Theme != AppTheme.System)

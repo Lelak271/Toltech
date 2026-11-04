@@ -62,32 +62,39 @@ namespace Toltech.App.Views
 
         #region Database
 
-        private void OpenFloatingPanelDB_Click(object sender, RoutedEventArgs e)
+        private readonly Dictionary<Type, Window> _openWindows = new();
+
+        private void ShowSingle<T>(Func<T> create) where T : Window
         {
-            // Récupère le ViewModel principal.
-            if (DataContext is not MainViewModel mainVM)
-                return;
-
-            // Récupère le ViewModel de la base de données.
-            var dbViewModel = mainVM.ToleranceVM;
-
-            // Crée la fenêtre en lui transmettant le ViewModel existant.
-            var floatingWindow = new FloatingPanelDB(dbViewModel)
+            if (_openWindows.TryGetValue(typeof(T), out var existing))
             {
-                Owner = this
-            };
+                if (existing.WindowState == WindowState.Minimized)
+                    existing.WindowState = WindowState.Normal;
 
-            // Affiche la fenêtre sans mode modal.
-            floatingWindow.Show();
+                existing.Activate();
+                return;
+            }
+
+            var window = create();
+            window.Owner = this;
+            window.Closed += (_, _) => _openWindows.Remove(typeof(T));
+            _openWindows[typeof(T)] = window;
+            window.Show();
         }
 
-        private void OpenFloatingPartDB_Click(object sender, RoutedEventArgs e)
+        private void OpenFloatingPartPanel_Click(object sender, RoutedEventArgs e)
         {
             if (!ModelValidationHelper.CheckModelActif(true))
                 return;
-            var floatingWindow = new FloatingPanelPartDB(_mainVM);
-            floatingWindow.Owner = this; // Associe à la fenêtre principale
-            floatingWindow.Show(); // Non modal
+
+            ShowSingle(() => new PartPanelWindow(_mainVM.PartVM));
+        }
+        private void OpenFloatingTolerancePanel_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ModelValidationHelper.CheckModelActif(true))
+                return;
+
+            ShowSingle(() => new TolerancePanelWindow(_mainVM.ToleranceVM));
         }
 
         #endregion
@@ -143,6 +150,7 @@ namespace Toltech.App.Views
 
         private void ThemeChanged_Click(object sender, RoutedEventArgs e)
         {
+            // Changement de theme via Binding sur Instance de App.Setting
             _mainVM.ThemeChanged();
         }
 

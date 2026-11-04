@@ -23,6 +23,8 @@
 
         <conv:IdToNameConverter x:Key="IdToNameConverter"/>
         <conv:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <conv:LengthUnitConverter  x:Key="LengthUnitConverter"/>
+        <conv:AngleUnitConverter   x:Key="AngleUnitConverter"/>
 
         <!-- ===== Carte principale : accent quand actif, atténuée quand inactif ===== -->
         <Style x:Key="ActiveAwareContainer" TargetType="Border">
@@ -68,9 +70,9 @@
 
         <Style x:Key="NumericBoxPointStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadPointStyle}">
             <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
+            <Setter Property="ClearButtonEnabled" Value="True"/>
+            <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="false">
                     <Setter Property="IsHitTestVisible" Value="True"/>
@@ -82,9 +84,9 @@
 
         <Style x:Key="NumericBoxDirectionStyle" TargetType="ui:NumberBox" BasedOn="{StaticResource NumericBoxCadEdgeStyle}">
             <Setter Property="Background" Value="{DynamicResource ControlFillColorDisabledBrush}"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="{DynamicResource ControlElevationBorderBrush}"/>
+            <Setter Property="ClearButtonEnabled" Value="True"/>
+            <Setter Property="SpinButtonPlacementMode" Value="Compact"/>
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                     <Setter Property="IsReadOnly" Value="False"/>
@@ -285,29 +287,33 @@
                                               Margin="0,0,4,0"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointX}"
-                                              Value="{Binding CoordX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordX, Mode=TwoWay,
+                                                           UpdateSourceTrigger=PropertyChanged,
+                                                           Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                         Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
                                 <ui:NumberBox x:Name="PointY" Grid.Row="1" Grid.Column="1" Margin="4,0"
-                                              HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointY}"
-                                              Value="{Binding CoordY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordY, Mode=TwoWay,
+                                                              UpdateSourceTrigger=PropertyChanged,
+                                                              Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                         Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
                                 <ui:NumberBox x:Name="PointZ" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
-                                              HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxPointStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_PointZ}"
-                                              Value="{Binding CoordZ, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordZ, Mode=TwoWay,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickPoint}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickPoint}"
                                         Executed="PickPointMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
@@ -329,32 +335,35 @@
                                            />
 
                                 <ui:NumberBox x:Name="DirU" Grid.Row="1" Grid.Column="0" Margin="0,0,4,0"
-                                              HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirX}"
-                                              Value="{Binding CoordU, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordU, Mode=TwoWay, 
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
                                 <ui:NumberBox x:Name="DirV" Grid.Row="1" Grid.Column="1" Margin="4,0"
-                                              HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirY}"
-                                              Value="{Binding CoordV, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordV, Mode=TwoWay,
+                                                         UpdateSourceTrigger=PropertyChanged,
+                                                         Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
                                 <ui:NumberBox x:Name="DirW" Grid.Row="1" Grid.Column="2" Margin="4,0,0,0"
-                                              HorizontalContentAlignment="Center"
                                               Style="{StaticResource NumericBoxDirectionStyle}"
                                               PlaceholderText="{lang:Loc Placeholder_DirZ}"
-                                              Value="{Binding CoordW, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                              Value="{Binding CoordW, Mode=TwoWay, 
+                                                                UpdateSourceTrigger=PropertyChanged,
+                                                                Converter={StaticResource LengthUnitConverter}}">
                                     <ui:NumberBox.CommandBindings>
-                                        <CommandBinding Command="{x:Static cad:CadCommands.PickEdge}"
+                                        <CommandBinding Command="{x:Static cad:CadSelectionCommands.PickEdge}"
                                                         Executed="PickEdgeMenuItem_Executed"/>
                                     </ui:NumberBox.CommandBindings>
                                 </ui:NumberBox>
